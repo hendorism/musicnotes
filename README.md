@@ -1,4 +1,4 @@
-# musicnotes
+# MusicNotes
 
 Aaron's music notation software.
 
