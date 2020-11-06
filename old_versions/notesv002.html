@@ -1,0 +1,231 @@
+<html>
+  <head>  <title>notesv002.html</title>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  table tr td{
+    padding: 0;
+  }
+  div.controls {
+    position: fixed;
+    top: 0;
+    background-color: #d9f;
+    width: 100%;
+  }
+  button {
+    width:50px;
+    height:50px;
+    border-radius: 3px;
+    border: 0px solid black;
+    background-color: #6688bb;
+  }
+  canvas#mnCanvas {
+    position: relative;
+    top: 270px;
+    border:1px solid black;
+    z-index: -1;
+  }
+  div#xDisplay {
+    position: fixed;
+    top:10;
+    left:400;
+    background-color:#000000;
+    color:#33ffee;
+    border-radius:13px;
+    height:130px;
+    width:130px;
+    font-family:helvetica;
+    font-size:27px;
+  }
+    div#yDisplay {
+    position: fixed;
+    top:10;
+    left:530;
+    background-color:#000000;
+    color:#33ffee;
+    border-radius:13px;
+    height:130px;
+    width:130px;
+    font-family:helvetica;
+    font-size:27px;
+  }
+</style>
+</head>
+<body onclick="updateRender()">
+<div class="controls">
+  <table>
+    <tr>
+    <td><button onclick="c6button();drawLedgerLines();">C6</button></td>
+      <td><button onclick="d6button();drawLedgerLines();">D6</button></td>
+      <td><button onclick="e6button();drawLedgerLines();">E6</button></td>
+      <td><button onclick="f6button();drawLedgerLines();">F6</button></td>
+      <td><button onclick="g6button();drawLedgerLines();">G6</button></td>
+      <td><button onclick="a6button();drawLedgerLines();">A6</button></td>
+      <td><button onclick="b6button();drawLedgerLines();">B6</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="c5button();drawLedgerLines();">C5</button></td>
+      <td><button onclick="d5button();drawLedgerLines();">D5</button></td>
+      <td><button onclick="e5button();drawLedgerLines();">E5</button></td>
+      <td><button onclick="f5button();drawLedgerLines();">F5</button></td>
+      <td><button onclick="g5button();drawLedgerLines();">G5</button></td>
+      <td><button onclick="a5button();drawLedgerLines();">A5</button></td>
+      <td><button onclick="b5button();drawLedgerLines();">B5</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="c4button();drawLedgerLines();">C4</button></td>
+      <td><button onclick="d4button();drawLedgerLines();">D4</button></td>
+      <td><button onclick="e4button();drawLedgerLines();">E4</button></td>
+      <td><button onclick="f4button();drawLedgerLines();">F4</button></td>
+      <td><button onclick="g4button();drawLedgerLines();">G4</button></td>
+      <td><button onclick="a4button();drawLedgerLines();">A4</button></td>
+      <td><button onclick="b4button();drawLedgerLines();">B4</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="c3button();drawLedgerLines();">C3</button></td>
+      <td><button onclick="d3button();drawLedgerLines();">D3</button></td>
+      <td><button onclick="e3button();drawLedgerLines();">E3</button></td>
+      <td><button onclick="f3button();drawLedgerLines();">F3</button></td>
+      <td><button onclick="g3button();drawLedgerLines();">G3</button></td>
+      <td><button onclick="a3button();drawLedgerLines();">A3</button></td>
+      <td><button onclick="b3button();drawLedgerLines();">B3</button></td>
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
+      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);">draw staves</button></td>
+      <td><button onclick="clearCanvas()">clear</button></td>
+      <td><button onclick="drawTrebleCleff(10,50+100*i);console.log(i);">treble clef</button></td>
+      <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
+      <td><button onclick="increaseXten()">x+=10</button></td>
+      <td><button onclick="decreaseXten()">x-=10</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="increaseX_5()">x+=5</button></td>
+      <td><button onclick="decreaseX_5()">x-=5</button></td>
+      <td><button onclick="increaseY_5()">y+=5</button></td>
+      <td><button onclick="decreaseY_5()">y-=5</button></td>
+      <script>
+        function increaseX_5() {x+=5;}
+        function decreaseX_5() {x-=5;}
+        function increaseY_5() {y+=5;}
+        function decreaseY_5() {y-=5;}
+      </script>
+    </tr>
+  </table>
+</div>
+
+
+
+
+<canvas id="mnCanvas"></canvas>
+<div id="xDisplay"></div>
+<div id="yDisplay"></div>
+<script src="https://hendorism.github.io/my-blog/music_notation_v0018.js"></script>
+
+
+<script>
+  var ii = 0;
+  var y = 50;
+  var x = 10;
+  let quan = 12;
+  let spac = 100;
+  let tmar = 50;
+  function clearCanvas() {
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillRect(0, 0, this.width, this.height);
+  }
+  function increaseXten() {
+    x+=10;
+  }
+  function decreaseXten() {
+    x-=10;
+  }
+  var xDisplay = document.getElementById("xDisplay");
+  var yDisplay = document.getElementById("yDisplay");
+  function updateRender() {
+    xDisplay.innerHTML = "      x=" + x;
+    yDisplay.innerHTML = "      y=" + y;
+  }
+  function drawLedgerLines() {
+    if (y>90 && y%2===0) {
+      for (ll=0; ll<(y-90)/5; ll++) {
+        drawLine(x-20, y-10*ll, x+10, y-10*ll);
+      }
+    } else if (y>90 && y%2===1) {
+      for (ll=0; ll<(y-90)/5; ll++) {
+        drawLine(x-20, y-10*ll-5, x+10, y-10*ll-5)
+      }
+    }
+  }
+</script>
+
+
+
+<script>
+      function c6button() {console.log(i);y=30;drawNoteHead(x,y+100*i);resetX();}
+      function d6button() {console.log(i);y=25;drawNoteHead(x,y+100*i);resetX();}
+      function e6button() {console.log(i);y=20;drawNoteHead(x,y+100*i);resetX();}
+      function f6button() {console.log(i);y=15;drawNoteHead(x,y+100*i);resetX();}
+      function g6button() {console.log(i);y=10;drawNoteHead(x,y+100*i);resetX();}
+      function a6button() {console.log(i);y=05;drawNoteHead(x,y+100*i);resetX();}
+      function b6button() {console.log(i);y=00;drawNoteHead(x,y+100*i);resetX();}
+      function c5button() {console.log(i);y=65;drawNoteHead(x,y+100*i);resetX();}
+      function d5button() {console.log(i);y=60;drawNoteHead(x,y+100*i);resetX();}
+      function e5button() {console.log(i);y=55;drawNoteHead(x,y+100*i);resetX();}
+      function f5button() {console.log(i);y=50;drawNoteHead(x,y+100*i);resetX();}
+      function g5button() {console.log(i);y=45;drawNoteHead(x,y+100*i);resetX();}
+      function a5button() {console.log(i);y=40;drawNoteHead(x,y+100*i);resetX();}
+      function b5button() {console.log(i);y=35;drawNoteHead(x,y+100*i);resetX();}
+      function c4button() {console.log(i);y=100;drawNoteHead(x,y+100*i);resetX();}
+      function d4button() {console.log(i);y=95;drawNoteHead(x,y+100*i);resetX();}
+      function e4button() {console.log(i);y=90;drawNoteHead(x,y+100*i);resetX();}
+      function f4button() {console.log(i);y=85;drawNoteHead(x,y+100*i);resetX();}
+      function g4button() {console.log(i);y=80;drawNoteHead(x,y+100*i);resetX();}
+      function a4button() {console.log(i);y=75;drawNoteHead(x,y+100*i);resetX();}
+      function b4button() {console.log(i);y=70;drawNoteHead(x,y+100*i);resetX();}
+      function c3button() {console.log(i);y=135;drawNoteHead(x,y+100*i);resetX();}
+      function d3button() {console.log(i);y=130;drawNoteHead(x,y+100*i);resetX();}
+      function e3button() {console.log(i);y=125;drawNoteHead(x,y+100*i);resetX();}
+      function f3button() {console.log(i);y=120;drawNoteHead(x,y+100*i);resetX();}
+      function g3button() {console.log(i);y=115;drawNoteHead(x,y+100*i);resetX();}
+      function a3button() {console.log(i);y=110;drawNoteHead(x,y+100*i);resetX();}
+      function b3button() {console.log(i);y=105;drawNoteHead(x,y+100*i);resetX();}
+      function resetX() {
+        x+=10;
+        if (x>390) {
+          x=15;
+          i+=1;
+        }
+      }
+
+      function drawLedgerLines() {
+    if (y<50 && y%2===0) {
+        for (i=0; i<(50-y)/10; i++) {
+            drawLine(x=10, y+10*i, x+10, y+10*i);
+        }
+    } else if (y<50 && y%2===1) {
+        for (i=0; i<50-(y-10); i++) {
+            drawLine(x-10, y+10*i, x-10, y+10*i);
+        }
+    } else if (y>90 && y%2===0) {
+        for (i=0; i<y-90; i++) {
+            drawLine(x-10, y-10*i, x+10, y-10*i);
+        }
+    } else if (y>90 && y%2===1) {
+        for (i=0; i<(y-10)-90; i++) {
+            drawLine(x-10, y-10*i, x+10, y-10*i);
+        }
+    }
+  }
+
+</script>
+
+
+   
+</body>
+
+</html>

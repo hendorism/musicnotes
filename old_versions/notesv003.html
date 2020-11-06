@@ -1,0 +1,98 @@
+<html>
+  <head>  <title>notesv002.html</title>
+<style>*{padding:0;margin:0;}
+  div.controls {background-color:#d9f;width:400px;}
+  button {width:50px;}
+</style>
+</head>
+<body>
+<div class="controls">
+  <table>
+    <tr>
+      <td><button onclick="y=30;">C6</button></td>
+      <td><button onclick="y=25;">D6</button></td>
+      <td><button onclick="y=20;">E6</button></td>
+      <td><button onclick="y=15;">F6</button></td>
+      <td><button onclick="y=10;">G6</button></td>
+      <td><button onclick="y=05;">A6</button></td>
+      <td><button onclick="y=00;">B6</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="y=65;">C5</button></td>
+      <td><button onclick="y=60;">D5</button></td>
+      <td><button onclick="y=55;">E5</button></td>
+      <td><button onclick="y=50;">F5</button></td>
+      <td><button onclick="y=45;">G5</button></td>
+      <td><button onclick="y=40;">A5</button></td>
+      <td><button onclick="y=35;">B5</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="y=100;">C4</button></td>
+      <td><button onclick="y=95;">D4</button></td>
+      <td><button onclick="y=90;">E4</button></td>
+      <td><button onclick="y=85;">F4</button></td>
+      <td><button onclick="y=80;">G4</button></td>
+      <td><button onclick="y=75;">A4</button></td>
+      <td><button onclick="y=70;">B4</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="y=135;">C3</button></td>
+      <td><button onclick="y=130;">D3</button></td>
+      <td><button onclick="y=125;">E3</button></td>
+      <td><button onclick="y=120;">F3</button></td>
+      <td><button onclick="y=115;">G3</button></td>
+      <td><button onclick="y=110;">A3</button></td>
+      <td><button onclick="y=105;">B3</button></td>
+    </tr>
+  </table>
+  <table>
+    <tr>
+      <td><button onclick="drawNoteHead(x,y);x+=10;drawLedgerLines();">draw note head</button>
+      <td><button onclick="drawStaves(quan,spac,tmar);">draw staves</button>
+        <td><button onclick="drawTrebleCleff(x,y);">treble clef</button></td>
+    </tr>
+  </table>
+</div>
+<canvas id="mnCanvas"></canvas>
+
+<script>
+  let y = 50;
+  let x = 10;
+  let quan = 12;
+  let spac = 100;
+  let tmar = 50;
+
+  function drawLedgerLines() {
+    if (y<50 && y%2===0) {
+        for (i=0; i<(50-y)/10; i++) {
+            drawLine(x=10, y+10*i, x+10, y+10*i);
+        }
+    } else if (y<50 && y%2===1) {
+        for (i=0; i<50-(y-10); i++) {
+            drawLine(x-10, y+10*i, x-10, y+10*i);
+        }
+    } else if (y>90 && y%2===0) {
+        for (i=0; i<y-90; i++) {
+            drawLine(x-10, y-10*i, x+10, y-10*i);
+        }
+    } else if (y>90 && y%2===1) {
+        for (i=0; i<(y-10)-90; i++) {
+            drawLine(x-10, y-10*i, x+10, y-10*i);
+        }
+    }
+  }
+</script>
+
+
+
+<script src="https://hendorism.github.io/my-blog/music_notation_v0018.js"></script>
+
+
+
+
+
+
+
+</body>
+
+</html>

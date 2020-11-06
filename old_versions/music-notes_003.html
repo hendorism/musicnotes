@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>  <title>music-notes_003</title>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  table tr td{
+    padding: 0;
+  }
+  div.controls {
+    position: fixed;
+    top: 0;
+    background-color: #9396b6;
+    width: 100%;
+  }
+  button {
+    width:50px;
+    height:50px;
+    border-radius: 3px;
+    border: 0px solid black;
+    background-color: #6688bb;
+  }
+  canvas#mnCanvas {
+    position: relative;
+    top: 400px;
+    border:1px solid black;
+    z-index: -1;
+  }
+  td {
+    text-align: center;
+  }
+</style>
+</head>
+<body onclick="updateRender()">
+<div class="controls">
+    <table>
+      <tr>
+        <td><button onclick="">C6</button></td>
+        <td><button onclick="">D6</button></td>
+        <td><button onclick="">E6</button></td>
+        <td><button onclick="">F6</button></td>
+        <td><button onclick="">G6</button></td>
+        <td><button onclick="">A6</button></td>
+        <td><button onclick="">B6</button></td>
+      </tr>
+      <tr>
+        <td><button onclick="">C5</button></td>
+        <td><button onclick="">D5</button></td>
+        <td><button onclick="">E5</button></td>
+        <td><button onclick="">F5</button></td>
+        <td><button onclick="">G5</button></td>
+        <td><button onclick="">A5</button></td>
+        <td><button onclick="">B5</button></td>
+      </tr>
+      <tr>
+        <td><button onclick="">C4</button></td>
+        <td><button onclick="">D4</button></td>
+        <td><button onclick="">E4</button></td>
+        <td><button onclick="">F4</button></td>
+        <td><button onclick="">G4</button></td>
+        <td><button onclick="">A4</button></td>
+        <td><button onclick="">B4</button></td>
+      </tr>
+      <tr>
+        <td><button onclick="">C3</button></td>
+        <td><button onclick="">D3</button></td>
+        <td><button onclick="">E3</button></td>
+        <td><button onclick="">F3</button></td>
+        <td><button onclick="">G3</button></td>
+        <td><button onclick="">A3</button></td>
+        <td><button onclick="">B3</button></td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);">draw staves</button></td>
+        <td><button onclick="increaseYfive()">y+=5</button></td>
+        <td><button onclick="clearCanvas()">clear</button></td>
+        <td><button onclick="drawTrebleCleff(x,80+spac*ii);console.log(i);x+=10;">treble clef</button></td>
+        <td><button onclick="drawSharp(x,y);x+=10;">sharp</button></td>
+        <td><button onclick="drawFlat(x,y);x+=10;">flat</button></td>
+        <td><button onclick="drawDoubleSharp(x,y);x+=10;">double sharp</button></td>
+        <td><button onclick="drawDoubleFlat(x,y);x+=10;">double flat</button></td>
+        <td></td>
+      </tr><tr>
+        <td><button onclick="decreaseXten()">x-=10</button></td>
+        <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
+        <td><button onclick="increaseXten()">x+=10</button></td>
+        <td style="background-color:#99bb99;"><span id="xDisplay"></span></td>
+        <td style="background-color:#99bb99;"><span id="yDisplay"></span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><button onclick="laDeeDah();">ladeedah<script>function laDeeDah() {alert("La dee dah.");}</script></button></td>
+        <td><button onclick="decreaseYfive();">y-=5</button></td>
+        <td><button onclick="toggleRest();">toggle rest</button></td>
+      </tr>
+    </table>
+  </div>
+  
+<canvas id="mnCanvas"></canvas>
+<script src="https://hendorism.github.io/my-blog/music_notation_v0018.js"></script>
+ 
+ 
+<script>
+  var ii = 0;
+  var y = 50;
+  var x = 10;
+  let quan = 12;
+  let spac = 100;
+  let tmar = 50;
+  function displayRests() {
+    console.log("displaying rest icons on duration buttons");
+  }
+  function displayNotes() {
+    console.log("displaying note icons on duration buttons");
+  }
+  function toggleRest() {
+    if (rest === true) {
+      rest = false;
+      displayNotes();
+    } else if (rest === false) {
+      rest = true;
+      displayRests();
+    }
+    console.log("rest = " + rest);
+  }
+  function clearCanvas() {
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillRect(0, 0, this.width, this.height);
+    console.log("clearCanvas() has been called!!!")
+    console.log(ctx.fillStyle);
+  }
+  function increaseXten() {
+    x+=10;
+  }
+  function decreaseXten() {
+    x-=10;
+  }
+  function increaseYfive() {
+    y+=5;
+  }
+  function decreaseYfive() {
+    y-=5;
+  }
+  var xDisplay = document.getElementById("xDisplay");
+  var yDisplay = document.getElementById("yDisplay");
+  function updateRender() {
+    xDisplay.innerHTML = "x=" + x;
+    yDisplay.innerHTML = "y=" + y;
+  }
+  function drawLedgerLines() {
+    if (y>90 && y%2===0) {
+      for (ll=0; ll<(y-90)/10; ll++) {
+        drawLine(x-10, y-10*ll+spac*ii, x+10, y-10*ll+spac*ii);
+      }
+    } else if (y>90 && y%2===1) {
+      for (ll=0; ll<(y-90)/10; ll++) {
+        drawLine(x-10, y-10*ll-5+spac*ii, x+10, y-10*ll-5+spac*ii);
+      }
+    } else if (y<50 && y%2===0) {
+      for (ll=0; ll<(50-y)/10; ll++) {
+        drawLine(x-10, y+10*ll+spac*ii, x+10, y+10*ll+spac*ii);
+      }
+    } else if (y<50 && y%2===1) {
+      for (ll=0; ll<(50-y)/10; ll++) {
+        drawLine(x-10, y+10*ll+5+spac*ii, x+10, y+10*ll+5+spac*ii);
+      }
+    }
+  }
+  var theWholeSong = [];
+  var rest = false;
+  var accidental = 0;
+  function noteButton(pitch, duration, rest, accidental) {
+    theWholeSong.push(new musicNote(pitch, duration, rest, accidental))
+    //redrawTheCanvas();
+  }
+
+  function musicNote(pitch, duration, rest, accidental) {
+    this.pitch = pitch;
+    this.duration = duration;
+    this.rest = rest;
+    this.accidental = accidental;
+  }
+
+</script>
+ 
+ 
+ <!-- 
+<script>
+   var note = {
+     duration: "1/4",
+
+   }
+ </script>  
+ -->
+</body>
+ 
+</html>
+
+<!-- 
+
+3 data structures
+mvc and drwing
+make a model
+then add math
+
+
+
+ -->
+
+ 

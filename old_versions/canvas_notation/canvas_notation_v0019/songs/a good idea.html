@@ -1,0 +1,225 @@
+
+
+<!-- 
+
+I think that I am a programmer. Therefore I am typing.
+I am going to learn the use of computers all the time and make monay.
+yo soy voy a aprender como usar los computadoras todo tiempo y hacer dinero por mis pantalones. lo que quiero dice es: ganar dinero o gana dinero. yo no sabe lo que es.
+
+I am goin got make a lot of money programming computers for the rets of my life until I die.
+
+I am going to make many sophisticated programs that cover a wide range of uses.
+
+These will include but not be limited to :
+
+music notation software.
+
+story based adventuresgames in 2d and 3d
+
+a software composing game
+
+
+ -->
+
+<html>
+<head>
+    <title>a good idea</title>
+    <style>
+        button{background-color:#def;}
+    </style>
+    
+<link rel="stylesheet" type="text/css" href="canvas_notation_v0019.css">
+
+</head>
+
+<body>
+    <canvas id="mnCanvas"></canvas>
+    <!-- duration buttons change from note to rest when you toggle the note/rest toggle -->
+    <div class="duration_container">        
+        <button class="duration" id="2duration"><img src="../img/2_thirtysecond_note.png" class="duration" id="2duration_img"></button>
+        <button class="duration" id="3duration"><img src="../img/3_sixteenth_note.png" class="duration" id="3duration_img"></button>
+        <button class="duration" id="4duration"><img src="../img/4_eighth_note.png" class="duration" id="4duration_img"></button>
+        <button class="duration" id="5duration"><img src="../img/5_quarter_note.png" class="duration" id="5duration_img"></button>
+        <button class="duration" id="6duration"><img src="../img/6_half_note.png" class="duration" id="6duration_img"></button>
+        <button class="duration" id="7duration"><img src="../img/7_whole_note.png" class="duration" id="7duration_img"></button>
+        <button class="duration" id="note/rest_toggle"><img src="../img/note_rest_toggle_on.png" class="duration" id="note/rest_toggle_img"></button>
+    </div>
+    <div class="octave_container">
+        <button class="octave" id="0octave">0</button>
+        <button class="octave" id="1octave">1</button>
+        <button class="octave" id="2octave">2</button>
+        <button class="octave" id="3octave">3</button>
+        <button class="octave" id="4octave">4</button>
+        <button class="octave" id="5octave">5</button>
+        <button class="octave" id="6octave">6</button>
+        <button class="octave" id="7octave">7</button>
+        <button class="octave" id="8octave">8</button>   
+    </div>
+    <div class="keyboard_container">
+        <button class="keyboard white_key" id="c_keyboard">C</button><br>
+        <button class="keyboard black_key" id="cs_keyboard">C#</button><br>
+        <button class="keyboard white_key" id="d_keyboard">D</button><br>
+        <button class="keyboard black_key" id="ds_keyboard">D#</button><br>
+        <button class="keyboard white_key" id="e_keyboard">E</button><br>
+        <button class="keyboard white_key" id="f_keyboard">F</button><br>
+        <button class="keyboard black_key" id="fs_keyboard">F#</button><br>
+        <button class="keyboard white_key" id="g_keyboard">G</button><br>
+        <button class="keyboard black_key" id="gs_keyboard">G#</button><br>
+        <button class="keyboard white_key" id="a_keyboard">A</button><br>
+        <button class="keyboard black_key" id="as_keyboard">A#</button><br>
+        <button class="keyboard white_key" id="b_keyboard">B</button><br>
+    </div>
+    <style>p.readMe{padding:14px;background-color:#dfe;width:500px;}</style>
+<p class="readMe">This is a culmination of my efforts as of 5/30/2020 to 
+    build my own music notation app/game based on HTML5 canvas.
+I am trying to make it very lightweight. I am not afraid  
+of trying to reinvent the wheel. The thing is, one way or another,
+I think someone is going to come along and make a better music that
+engraves music prettily and also teaches and interacts with the user.
+I want to make something that serves a different purpose besides
+just publishing notation. I want to publish notation to the screen 
+to be interacted with in real-time.
+I want to create an app that teaches, is interactive, and is very 
+lightweight with absolutely no lag of any kind.</p>
+<script src="../canvas_notation_v0019.js"></script>
+<script src="../generate_note_table_from_array.js"></script>
+<script>
+//this is the song.
+//the title of the song is "a good idea"
+//i am going to show you how it works
+//that is to say I am going to go ahead 
+//and type objects and then later write 
+//a function to iterate throough this 
+//array of objkects and use the values 
+//and keys within the objects to place 
+//them all on the canvas.
+
+drawStaves(10,100,100,0);
+drawLine(10,100,10,240);
+drawTrebleCleff(20,155);
+drawTrebleCleff(20,255);
+drawKeySignature(30,120,-4);
+drawKeySignature(30,220,-4);
+
+// 1st level represents the song (idea is an array of measures)
+// 2nd level represents measures (each measure is represented by an array of 8 notes)
+// 3rd level represents the two parts (each note array contains one pitch for each part of the duet)
+// 100 = line5, 110 = line4, etc...
+/*
+       
+100 ---|\----------
+110 ---|-|---------
+120 ---|/----------
+130 --/|/\---------
+140 --\|_/---------
+       |
+*/
+ctx.font = "30px Verdana";
+// Create gradient
+var gSauce = ctx.createLinearGradient(0, 0, c.width, 0);
+gSauce.addColorStop("0", "magenta");
+gSauce.addColorStop("0.5", "blue");
+gSauce.addColorStop("1.0", "red");
+// Fill with gradient
+ctx.fillStyle = gSauce;
+ctx.fillText("a good idea", 10, 40);
+ctx.fillText("Aaron Dull 5/30/2020",280,35)
+
+var idea = [
+    [100,100],[80,120],[75,140],[135,140],[105,100],[110,150],[115,160],[120,150],
+    [100,100],[110,120],[120,65],[135,140],[105,100],[110,150],[115,160],[120,150],
+    [125,125],[105,140],[125,125],[105,140],[100,100],[165,165],[100,150],[120,150],
+    [100,135],[105,135],[90,125],[105,125],[120,120],[155,120],[150,155],[150,155]
+]
+generate_note_table_from_array(idea);
+const noteSpacing = 15;
+const llWidth = 40;
+var clarinet1 = [];
+var clarinet2 = [];
+for (i=0; i<idea.length; i++) {
+    clarinet1.push(idea[i][0]);
+    clarinet2.push(idea[i][1]);
+}
+console.log(clarinet1);
+console.log(clarinet2);
+for (i=0; i<idea.length; i++) {
+    for (e=0; e<idea[i].length; e++) {
+        drawNoteHead(60+noteSpacing*i, idea[i][e]+100*e);
+        drawLine(63+noteSpacing*i, idea[i][e]+100*e, 63+noteSpacing*i, 80+100*e)
+        if (i % 4 == 0){
+            //drawing the beam across the tops of the stems of every group of four eighth notes
+            let beam_elevation = 80;
+            let min_stem_height = 12;
+            for (p=0; p<idea.length; p++) {
+                for (q=0; q<idea[p].length; q++) {
+                    if (idea[p][q] < beam_elevation + min_stem_height) {
+                        var lowest_y_in_set = beam_elevation + min_stem_height;
+                        if (idea[p][q] < lowest_y_in_set) {
+                            lowest_y_in_set = idea[p][q];
+                        }
+                        beam_elevation = lowest_y_in_set - min_stem_height;
+                        drawThickLine(63+noteSpacing*i, beam_elevation+100*e, 63+noteSpacing*i+noteSpacing*3, beam_elevation+100*e)
+                    }
+                }
+            }
+            if (idea[i][e] < beam_elevation + min_stem_height) {
+                console.log("beam_elevation: " + beam_elevation);
+                beam_elevation -= (beam_elevation + min_stem_height) - idea[i][e];
+                console.log("i=" + i + ", e=" + e + "... beam_elevation -= (beam_elevation+min_stem_height)+idea[i][e];");
+            }
+            console.log("beam_elevation: "+beam_elevation)
+        }
+        if ((i + 1) % 8 == 0) {
+            drawLine(60+noteSpacing*i+(noteSpacing/2), 100+100*e, 60+noteSpacing*i+(noteSpacing/2), 100+100*e+40)
+        }
+        if (idea[i][e] > 140) {
+            // draw ledger lines if note is below staff
+
+            for (b=0; b<(idea[i][e]-140)/10; b++) {
+                let llqty = idea[i][e]-140/10;
+                if ((idea[i][e]-140)%2 == 0) {
+                    drawLine(60+noteSpacing*i-llWidth/2, idea[i][e]+100*e-10*b, 60+noteSpacing*i+llWidth/2, idea[i][e]+100*e-10*b)
+                } else if ((idea[i][e]-140)%2 == 1) {
+                    drawLine(60+noteSpacing*i-llWidth/2, idea[i][e]+100*e+5-10*(b+1), 60+noteSpacing*i+llWidth/2, idea[i][e]+100*e+5-10*(b+1))
+                }
+            }
+        }
+        if (idea[i][e] < 100) {
+            // draw ledger lines if note is above staff
+            for (b=0; b<(100-idea[i][e])/10; b++) {
+                let llqty = (100-idea[i][e])/10;
+                console.log(llqty);
+                if ((idea[i][e]-140)%2 == 0) {
+                    drawLine(60+noteSpacing*i-llWidth/2, idea[i][e]+100*e-10*b, 60+noteSpacing*i+llWidth/2, idea[i][e]+100*e-10*b)
+                } else if ((idea[i][e]-140)%2 == 1) {
+                    drawLine(60+noteSpacing*i-llWidth/2, idea[i][e]+100*e+5-10*(b+1), 60+noteSpacing*i+llWidth/2, idea[i][e]+100*e+5-10*(b+1))
+                }
+            }
+        }
+    }
+}
+
+
+
+// The note stem should be drawn to a y 
+// value that is 20 less than the y value 
+// of the note with the lowest y value 
+// in that group of four.
+
+// ctx.lineWidth = 1.5;
+    // ctx.beginPath();
+    // ctx.moveTo( 10, 10 );
+    // ctx.lineTo( 100, 100 );
+    // ctx.stroke();
+    // console.log("hello");
+</script>
+<script>console.log("this is it")</script>
+<script src="controls_interface.js"></script>
+
+
+</body>
+
+</html>
+
+
+

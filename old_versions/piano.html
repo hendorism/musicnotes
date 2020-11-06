@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <style>
+            button.active {background-color:#f33;}
+.cupper {position:absolute;top:10;height:150;width:30;left:10;background-color:#bbf;border-bottom:none;}
+.csharp {position:absolute;top:10;height:150;width:30;left:40;background-color:#333;border-bottom:none;}
+.dupper {position:absolute;top:10;height:150;width:30;left:70;background-color:#bbf;border-bottom:none;}
+.dsharp {position:absolute;top:10;height:150;width:30;left:100;background-color:#333;border-bottom:none;}
+.eupper {position:absolute;top:10;height:150;width:30;left:130;background-color:#bbf;border-bottom:none;}
+.fupper {position:absolute;top:10;height:150;width:30;left:160;background-color:#bbf;border-bottom:none;}
+.fsharp {position:absolute;top:10;height:150;width:30;left:190;background-color:#333;border-bottom:none;}
+.gupper {position:absolute;top:10;height:150;width:25;left:220;background-color:#bbf;border-bottom:none;}
+.gsharp {position:absolute;top:10;height:150;width:30;left:245;background-color:#333;border-bottom:none;}
+.aupper {position:absolute;top:10;height:150;width:25;left:275;background-color:#bbf;border-bottom:none;}
+.asharp {position:absolute;top:10;height:150;width:30;left:300;background-color:#333;border-bottom:none;}
+.bupper {position:absolute;top:10;height:150;width:30;left:330;background-color:#bbf;border-bottom:none;}
+.clower {position:absolute;top:160;height:50;width:50;left:10;background-color:#bbf;border-top:none;}
+.dlower {position:absolute;top:160;height:50;width:50;left:60;background-color:#bbf;border-top:none;}
+.elower {position:absolute;top:160;height:50;width:50;left:110;background-color:#bbf;border-top:none;}
+.flower {position:absolute;top:160;height:50;width:50;left:160;background-color:#bbf;border-top:none;}
+.glower {position:absolute;top:160;height:50;width:50;left:210;background-color:#bbf;border-top:none;}
+.alower {position:absolute;top:160;height:50;width:50;left:260;background-color:#bbf;border-top:none;}
+.blower {position:absolute;top:160;height:50;width:50;left:310;background-color:#bbf;border-top:none;}
+.drawStaves {position:absolute;top:10;left:360;height:35;width:100;padding:0;}
+.duration1 {position:absolute;top:45;left:360;height:35;width:35;padding:0;}
+.duration2 {position:absolute;top:45;left:395;height:35;width:35;padding:0;}
+.duration3 {position:absolute;top:45;left:430;height:35;width:35;padding:0;}
+.duration4 {position:absolute;top:45;left:465;height:35;width:35;padding:0;}
+.duration5 {position:absolute;top:45;left:500;height:35;width:35;padding:0;}
+.duration6 {position:absolute;top:45;left:535;height:35;width:35;padding:0;}
+.duration7 {position:absolute;top:45;left:570;height:35;width:35;padding:0;}
+.duration8 {position:absolute;top:45;left:605;height:35;width:35;padding:0;}
+#mnCanvas {position:absolute;top:210;left:10;}
+
+        </style>
+    </head>
+    <body>
+        <button class="cupper"></button>
+        <button class="csharp"></button>
+        <button class="dupper"></button>
+        <button class="dsharp"></button>
+        <button class="eupper"></button>
+        <button class="fupper"></button>
+        <button class="fsharp"></button>
+        <button class="gupper"></button>
+        <button class="gsharp"></button>
+        <button class="aupper"></button>
+        <button class="asharp"></button>
+        <button class="bupper"></button>
+        <button class="clower"></button>
+        <button class="dlower"></button>
+        <button class="elower"></button>
+        <button class="flower"></button>
+        <button class="glower"></button>
+        <button class="alower"></button>
+        <button class="blower"></button>
+        <button class="drawStaves">draw staves</button>
+        <button class="duration1"><img src=""></button>
+        <button class="duration2"><img src=""></button>
+        <button class="duration3"><img src=""></button>
+        <button class="duration4"><img src=""></button>
+        <button class="duration5 active"><img src=""></button>
+        <button class="duration6"><img src=""></button>
+        <button class="duration7"><img src=""></button>
+        <button class="duration8"><img src=""></button>
+        <canvas id="mnCanvas"></canvas>
+
+        <script>
+            var x = 20;
+            var cupper = document.querySelector(".cupper");
+            cupper.addEventListener("click", function() {drawNoteHead(x,100);x+=10});
+            document.querySelector(".csharp").addEventListener("click", function() {drawNoteSharp(x,100);x+=10});
+            document.querySelector(".dupper").addEventListener("click", function() {drawNoteHead(x,95);x+=10});
+            document.querySelector(".dsharp").addEventListener("click", function() {drawNoteSharp(x,95);x+=10});
+            document.querySelector(".eupper").addEventListener("click", function() {drawNoteHead(x,90);x+=10});
+            document.querySelector(".fupper").addEventListener("click", function() {drawNoteHead(x,85);x+=10});
+            document.querySelector(".fsharp").addEventListener("click", function() {drawNoteSharp(x,85);x+=10});
+            document.querySelector(".gupper").addEventListener("click", function() {drawNoteHead(x,80);x+=10});
+            document.querySelector(".gsharp").addEventListener("click", function() {drawNoteSharp(x,80);x+=10});
+            document.querySelector(".aupper").addEventListener("click", function() {drawNoteHead(x,75);x+=10});
+            document.querySelector(".asharp").addEventListener("click", function() {drawNoteSharp(x,75);x+=10});
+            document.querySelector(".bupper").addEventListener("click", function() {drawNoteHead(x,70);x+=10});
+            document.querySelector(".clower").addEventListener("click", function() {drawNoteHead(x,100);x+=10});
+            document.querySelector(".dlower").addEventListener("click", function() {drawNoteHead(x,95);x+=10});
+            document.querySelector(".elower").addEventListener("click", function() {drawNoteHead(x,90);x+=10});
+            document.querySelector(".flower").addEventListener("click", function() {drawNoteHead(x,85);x+=10});
+            document.querySelector(".glower").addEventListener("click", function() {drawNoteHead(x,80);x+=10});
+            document.querySelector(".alower").addEventListener("click", function() {drawNoteHead(x,75);x+=10});
+            document.querySelector(".blower").addEventListener("click", function() {drawNoteHead(x,70);x+=10});
+            document.querySelector(".drawStaves").addEventListener("click", function() {drawStaves(5,100,50,10)});
+            document.querySelector(".duration1").addEventListener("click", function() {});
+            document.querySelector(".duration2").addEventListener("click", function() {});
+            document.querySelector(".duration3").addEventListener("click", function() {});
+            document.querySelector(".duration4").addEventListener("click", function() {});
+            document.querySelector(".duration5").addEventListener("click", function() {});
+            document.querySelector(".duration6").addEventListener("click", function() {});
+            document.querySelector(".duration7").addEventListener("click", function() {});
+            document.querySelector(".duration8").addEventListener("click", function() {});
+
+
+        </script>
+        <script src="canvas_notation/canvas_notation_v0019/canvas_notation_v0019.js"></script>
+    </body>
+</html>

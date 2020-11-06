@@ -1,0 +1,92 @@
+
+
+<!-- 
+
+I think that I am a programmer. Therefore I am typing.
+I am going to learn the use of computers all the time and make monay.
+yo soy voy a aprender como usar los computadoras todo tiempo y hacer dinero por mis pantalones. lo que quiero dice es: ganar dinero o gana dinero. yo no sabe lo que es.
+
+I am goin got make a lot of money programming computers for the rets of my life until I die.
+
+I am going to make many sophisticated programs that cover a wide range of uses.
+
+These will include but not be limited to :
+
+music notation software.
+
+story based adventuresgames in 2d and 3d
+
+a software composing game
+
+
+ -->
+
+ <html>
+    <head>
+        <title>a good idea</title>
+        <style>
+            button{background-color:#def;}
+        </style>
+        
+    <link rel="stylesheet" type="text/css" href="canvas_notation_v0019.css">
+    
+    </head>
+    
+    <body>
+        <canvas id="mnCanvas"></canvas>
+        <!-- duration buttons change from note to rest when you toggle the note/rest toggle -->
+        <div class="duration_container">        
+            <button class="duration" id="2duration"><img src="../img/2_thirtysecond_note.png" class="duration" id="2duration_img"></button>
+            <button class="duration" id="3duration"><img src="../img/3_sixteenth_note.png" class="duration" id="3duration_img"></button>
+            <button class="duration" id="4duration"><img src="../img/4_eighth_note.png" class="duration" id="4duration_img"></button>
+            <button class="duration" id="5duration"><img src="../img/5_quarter_note.png" class="duration" id="5duration_img"></button>
+            <button class="duration" id="6duration"><img src="../img/6_half_note.png" class="duration" id="6duration_img"></button>
+            <button class="duration" id="7duration"><img src="../img/7_whole_note.png" class="duration" id="7duration_img"></button>
+            <button class="duration" id="note/rest_toggle"><img src="../img/note_rest_toggle_on.png" class="duration" id="note/rest_toggle_img"></button>
+        </div>
+        <div class="octave_container">
+            <button class="octave" id="0octave">0</button>
+            <button class="octave" id="1octave">1</button>
+            <button class="octave" id="2octave">2</button>
+            <button class="octave" id="3octave">3</button>
+            <button class="octave" id="4octave">4</button>
+            <button class="octave" id="5octave">5</button>
+            <button class="octave" id="6octave">6</button>
+            <button class="octave" id="7octave">7</button>
+            <button class="octave" id="8octave">8</button>   
+        </div>
+        <div class="keyboard_container">
+            <button class="keyboard white_key" id="c_keyboard">C</button><br>
+            <button class="keyboard black_key" id="cs_keyboard">C#</button><br>
+            <button class="keyboard white_key" id="d_keyboard">D</button><br>
+            <button class="keyboard black_key" id="ds_keyboard">D#</button><br>
+            <button class="keyboard white_key" id="e_keyboard">E</button><br>
+            <button class="keyboard white_key" id="f_keyboard">F</button><br>
+            <button class="keyboard black_key" id="fs_keyboard">F#</button><br>
+            <button class="keyboard white_key" id="g_keyboard">G</button><br>
+            <button class="keyboard black_key" id="gs_keyboard">G#</button><br>
+            <button class="keyboard white_key" id="a_keyboard">A</button><br>
+            <button class="keyboard black_key" id="as_keyboard">A#</button><br>
+            <button class="keyboard white_key" id="b_keyboard">B</button><br>
+        </div>
+
+
+
+    <script src="../canvas_notation_v0019.js"></script>
+    <script src="../generate_note_table_from_array.js"></script>
+    <script src="controls_interface.js"></script>
+
+    <script>
+        console.lot("this script is working");
+        drawNoteHead(100,100);
+        
+    </script>
+    
+    
+    </body>
+    
+    </html>
+    
+    
+    
+    

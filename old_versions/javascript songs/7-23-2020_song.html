@@ -1,0 +1,206 @@
+<html>
+    <head>
+        <style>
+            div#durationdiv {
+                position:fixed;
+                right:0;
+                top:0;
+                background-color:#F7b;
+                height:50px;
+                width:300px;
+            }
+            div#durationdiv button {
+                height:50px;
+                width:50px;
+                padding:0px;
+
+            }
+            button {background-color:#f7b;position:absolute}
+            div#durationdiv button#wnbutton {top: 0; left: 0;}
+            div#durationdiv button#hnbutton {top: 0; left: 50;}
+            div#durationdiv button#qnbutton {top: 0; left: 100;}
+            div#durationdiv button#enbutton {top: 0; left: 150;}
+            div#durationdiv button#snbutton {top: 0; left: 200;}
+            div#durationdiv button#tnbutton {top: 0; left: 250;}
+
+            /* div#piano button.cupper {} */
+        </style>
+    </head>
+    <body>
+        <script>
+        </script>
+        <canvas id="mnCanvas" style="z-index:99;"></canvas>
+        <div id="durationdiv">
+            <button id="wnbutton"><img src="wholenote.jpg"></button>
+            <button id="hnbutton"><img src="halfnote.jpg"></button>
+            <button id="qnbutton"><img src="quarternote.jpg"></button>
+            <button id="enbutton"><img src="eighthnote.jpg"></button>
+            <button id="snbutton"><img src="sixteenthnote.jpg"></button>
+            <button id="tnbutton"><img src="thirtysecondnote.jpg"></button>
+        </div>
+        <script src="https://hendorism.github.io/my-blog/music_notation_v0018.js"></script>
+        <script>
+            console.log(c.width);
+            console.log(ctx.width);
+            ctx.font = "16px Verdana";
+            var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
+            gradient.addColorStop("0", "#f33");
+            gradient.addColorStop("0.5", "#000");
+            gradient.addColorStop("1.0", "#0f0");
+            ctx.fillStyle = gradient;
+            ctx.fillText("Bb clarinet", 20, 40);
+            ctx.fillText("7-23-2020_song.html", 100, 20);
+            drawStaves(6,100,50);
+            drawTrebleCleff(10,75);
+            drawKeySignature(25,70,-4);
+            drawNoteHead(50,50);
+            drawNoteHead(58,60);
+            drawNoteHead(66,70);
+            drawNoteHead(74,80);
+            drawLine(47,50,47,87);
+            drawLine(55,60,55,90);
+            drawLine(63,70,63,93);
+            drawLine(71,80,71,96);
+            drawThickLine(47,87,71,96);
+            drawThickLine(47,83,71,92);
+
+            drawNoteHead(82,85);
+            drawNoteHead(90,75);
+            drawNoteHead(98,50);
+            drawNoteHead(106,100);drawLine(96,100,116,100);
+            drawLine(79,85,79,103);
+            drawLine(87,75,87,98);
+            drawLine(95,50,95,93);
+            drawLine(103,100,103,84);
+            drawThickLine(79,103,103,88);
+            drawThickLine(79,99,103,84);
+
+            drawNoteHead(112,55);
+            drawNoteHead(120,80);
+            drawNoteHead(128,50);
+            drawNoteHead(136,85);
+            drawLine(109, 55, 109, 72);
+            drawLine(117, 80, 117, 65);
+            drawLine(125, 50, 125, 66);
+            drawLine(133, 85, 133, 59);
+            drawThickLine(109, 72, 133, 63);
+            drawThickLine(109, 68, 133, 59);
+
+            const beat0004 = [50, 90, 120, 90];
+            let x = 144;
+            let y;
+            let deltax = 8;
+            let startx;
+            for (i=0; i<beat0004.length; i++) {
+                y = beat0004[i];
+                if (y === 120) {
+                    for (e=0; e<3; e++) {
+                        drawLine(x-10, y-10*e, x+10, y-10*e);
+                    }
+                }
+                if (i === 2) {
+                    x -= 3;
+                }
+                if (i === 3) {
+                    x += 2;
+                }
+                drawNoteHead(x, y);
+                if (y < 60) {
+                    drawLine(x-3, y, x-3, 75-0.7*(x-144));
+                }
+                if (y > 60) {
+                    drawLine(x+3, y, x+3, 75-0.7*(x-144)-4);
+                }
+                x += deltax;
+            }
+            drawThickLine(141,75,170,64);
+            drawThickLine(141,70,170,59);
+            drawLine(180,50,180,90);
+            x = 188;
+            startx = x;
+            const beat0005 = [85,75,50,80];
+            for (i=0; i<beat0005.length; i++) {
+                y = beat0005[i];
+                if (y < 55) {
+                    drawLine(x - 2 + 2, y, x - 2 + 2, 60 + 0.2 * (x - startx) + 4);
+                    drawNoteHead(x+2, y);
+                } else if (y > 55) {
+                    drawLine(x+2, y, x+2, 60+0.2*(x-startx));
+                    drawNoteHead(x, y);
+                }
+
+                x += deltax;
+
+            }
+            drawThickLine(190,60,215,65);
+            drawThickLine(190,65,215,70);
+            console.log("hello? are you listening?");
+    x = 220;
+    startx = x;
+    deltax = 8;
+    let beamlength = 28;
+    const beat0006 = [85,120,75,85,75,120,75,85,110,85,65,85,60,60,62,64,66];
+    for (i=0; i<3; i++) {
+        drawLine(200, 100+10*i, 350, 100.5+10*i)
+    }
+    for (i=0; i<beat0006.length; i++) {
+        y = beat0006[i];
+        if (i === 12) {
+            x += 10;
+            isnewmeasure = "true";
+            beamlength += 10;
+        }
+        drawNoteHead(x, y);
+        drawLine(x+3,y,x+3,40);
+        if ((i + 4) % 4 === 0) {
+            for (e=0; e<2; e++) {
+                drawThickLine(x+3,40+5*e,x+beamlength,40+5*e);
+            }
+        }
+        x += deltax;
+    }
+    drawLine(320,50,320,90);
+
+drawLine(330,20,390,100);
+drawLine(330,100,390,20);
+drawTrebleCleff(8,180);
+drawKeySignature(17,170,-4);
+x = 64;
+beamlength = 28;
+let stemlength = 28;
+let upstem = 5;
+const linetwonotes = [150,185,140,165,150,185,140,165,150,185,140,165];
+for (i=0; i<2; i++) {
+    drawLine(60, 140-10*i, 200, 140-10*i);
+}
+for (i=0; i<linetwonotes.length; i++) {
+    y = linetwonotes[i];
+    drawNoteHead(x, y);
+    drawLine(x+3, y, x+3, 120+0.1*x-upstem);
+    x += deltax;
+}
+            /*
+                50 = F5
+                55 = E5
+                60 = D5
+                65 = C5
+                70 = B4
+                75 = A4
+                80 = G4
+                85 = F4
+                90 = E4
+                95 = D4
+                1  = 5
+                2  = 10
+                3  = 15
+                4  = 20
+                5  = 25
+                6  = 30
+                7  = 35
+                8  = 40
+                9  = 45
+                10 = 50
+            */
+        </script>
+    </body>
+</html>
