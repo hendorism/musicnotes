@@ -1,4 +1,5 @@
-
+<!-- created by Aaron Dull 2018-2020 -->
+<!--  -->
 <html>
   <head>
     <title>music notes</title>
@@ -34,9 +35,9 @@
     position: fixed;
     top:10;
     left:400;
-    background-color:#000000;
+    background-color:#112230;
     color: #33ffee;
-    border-radius: 13px;
+    border-radius: 6px;
     height: 130px;
     width: 130px;
     font-family: helvetica;
@@ -48,11 +49,44 @@
     left: 530;
     background-color: #112230;
     color: #33ffee;
-    border-radius: 13px;
+    border-radius: 6px;
     height: 130px;
     width: 130px;
     font-family: helvetica;
     font-size: 27px;
+  }
+  div#notationConsole {
+    position: fixed;
+    top: 140;
+    left: 400;
+    background-color: #112240;
+    color: #33ffee;
+    border-radius: 6px;
+    height: 520px;
+    width: 260px;
+    font-family: helvetica;
+    font-size: 12px;
+    overflow: scroll;
+    word-wrap: break-word;
+  }
+  div#notationConsole span {
+    margin: 0px 4px 0px 4px;
+    background-color: #444444;
+    border: 1px solid #000000;
+  }
+  div#listOfNotesDisplay {
+    position: fixed;
+    top: 660;
+    left: 400;
+    background-color: #442240;
+    color: #33ffee;
+    border-radius: 6px;
+    height: 400px;
+    width: 200px;
+    font-family: helvetica;
+    font-size: 12px;
+    word-wrap: break-word;
+    overflow: scroll;
   }
 </style>
 </head>
@@ -60,40 +94,40 @@
 <div class="controls">
   <table>
     <tr>
-    <td><button onclick="c6button();drawLedgerLines();">C6</button></td>
-      <td><button onclick="d6button();drawLedgerLines();">D6</button></td>
-      <td><button onclick="e6button();drawLedgerLines();">E6</button></td>
-      <td><button onclick="f6button();drawLedgerLines();">F6</button></td>
-      <td><button onclick="g6button();drawLedgerLines();">G6</button></td>
-      <td><button onclick="a6button();drawLedgerLines();">A6</button></td>
-      <td><button onclick="b6button();drawLedgerLines();">B6</button></td>
+      <td><button onclick="createANote(this.id);" id="c6button">C6</button></td>
+      <td><button onclick="createANote(this.id);" id="d6button">D6</button></td>
+      <td><button onclick="createANote(this.id);" id="e6button">E6</button></td>
+      <td><button onclick="createANote(this.id);" id="f6button">F6</button></td>
+      <td><button onclick="createANote(this.id);" id="g6button">G6</button></td>
+      <td><button onclick="createANote(this.id);" id="a6button">A6</button></td>
+      <td><button onclick="createANote(this.id);" id="b6button">B6</button></td>
     </tr>
     <tr>
-      <td><button onclick="c5button();drawLedgerLines();">C5</button></td>
-      <td><button onclick="d5button();drawLedgerLines();">D5</button></td>
-      <td><button onclick="e5button();drawLedgerLines();">E5</button></td>
-      <td><button onclick="f5button();drawLedgerLines();">F5</button></td>
-      <td><button onclick="g5button();drawLedgerLines();">G5</button></td>
-      <td><button onclick="a5button();drawLedgerLines();">A5</button></td>
-      <td><button onclick="b5button();drawLedgerLines();">B5</button></td>
+      <td><button onclick="createANote(this.id);" id="c5button">C5</button></td>
+      <td><button onclick="createANote(this.id);" id="d5button">D5</button></td>
+      <td><button onclick="createANote(this.id);" id="e5button">E5</button></td>
+      <td><button onclick="createANote(this.id);" id="f5button">F5</button></td>
+      <td><button onclick="createANote(this.id);" id="g5button">G5</button></td>
+      <td><button onclick="createANote(this.id);" id="a5button">A5</button></td>
+      <td><button onclick="createANote(this.id);" id="b5button">B5</button></td>
     </tr>
     <tr>
-      <td><button onclick="c4button();drawLedgerLines();">C4</button></td>
-      <td><button onclick="d4button();drawLedgerLines();">D4</button></td>
-      <td><button onclick="e4button();drawLedgerLines();">E4</button></td>
-      <td><button onclick="f4button();drawLedgerLines();">F4</button></td>
-      <td><button onclick="g4button();drawLedgerLines();">G4</button></td>
-      <td><button onclick="a4button();drawLedgerLines();">A4</button></td>
-      <td><button onclick="b4button();drawLedgerLines();">B4</button></td>
+      <td><button onclick="createANote(this.id);" id="c4button">C4</button></td>
+      <td><button onclick="createANote(this.id);" id="d4button">D4</button></td>
+      <td><button onclick="createANote(this.id);" id="e4button">E4</button></td>
+      <td><button onclick="createANote(this.id);" id="f4button">F4</button></td>
+      <td><button onclick="createANote(this.id);" id="g4button">G4</button></td>
+      <td><button onclick="createANote(this.id);" id="a4button">A4</button></td>
+      <td><button onclick="createANote(this.id);" id="b4button">B4</button></td>
     </tr>
     <tr>
-      <td><button onclick="c3button();drawLedgerLines();">C3</button></td>
-      <td><button onclick="d3button();drawLedgerLines();">D3</button></td>
-      <td><button onclick="e3button();drawLedgerLines();">E3</button></td>
-      <td><button onclick="f3button();drawLedgerLines();">F3</button></td>
-      <td><button onclick="g3button();drawLedgerLines();">G3</button></td>
-      <td><button onclick="a3button();drawLedgerLines();">A3</button></td>
-      <td><button onclick="b3button();drawLedgerLines();">B3</button></td>
+      <td><button onclick="createANote(this.id);" id="c3button">C3</button></td>
+      <td><button onclick="createANote(this.id);" id="d3button">D3</button></td>
+      <td><button onclick="createANote(this.id);" id="e3button">E3</button></td>
+      <td><button onclick="createANote(this.id);" id="f3button">F3</button></td>
+      <td><button onclick="createANote(this.id);" id="g3button">G3</button></td>
+      <td><button onclick="createANote(this.id);" id="a3button">A3</button></td>
+      <td><button onclick="createANote(this.id);" id="b3button">B3</button></td>
     </tr>
   </table>
   <table>
@@ -111,6 +145,7 @@
       <td><button onclick="decreaseX_5()">x-=5</button></td>
       <td><button onclick="increaseY_5()">y+=5</button></td>
       <td><button onclick="decreaseY_5()">y-=5</button></td>
+      <td><button onclick="set"></button></td>
       <script>
         function increaseX_5() {x+=5;}
         function decreaseX_5() {x-=5;}
@@ -127,6 +162,10 @@
 <canvas id="mnCanvas"></canvas>
 <div id="xDisplay"></div>
 <div id="yDisplay"></div>
+<div id="notationConsole">
+  <span>notation console</span>
+</div>
+<div id="listOfNotesDisplay"></div>
 <script src="draw_music_symbols.js"></script>
 
 
@@ -149,6 +188,8 @@
   }
   var xDisplay = document.getElementById("xDisplay");
   var yDisplay = document.getElementById("yDisplay");
+  var notationConsole = document.getElementById("notationConsole");
+  var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
   function updateRender() {
     xDisplay.innerHTML = "      x=" + x;
     yDisplay.innerHTML = "      y=" + y;
@@ -164,39 +205,56 @@
       }
     }
   }
+  var listOfNotes = [];
+  var yValues = {
+    "b6": -70, "a6": -65, "g6": -60, "f6": -55, "e6": -50, "d6": -45, "c6": -40,
+    "b5": -35, "a5": -30, "g5": -25, "f5": -20, "e5": -15, "d5": -10, "c5": -5,
+    "b4": 0, "a4": 5, "g4": 10, "f4": 15, "e4": 20, "d4": 25, "c4": 30,
+    "b3": 35, "a3": 40, "g3": 45, "f3": 50, "e3": 55, "d3": 60, "c3": 65
+  }
+  function createANote(idOfButton) {
+    // listOfNotes.push(idOfButton.slice(0,1);)
+    console.log(idOfButton);
+    listOfNotes.push(idOfButton.slice(0,2));
+    notationConsole.innerHTML += ("<br>" + "you pressed: " + idOfButton);
+    listOfNotesDisplay.innerHTML = ("<br>" + "notes are: " + listOfNotes);
+    x += 10;
+    y = yValues['idOfButton.slice(0,1)'];
+    drawNoteHead(x,y);
+  }
 </script>
 
 
 
 <script>
-      function c6button() {console.log(i);y=30;drawNoteHead(x,y+100*i);resetX();}
-      function d6button() {console.log(i);y=25;drawNoteHead(x,y+100*i);resetX();}
-      function e6button() {console.log(i);y=20;drawNoteHead(x,y+100*i);resetX();}
-      function f6button() {console.log(i);y=15;drawNoteHead(x,y+100*i);resetX();}
-      function g6button() {console.log(i);y=10;drawNoteHead(x,y+100*i);resetX();}
-      function a6button() {console.log(i);y=05;drawNoteHead(x,y+100*i);resetX();}
-      function b6button() {console.log(i);y=00;drawNoteHead(x,y+100*i);resetX();}
-      function c5button() {console.log(i);y=65;drawNoteHead(x,y+100*i);resetX();}
-      function d5button() {console.log(i);y=60;drawNoteHead(x,y+100*i);resetX();}
-      function e5button() {console.log(i);y=55;drawNoteHead(x,y+100*i);resetX();}
-      function f5button() {console.log(i);y=50;drawNoteHead(x,y+100*i);resetX();}
-      function g5button() {console.log(i);y=45;drawNoteHead(x,y+100*i);resetX();}
-      function a5button() {console.log(i);y=40;drawNoteHead(x,y+100*i);resetX();}
-      function b5button() {console.log(i);y=35;drawNoteHead(x,y+100*i);resetX();}
-      function c4button() {console.log(i);y=100;drawNoteHead(x,y+100*i);resetX();}
-      function d4button() {console.log(i);y=95;drawNoteHead(x,y+100*i);resetX();}
-      function e4button() {console.log(i);y=90;drawNoteHead(x,y+100*i);resetX();}
-      function f4button() {console.log(i);y=85;drawNoteHead(x,y+100*i);resetX();}
-      function g4button() {console.log(i);y=80;drawNoteHead(x,y+100*i);resetX();}
-      function a4button() {console.log(i);y=75;drawNoteHead(x,y+100*i);resetX();}
-      function b4button() {console.log(i);y=70;drawNoteHead(x,y+100*i);resetX();}
-      function c3button() {console.log(i);y=135;drawNoteHead(x,y+100*i);resetX();}
-      function d3button() {console.log(i);y=130;drawNoteHead(x,y+100*i);resetX();}
-      function e3button() {console.log(i);y=125;drawNoteHead(x,y+100*i);resetX();}
-      function f3button() {console.log(i);y=120;drawNoteHead(x,y+100*i);resetX();}
-      function g3button() {console.log(i);y=115;drawNoteHead(x,y+100*i);resetX();}
-      function a3button() {console.log(i);y=110;drawNoteHead(x,y+100*i);resetX();}
-      function b3button() {console.log(i);y=105;drawNoteHead(x,y+100*i);resetX();}
+      // function c6button() {console.log(i);y=30;drawNoteHead(x,y+100*i);resetX();}
+      // function d6button() {console.log(i);y=25;drawNoteHead(x,y+100*i);resetX();}
+      // function e6button() {console.log(i);y=20;drawNoteHead(x,y+100*i);resetX();}
+      // function f6button() {console.log(i);y=15;drawNoteHead(x,y+100*i);resetX();}
+      // function g6button() {console.log(i);y=10;drawNoteHead(x,y+100*i);resetX();}
+      // function a6button() {console.log(i);y=05;drawNoteHead(x,y+100*i);resetX();}
+      // function b6button() {console.log(i);y=00;drawNoteHead(x,y+100*i);resetX();}
+      // function c5button() {console.log(i);y=65;drawNoteHead(x,y+100*i);resetX();}
+      // function d5button() {console.log(i);y=60;drawNoteHead(x,y+100*i);resetX();}
+      // function e5button() {console.log(i);y=55;drawNoteHead(x,y+100*i);resetX();}
+      // function f5button() {console.log(i);y=50;drawNoteHead(x,y+100*i);resetX();}
+      // function g5button() {console.log(i);y=45;drawNoteHead(x,y+100*i);resetX();}
+      // function a5button() {console.log(i);y=40;drawNoteHead(x,y+100*i);resetX();}
+      // function b5button() {console.log(i);y=35;drawNoteHead(x,y+100*i);resetX();}
+      // function c4button() {console.log(i);y=100;drawNoteHead(x,y+100*i);resetX();}
+      // function d4button() {console.log(i);y=95;drawNoteHead(x,y+100*i);resetX();}
+      // function e4button() {console.log(i);y=90;drawNoteHead(x,y+100*i);resetX();}
+      // function f4button() {console.log(i);y=85;drawNoteHead(x,y+100*i);resetX();}
+      // function g4button() {console.log(i);y=80;drawNoteHead(x,y+100*i);resetX();}
+      // function a4button() {console.log(i);y=75;drawNoteHead(x,y+100*i);resetX();}
+      // function b4button() {console.log(i);y=70;drawNoteHead(x,y+100*i);resetX();}
+      // function c3button() {console.log(i);y=135;drawNoteHead(x,y+100*i);resetX();}
+      // function d3button() {console.log(i);y=130;drawNoteHead(x,y+100*i);resetX();}
+      // function e3button() {console.log(i);y=125;drawNoteHead(x,y+100*i);resetX();}
+      // function f3button() {console.log(i);y=120;drawNoteHead(x,y+100*i);resetX();}
+      // function g3button() {console.log(i);y=115;drawNoteHead(x,y+100*i);resetX();}
+      // function a3button() {console.log(i);y=110;drawNoteHead(x,y+100*i);resetX();}
+      // function b3button() {console.log(i);y=105;drawNoteHead(x,y+100*i);resetX();}
       function resetX() {
         x+=10;
         if (x>390) {
