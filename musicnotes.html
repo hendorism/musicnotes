@@ -146,18 +146,9 @@
       <td><button onclick="increaseY_5()">y+=5</button></td>
       <td><button onclick="decreaseY_5()">y-=5</button></td>
       <td><button onclick="set"></button></td>
-      <script>
-        function increaseX_5() {x+=5;}
-        function decreaseX_5() {x-=5;}
-        function increaseY_5() {y+=5;}
-        function decreaseY_5() {y-=5;}
-      </script>
     </tr>
   </table>
 </div>
-
-
-
 
 <canvas id="mnCanvas"></canvas>
 <div id="xDisplay"></div>
@@ -168,8 +159,13 @@
 <div id="listOfNotesDisplay"></div>
 <script src="draw_music_symbols.js"></script>
 
-
 <script>
+  function increaseX_5() {x+=5;}
+  function decreaseX_5() {x-=5;}
+  function increaseY_5() {y+=5;}
+  function decreaseY_5() {y-=5;}
+  function increaseXten() {x+=10;}
+  function decreaseXten() {x-=10;}
   var ii = 0;
   var y = 50;
   var x = 10;
@@ -180,12 +176,6 @@
     ctx.fillStyle = "#eeeeee";
     ctx.fillRect(0, 0, this.width, this.height);
   }
-  function increaseXten() {
-    x+=10;
-  }
-  function decreaseXten() {
-    x-=10;
-  }
   var xDisplay = document.getElementById("xDisplay");
   var yDisplay = document.getElementById("yDisplay");
   var notationConsole = document.getElementById("notationConsole");
@@ -193,6 +183,10 @@
   function updateRender() {
     xDisplay.innerHTML = "      x=" + x;
     yDisplay.innerHTML = "      y=" + y;
+    drawEverythingToPage();
+  }
+  function drawEverythingToPage() {
+    
   }
   function drawLedgerLines() {
     if (y>90 && y%2===0) {
