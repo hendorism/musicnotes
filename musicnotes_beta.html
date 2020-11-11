@@ -89,6 +89,12 @@
     word-wrap: break-word;
     overflow: scroll;
   }
+  input#xControlRange {
+    width: 100%;
+  }
+  input#yControlRange {
+    transform: rotate(90deg);
+  }
 </style>
 </head>
 <body onclick="updateRender()">
@@ -102,6 +108,7 @@
       <td><button onclick="createANote(this.id);" id="g6button">G6</button></td>
       <td><button onclick="createANote(this.id);" id="a6button">A6</button></td>
       <td><button onclick="createANote(this.id);" id="b6button">B6</button></td>
+      <td rowspan="7" style="background-color:#2fbf65;width:500px;"><input type="range" id="yControlRange"></td>
     </tr>
     <tr>
       <td><button onclick="createANote(this.id);" id="c5button">C5</button></td>
@@ -134,7 +141,7 @@
   <table>
     <tr>
       <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
-      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
+      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);">draw staves</button></td>
       <td><button onclick="clearCanvas()">clear</button></td>
       <td><button onclick="drawTrebleCleff(10,50+100*i);console.log(i);">treble clef</button></td>
       <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
@@ -147,6 +154,12 @@
       <td><button onclick="increaseY_5()">y+=5</button></td>
       <td><button onclick="decreaseY_5()">y-=5</button></td>
       <td><button></button></td>
+    </tr>
+    <tr>
+      <td colspan="7">
+        <input type="range" id="xControlRange" name="xControlRange" min="0" max="400">
+        <label for="xControlRange">set X</label>
+      </td>
     </tr>
   </table>
 </div>
@@ -161,7 +174,6 @@
 <script src="draw_music_symbols.js"></script>
 
 <script>
-  var stavesHaveBeenDrawn = false;
   function increaseX_5() {x+=5;}
   function decreaseX_5() {x-=5;}
   function increaseY_5() {y+=5;}
@@ -175,27 +187,20 @@
   let spac = 100;
   let tmar = 50;
   function clearCanvas() {
-    ctx.fillStyle = "#eeeedd";
-    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillRect(0, 0, this.width, this.height);
   }
   var xDisplay = document.getElementById("xDisplay");
   var yDisplay = document.getElementById("yDisplay");
   var notationConsole = document.getElementById("notationConsole");
   var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
   function updateRender() {
-    clearCanvas();
-    if (stavesHaveBeenDrawn == true) {
-      drawStaves(quan, spac, tmar);
-    }
-    x = 20;
-    systemNumber = 1;
     xDisplay.innerHTML = "      x=" + x;
     yDisplay.innerHTML = "      y=" + y;
-    for (iii=0; iii<listOfNotes.length; iii++) {
-      drawNoteHead( (x), (yValues[listOfNotes[iii]] + tmar + 20 + (spac * (systemNumber - 1))) );
-      x += 10;
-      if (x > 390) {x = 20;systemNumber += 1;}
-    }
+    drawEverythingToPage();
+  }
+  function drawEverythingToPage() {
+    
   }
   function drawLedgerLines() {
     if (y>90 && y%2===0) {
@@ -224,17 +229,15 @@
     listOfNotesDisplay.innerHTML = ("notes are: " + listOfNotes);
   }
   function createANote(idOfButton) {
-    console.log('idOfButton = ' + idOfButton);
+    // listOfNotes.push(idOfButton.slice(0,1);)
+    console.log(idOfButton);
     listOfNotes.push(idOfButton.slice(0,2));
     notationConsoleDotLog("you pressed: " + idOfButton);
     listOfNotesDisplayUpdate(listOfNotes);
     x += 10;
-    let noteName = idOfButton.slice(0,2);
-    y = yValues[noteName];
-    console.log('noteName = ' + noteName);
-    console.log('y = ' + y);
-    //drawNoteHead(x,y);
-    //updateRender();
+    y = yValues['idOfButton.slice(0,1)'];
+    console.log(y);
+    drawNoteHead(x,y);
   }
 </script>
 
