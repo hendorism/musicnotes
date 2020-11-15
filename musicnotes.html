@@ -28,7 +28,7 @@
   }
   canvas#mnCanvas {
     position: relative;
-    top: 270px;
+    top: 320px;
     border: 1px solid black;
     z-index: -1;
   }
@@ -135,7 +135,7 @@
     <tr>
       <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
       <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
-      <td><button onclick="clearCanvas()">clear</button></td>
+      <td><button onclick="clearCanvas();console.log(clearCanvas);">clear</button></td>
       <td><button onclick="drawTrebleCleff(10,50+100*i);console.log(i);">treble clef</button></td>
       <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
       <td><button onclick="increaseXten()">x+=10</button></td>
@@ -150,7 +150,6 @@
     </tr>
   </table>
 </div>
-
 <canvas id="mnCanvas"></canvas>
 <div id="xDisplay"></div>
 <div id="yDisplay"></div>
@@ -159,7 +158,6 @@
 </div>
 <div id="listOfNotesDisplay"></div>
 <script src="draw_music_symbols.js"></script>
-
 <script>
   var stavesHaveBeenDrawn = false;
   function increaseX_5() {x+=5;}
@@ -175,7 +173,7 @@
   let spac = 100;
   let tmar = 50;
   function clearCanvas() {
-    ctx.fillStyle = "#eeeedd";
+    ctx.fillStyle = "#fefefe";
     ctx.fillRect(0, 0, c.width, c.height);
   }
   var xDisplay = document.getElementById("xDisplay");
@@ -189,23 +187,14 @@
     }
     x = 20;
     systemNumber = 1;
-    xDisplay.innerHTML = "      x=" + x;
-    yDisplay.innerHTML = "      y=" + y;
+    xDisplay.innerHTML = "x=" + x;
+    yDisplay.innerHTML = "y=" + y;
     for (iii=0; iii<listOfNotes.length; iii++) {
+      let yyy = yValues[listOfNotes[iii]];
       drawNoteHead( (x), (yValues[listOfNotes[iii]] + tmar + 20 + (spac * (systemNumber - 1))) );
+      drawLedgerLines(yyy);
       x += 10;
       if (x > 390) {x = 20;systemNumber += 1;}
-    }
-  }
-  function drawLedgerLines() {
-    if (y>90 && y%2===0) {
-      for (ll=0; ll<(y-90)/5; ll++) {
-        drawLine(x-20, y-10*ll, x+10, y-10*ll);
-      }
-    } else if (y>90 && y%2===1) {
-      for (ll=0; ll<(y-90)/5; ll++) {
-        drawLine(x-20, y-10*ll-5, x+10, y-10*ll-5);
-      }
     }
   }
   var listOfNotes = [];
@@ -236,71 +225,32 @@
     //drawNoteHead(x,y);
     //updateRender();
   }
-</script>
-
-
-
-<script>
-      // function c6button() {console.log(i);y=30;drawNoteHead(x,y+100*i);resetX();}
-      // function d6button() {console.log(i);y=25;drawNoteHead(x,y+100*i);resetX();}
-      // function e6button() {console.log(i);y=20;drawNoteHead(x,y+100*i);resetX();}
-      // function f6button() {console.log(i);y=15;drawNoteHead(x,y+100*i);resetX();}
-      // function g6button() {console.log(i);y=10;drawNoteHead(x,y+100*i);resetX();}
-      // function a6button() {console.log(i);y=05;drawNoteHead(x,y+100*i);resetX();}
-      // function b6button() {console.log(i);y=00;drawNoteHead(x,y+100*i);resetX();}
-      // function c5button() {console.log(i);y=65;drawNoteHead(x,y+100*i);resetX();}
-      // function d5button() {console.log(i);y=60;drawNoteHead(x,y+100*i);resetX();}
-      // function e5button() {console.log(i);y=55;drawNoteHead(x,y+100*i);resetX();}
-      // function f5button() {console.log(i);y=50;drawNoteHead(x,y+100*i);resetX();}
-      // function g5button() {console.log(i);y=45;drawNoteHead(x,y+100*i);resetX();}
-      // function a5button() {console.log(i);y=40;drawNoteHead(x,y+100*i);resetX();}
-      // function b5button() {console.log(i);y=35;drawNoteHead(x,y+100*i);resetX();}
-      // function c4button() {console.log(i);y=100;drawNoteHead(x,y+100*i);resetX();}
-      // function d4button() {console.log(i);y=95;drawNoteHead(x,y+100*i);resetX();}
-      // function e4button() {console.log(i);y=90;drawNoteHead(x,y+100*i);resetX();}
-      // function f4button() {console.log(i);y=85;drawNoteHead(x,y+100*i);resetX();}
-      // function g4button() {console.log(i);y=80;drawNoteHead(x,y+100*i);resetX();}
-      // function a4button() {console.log(i);y=75;drawNoteHead(x,y+100*i);resetX();}
-      // function b4button() {console.log(i);y=70;drawNoteHead(x,y+100*i);resetX();}
-      // function c3button() {console.log(i);y=135;drawNoteHead(x,y+100*i);resetX();}
-      // function d3button() {console.log(i);y=130;drawNoteHead(x,y+100*i);resetX();}
-      // function e3button() {console.log(i);y=125;drawNoteHead(x,y+100*i);resetX();}
-      // function f3button() {console.log(i);y=120;drawNoteHead(x,y+100*i);resetX();}
-      // function g3button() {console.log(i);y=115;drawNoteHead(x,y+100*i);resetX();}
-      // function a3button() {console.log(i);y=110;drawNoteHead(x,y+100*i);resetX();}
-      // function b3button() {console.log(i);y=105;drawNoteHead(x,y+100*i);resetX();}
-      function resetX() {
-        x+=10;
-        if (x>390) {
-          x=15;
-          i+=1;
-        }
-      }
-
-      function drawLedgerLines() {
-    if (y<50 && y%2===0) {
+  function drawLedgerLines(y) {
+    if (y<(-20) && y%2===0) {
         for (i=0; i<(50-y)/10; i++) {
             drawLine(x=10, y+10*i, x+10, y+10*i);
         }
-    } else if (y<50 && y%2===1) {
+    } else if (y<(-20) && y%2===1) {
         for (i=0; i<50-(y-10); i++) {
             drawLine(x-10, y+10*i, x-10, y+10*i);
         }
-    } else if (y>90 && y%2===0) {
+    } else if (y>20 && y%2===0) {
         for (i=0; i<y-90; i++) {
             drawLine(x-10, y-10*i, x+10, y-10*i);
         }
-    } else if (y>90 && y%2===1) {
+    } else if (y>20 && y%2===1) {
         for (i=0; i<(y-10)-90; i++) {
             drawLine(x-10, y-10*i, x+10, y-10*i);
         }
     }
   }
-
+  function resetX() {
+    x+=10;
+    if (x>390) {
+      x=15;
+      i+=1;
+    }
+  }
 </script>
-
-
-   
 </body>
-
 </html>
