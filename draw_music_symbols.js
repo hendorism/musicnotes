@@ -33,7 +33,7 @@ function crossBeams(q, x1, y1, x2, y2) {
   }
 }
 function drawTrebleCleff(x,y){
-    //drawReticle(x,y);
+    drawReticle(x,y);
     ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
     ctx.beginPath ();
@@ -42,12 +42,12 @@ function drawTrebleCleff(x,y){
     x+3,y+40,
     x+4,y+15,
     x-4,y-40);
-    
-    ctx.bezierCurveTo ( 
+
+    ctx.bezierCurveTo (
     x+16,y-35,
     x-20,y-4,
     x-4,y+14);
-    
+
     ctx.bezierCurveTo (
     x+16,y+35,
     x+10,y-45,

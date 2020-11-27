@@ -56,12 +56,12 @@ Dell Optiples-380 on 20201126232519 -->
   }
   div#listOfNotesDisplay {
     position: fixed;
-    top: 660;
+    top: 530;
     left: 400;
     background-color: #442240;
     color: #33ffee;
-    height: 400px;
-    width: 200px;
+    height: 300px;
+    width: 300px;
     font-family: helvetica;
     font-size: 12px;
     word-wrap: break-word;
@@ -114,8 +114,6 @@ Dell Optiples-380 on 20201126232519 -->
       <td><button onclick="createANote(this.id);" id="a3button">A3</button></td>
       <td><button onclick="createANote(this.id);" id="b3button">B3</button></td>
     </tr>
-  </table>
-  <table>
     <tr>
       <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
       <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
@@ -141,8 +139,25 @@ Dell Optiples-380 on 20201126232519 -->
   <span>notation console</span>
 </div>
 <div id="listOfNotesDisplay"></div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="draw_music_symbols.js"></script>
 <script>
+/*
+  $(document).keypress(function(e){
+     if (e.which == 87){
+         document.body.style.backgroundColor = "black";
+     }
+  }); */
+  //key binding:
+    $(document).keypress(function(e){
+       createANote(keyMap[e.which]);
+    });
+  var keyMap = {
+    "122": "c3", "120": "d3",  "99": "e3", "118": "f3",  "98": "g3", "110": "a3", "109": "b3",
+     "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
+    "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
+     "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+  }
   var stavesHaveBeenDrawn = false;
   function increaseX_5() {x+=5;}
   function decreaseX_5() {x-=5;}
@@ -247,3 +262,7 @@ Dell Optiples-380 on 20201126232519 -->
 </script>
 </body>
 </html>
+<!--
+clicking on any clef gives a dropdown menu with other clef options.
+shift-clicking an option allows user to drag to the point where clef reverts to what it was before.
+ -->
