@@ -155,26 +155,34 @@ Dell Optiples-380 on 20201126232519 -->
       <td><button>&#9837;</button></td>
       <td><button>&#9838;</button></td>
       <td><button>&#9839;</button></td>
+      <td><button onclick="createANote();">test</button></td>
     </tr>
   </table>
 </div>
-<a id="instruction-manual-link" href="readme.html" target="_blank">click for instructions</a>
+<a id="instruction-manual-link" href="instructions.html" target="_blank">click for instructions</a>
 <canvas id="mnCanvas"></canvas>
 <div id="notationConsole">
   <span>notation console</span>
 </div>
 <div id="listOfNotesDisplay"></div>
+<!-- jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- classes -->
 <script src="classes.js"></script>
+<!-- draw music symbols -->
 <script src="draw_music_symbols.js"></script>
+<!-- other stuff -->
 <script>
-/*
-  $(document).keypress(function(e){
-     if (e.which == 87){
-         document.body.style.backgroundColor = "black";
-     }
-  }); */
+    // function redrawEverything() {
+    //   //redraw everything
+    // }
   //key binding:
+  window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
     $(document).keypress(function(e){
       notationConsoleDotLog("You pressed: " + e.which);
       createANote(keyMap[e.which]);
@@ -184,12 +192,7 @@ Dell Optiples-380 on 20201126232519 -->
       notationConsoleDotLog("You pressed: " + e.which);
       if (e.which == 8){
         startOver();
-      }
-      // 54: You pressed: 38
-      // 55: You pressed: 39
-      // 56: You pressed: 40
-      // 57: You pressed: 37
-      if (e.which == 38) { //up
+      } else if (e.which == 38) { //up
         decreaseY_5();
       } else if (e.which == 39) { //right
         increaseX_5();
@@ -197,6 +200,8 @@ Dell Optiples-380 on 20201126232519 -->
         increaseY_5();
       } else if (e.which == 37) { //left
         decreaseX_5();
+      } else if (e.which == 32) { //spacebar
+        drawStaves(quan,spac,tmar);
       }
       notationConsoleDotLog("x=" + x + ", y=" + y);
       drawReticle(x,y);
@@ -266,16 +271,19 @@ Dell Optiples-380 on 20201126232519 -->
   }
   function createANote(idOfButton) {
     clearCanvas();
-    let noteName = idOfButton.slice(0,2);
-    listOfNotes.push(noteName);
-    notationConsoleDotLog('new note: ' + noteName);
+    if (idOfButton != undefined) {
+      let noteName = idOfButton.slice(0,2);
+      listOfNotes.push(noteName);
+      notationConsoleDotLog('new note: ' + noteName);
+    } else {
+      notationConsoleDotLog("idOfButton is " + idOfButton);
+    }
     if (stavesHaveBeenDrawn == true) {
       drawStaves(quan, spac, tmar);
     }
     x=15;
     ii = 0;
     for (iii=0; iii<listOfNotes.length; iii++) {
-      //yValueOfNoteRelativeToMiddleLine = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii]];
       y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii]]+tmar+20+spac*ii;
       drawNoteHead(x,y);
       drawLedgerLines(y);
@@ -287,27 +295,19 @@ Dell Optiples-380 on 20201126232519 -->
     let noteHeadY_minus_middleLineY = yy-middleLineY;
     if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===0) {
         for (ledgerLineNumber=0; ledgerLineNumber>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
-          for (doItTwice=0; doItTwice<2; doItTwice++) {
             drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
-          }
         }
     } else if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===1) {
         for (ledgerLineNumber=0; ledgerLineNumber-1>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
-          for (doItTwice=0; doItTwice<2; doItTwice++) {
             drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
-          }
         }
     } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===0) {
         for (ledgerLineNumber=0; ledgerLineNumber<=(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
-          for (doItTwice=0; doItTwice<2; doItTwice++) {
             drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
-          }
         }
     } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===1) {
         for (ledgerLineNumber=0; ledgerLineNumber<(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
-          for (doItTwice=0; doItTwice<2; doItTwice++) {
             drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
-          }
         }
     }
   }
