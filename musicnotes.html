@@ -6,98 +6,7 @@ Dell Optiples-380 on 20201126232519 -->
 <html>
   <head>
     <title>music notes</title>
-<style>
-  * {
-    padding: 0;
-    margin: 0;
-    font-family: monospace;
-  }
-  table tr td{
-    padding: 0;
-    text-align:center;
-  }
-  div.controls {
-    position: fixed;
-    top: 0;
-    background-color: #d9f;
-    width: 100%;
-  }
-  button {
-    /* font-family: arial; */
-    width: 50px;
-    height: 50px;
-    border-radius: 3px;
-    border: 0px solid black;
-    background-color: #6688bb;
-    color: #ddeeff;
-    text-shadow: 2px 2px 4px #262626;
-  }
-  canvas#mnCanvas {
-    position: relative;
-    top: 320px;
-    border: 1px solid black;
-    z-index: -1;
-  }
-  div#notationConsole {
-    position: fixed;
-    top: 0;
-    left: 400;
-    background-color: #112240;
-    color: #33ffee;
-    border-radius: 6px;
-    height: 520px;
-    width: 500px;
-    font-family: helvetica;
-    font-size: 12px;
-    overflow: scroll;
-    word-wrap: break-word;
-    text-shadow: 2px 2px 4px #9999bb;
-  }
-  div#notationConsole span {
-    margin: 0px 4px 0px 4px;
-    background-color: #444444;
-    border: 1px solid #000000;
-  }
-  div#listOfNotesDisplay {
-    position: fixed;
-    top: 530;
-    left: 400;
-    background-color: #442240;
-    color: #33ffee;
-    height: 300px;
-    width: 300px;
-    font-family: helvetica;
-    font-size: 12px;
-    word-wrap: break-word;
-    overflow: scroll;
-  }
-  .notationConsoleLineNumbers {
-    color:#ddddef;
-    background-color: #335599;
-    font-family: monospace;
-    font-size:16px;
-  }
-  a#instruction-manual-link {
-    transform: rotate(90deg);
-    letter-spacing:3px;
-    text-transform: uppercase;
-    text-decoration: none;
-    position: fixed;
-    top: 130px;
-    left: 258px;
-    z-index: 5;
-    color: #39ffb3;
-    height: 22px;
-    width: 250px;
-    background-color:#333333;
-    border-radius: 3.2px;
-    padding: 0px;
-    text-align: center;
-  }
-  a#instruction-manual-link:hover {
-    color: #00ff00;
-  }
-</style>
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
 <div class="controls">
@@ -168,9 +77,9 @@ Dell Optiples-380 on 20201126232519 -->
 <!-- jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!-- classes -->
-<script src="classes.js"></script>
+<script src="js/classes.js"></script>
 <!-- draw music symbols -->
-<script src="draw_music_symbols.js"></script>
+<script src="js/draw_music_symbols.js"></script>
 <!-- other stuff -->
 <script>
     // function redrawEverything() {
