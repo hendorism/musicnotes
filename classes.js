@@ -23,5 +23,6 @@ class musicnote {
     this.octave = octave;
     this.duration = duration;
     this.accidental = accidental;
+    this.selected = boolean;
   }
 }
