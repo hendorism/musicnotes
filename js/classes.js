@@ -1,28 +1,28 @@
-class canvas {
-  constructor(systemsQuantity, systemsSpacing, topMargin) {
-    this.systemsQuantity = systemsQuantity;
-    this.systemsSpacing = systemsSpacing;
-    this.marginTop = marginTop;
-  }
+function canvas(systemsQuantity, systemsSpacing, marginTop) {
+  // how many systems are goin got be on that page. is a function of all margins and spacing and page height.
+  this.systemsQuantity = systemsQuantity;
+  // essentially a bottom-margin for systems in addition to whatever bottom margin for the bottom staff in that system
+  this.systemsSpacing = systemsSpacing;
+  // top-margin for the music, (gets added to staff top margin) systems do not have top-margin.
+  this.marginTop = marginTop;
 }
-class system {
-  constructor(staffQuantity, measuresQuantity) {
-    this.staffQuantity = staffQuantity;
-    this.measuresQuantity = measuresQuantity;
-  }
+function system(staffQuantity, measuresQuantity) {
+  // How many staves in a given system
+  this.staffQuantity = staffQuantity;
+  // How many measures in a given system
+  this.measuresQuantity = measuresQuantity;
 }
-class staff {
-  constructor(marginTop, marginBottom) {
-    this.marginTop = marginTop;
-    this.marginBottom = marginBottom;
-  }
+function staff(marginTop, marginBottom) {
+  // a top-margin just for a particular staff
+  this.marginTop = marginTop;
+  // a bottom-margin just for a particular staff
+  this.marginBottom = marginBottom;
 }
-class musicnote {
-  constructor(name, octave, duration, accidental) {
-    this.name = name;
-    this.octave = octave;
-    this.duration = duration;
-    this.accidental = accidental;
-    this.selected = boolean;
-  }
+function musicNote(name, octave, sharpFlat) {
+  this.name = name; // e.g. a
+  this.octave = octave; // e.g. 4
+  //this.duration = duration; // e.g. 4 to mean 1/4 or quarter-note
+  this.displayAccidental = false; // false if accidental is implied from key signature
+  this.sharpFlat = sharpFlat; // whether the note is natural, flat, sharp, double-sharp etc.
+  this.selected = true; // if note is selected, notehed appears different color, and we can do things to it.
 }

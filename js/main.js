@@ -1,87 +1,4 @@
-<!-- created by Aaron Dull 2018-2020 -->
-<!-- You are a jelly donut and I am
-pushing this comment to GitHub with
-Atom running on Linux Zorin on my
-Dell Optiples-380 on 20201126232519 -->
-<html>
-  <head>
-    <title>music notes</title>
-    <link rel="stylesheet" type="text/css" href="styles/style.css">
-</head>
-<body>
-<div class="controls">
-  <table>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b6button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b5button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b4button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b3button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
-      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
-      <td><button onclick="startOver();">new</button></td>
-      <td><button onclick="drawTrebleCleff(x,y);console.log(i);">treble clef</button></td>
-      <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
-      <td><button onclick="increaseXten()">x+=10</button></td>
-      <td><button onclick="decreaseXten()">x-=10</button></td>
-    </tr>
-    <tr>
-      <td><button onclick="increaseX_5()">x+=5</button></td>
-      <td><button onclick="decreaseX_5()">x-=5</button></td>
-      <td><button onclick="increaseY_5()">y+=5</button></td>
-      <td><button onclick="decreaseY_5()">y-=5</button></td>
-      <td><button>&#9837;</button></td>
-      <td><button>&#9838;</button></td>
-      <td><button>&#9839;</button></td>
-      <td><button onclick="createANote();">test</button></td>
-    </tr>
-  </table>
-</div>
-<a id="instruction-manual-link" href="instructions.html" target="_blank">click for instructions</a>
-<canvas id="mnCanvas"></canvas>
-<div id="notationConsole">
-  <span>notation console</span>
-</div>
-<div id="listOfNotesDisplay"></div>
-<!-- jquery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<!-- classes -->
-<script src="js/classes.js"></script>
-<!-- draw music symbols -->
-<script src="js/draw_music_symbols.js"></script>
-<!-- other stuff -->
-<script>
+
     // function redrawEverything() {
     //   //redraw everything
     // }
@@ -182,8 +99,16 @@ Dell Optiples-380 on 20201126232519 -->
     clearCanvas();
     if (idOfButton != undefined) {
       let noteName = idOfButton.slice(0,2);
-      listOfNotes.push(noteName);
-      notationConsoleDotLog('new note: ' + noteName);
+    //   function musicNote(name, octave, sharpFlat) {
+    //     this.name = name; // e.g. a
+    //     this.octave = octave; // e.g. 4
+    //     //this.duration = duration; // e.g. 4 to mean 1/4 or quarter-note
+    //     this.displayAccidental = false; // false if accidental is implied from key signature
+    //     this.sharpFlat = sharpFlat; // whether the note is natural, flat, sharp, double-sharp etc.
+    //     this.selected = true; // if note is selected, notehed appears different color, and we can do things to it.
+    //   }
+      listOfNotes.push(new musicNote(noteName.slice(0,1), noteName.slice(1,1), 0));
+      notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
     } else {
       notationConsoleDotLog("idOfButton is " + idOfButton);
     }
@@ -193,7 +118,7 @@ Dell Optiples-380 on 20201126232519 -->
     x=15;
     ii = 0;
     for (iii=0; iii<listOfNotes.length; iii++) {
-      y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii]]+tmar+20+spac*ii;
+      y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii].name + listOfNotes[iii].octave]+tmar+20+spac*ii;
       drawNoteHead(x,y);
       drawLedgerLines(y);
       resetX();
@@ -228,10 +153,3 @@ Dell Optiples-380 on 20201126232519 -->
       ii += 1;
     }
   }
-</script>
-</body>
-</html>
-<!--
-clicking on any clef gives a dropdown menu with other clef options.
-shift-clicking an option allows user to drag to the point where clef reverts to what it was before.
- -->
