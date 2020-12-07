@@ -2,6 +2,9 @@
 
 ##Aaron's music notation software.
 
+"Move fast and break things."
+-Mark Zuckerberg
+
 This program is meant to be a notation app that is not so much for engraving and publishing as it is for practicing your composition skills and sight-reading.
 
 It is meant to fit nicely in any screen although so far it is optimized for my phone, Galaxy s7. When I say optimized I mean it kind of fits for now.
@@ -32,3 +35,5 @@ In the key of 4 flats, if I select an Eb and press up arrow, it will become F, o
 - [] holding shift and pressing up will transpose the selection up a halfstep. So in key of 0 sharps, if I select sequence of notes [e4, d4, c4], and press shift+up, it will become [f4, Eb4, Dd4]. If I press up again, it will become [F#4, E4, D4].
 
 My idea with this app is not to re-create MuseScore, Finale, Sibelius, Dorico, etc. but to build a system that works for me and out of which I can build some music games for ear training, sight-reading, transposition, etc.
+
+https://www.alt-codes.net/music_note_alt_codes.php
