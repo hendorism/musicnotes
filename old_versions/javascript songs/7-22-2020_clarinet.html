@@ -17,7 +17,7 @@ ctx.strokeRect(0, 0, c.width, c.height);
 ctx.fillStyle = "#eeeecc";
 ctx.fillRect(0,0,c.width, c.height);
 const noteHeadRadius = 4;
-const lineWidth = 1;
+const lineWidth = 1
 const thickLineWidth = 2.5;
 function drawReticle(x,y){
     ctx.fillStyle = '#77f';
@@ -40,12 +40,20 @@ let deltax = 8;
 for (i=0; i<beat001.length; i++) {
     let y = beat001[i];
     drawNoteHead(x, y);
+    if (y > 390) {
+        for (e=0; e<2; e++) {
+            drawLine(x-30, 390+10*(e+1), x+30, 390+10*(e+1));
+        }
+    }
+    if (y < 350) {
+        for (e=0; e<30; e++) {
+            drawLine(x-30, 350-10*(e+1), x+30, 350-10*(e+1));
+        }
+    }
     x += deltax;
-    if (y > 390) {for (e=0; e<2; e++) {drawLine(x-30, 390+10*(e+1), x+30, 390+10*(e+1));}}
-    if (y < 350) {for (e=0; e<30; e++) {drawLine(x-30, 350-10*(e+1), x+30, 350-10*(e+1));}}
 }
 drawTrebleCleff(15,480);
-drawKeySignature(22,470,-4)
+drawKeySignature(22,470,-4);
 function drawTrebleCleff(x, y){
     //drawReticle(x,y);
     ctx.fillStyle = '#000';
@@ -163,7 +171,7 @@ function drawKeySignature(x,y,a){
     //drawReticle(x,y);
     if (a<0) {
         for(i=0;i>a;i-=1){
-            drawFlat(x+5*-i,y+orderOfFlats[-i]);
+            drawFlat(x+5*-i, y+orderOfFlats[-i]);
         }
     } else if (a>0) {
         for(i=0;i<a;i++){
