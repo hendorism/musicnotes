@@ -4,11 +4,15 @@
     // }
   //key binding:
   window.addEventListener("keydown", function(e) {
-    // space and arrow keys
+    // prevent space-bar and arrow-keys from scrolling the page
+    // 37 39 38 40 32
+    // LE RI UP DO SB
+    //
+    //
     if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
-}, false);
+}, false); // idk what the false is for or what it means
     $(document).keypress(function(e){
       notationConsoleDotLog("You pressed: " + e.which);
       createANote(keyMap[e.which]);
@@ -28,6 +32,7 @@
         decreaseX_5();
       } else if (e.which == 32) { //spacebar
         drawStaves(quan,spac,tmar);
+        stavesHaveBeenDrawn = true;
       }
       notationConsoleDotLog("x=" + x + ", y=" + y);
       drawReticle(x,y);
@@ -37,7 +42,6 @@
      "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
     "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
      "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
-
   }
   var stavesHaveBeenDrawn = false;
   function increaseX_5() {x+=5;}
@@ -95,6 +99,16 @@
     }
     listOfNotesDisplay.scrollTop = listOfNotesDisplay.scrollHeight;
   }
+  /* ======================PERFORMANCE=======TEST===============================
+  // When window is done loading, wait 1 second and do performance test.
+ let ptn = 1000;
+  window.onload(setTimeout(performanceTest(ptn), 1000));
+  function performanceTest(oooo) {
+    for (ooo=0;ooo<oooo;ooo++) {
+      createANote('b4');
+    }
+  }
+  =========================================================================== */
   function createANote(idOfButton) {
     clearCanvas();
     if (idOfButton != undefined) {
@@ -107,7 +121,7 @@
     //     this.sharpFlat = sharpFlat; // whether the note is natural, flat, sharp, double-sharp etc.
     //     this.selected = true; // if note is selected, notehed appears different color, and we can do things to it.
     //   }
-      listOfNotes.push(new musicNote(noteName.slice(0,1), noteName.slice(1,1), 0));
+      listOfNotes.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
       notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
     } else {
       notationConsoleDotLog("idOfButton is " + idOfButton);
@@ -118,6 +132,11 @@
     x=15;
     ii = 0;
     for (iii=0; iii<listOfNotes.length; iii++) {
+      if (listOfNotes[iii].selected==true) {
+        fillStyle = '#238fb3';
+      } else {
+        fillStyle = '#000000';
+      }
       y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii].name + listOfNotes[iii].octave]+tmar+20+spac*ii;
       drawNoteHead(x,y);
       drawLedgerLines(y);
