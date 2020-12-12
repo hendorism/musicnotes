@@ -139,7 +139,7 @@ function drawNoteHead(x,y){
     //ctx.arc(x,y,noteHeadRadius,0,Math.PI*2,true);
     //ctx.closePath();
     //ctx.fill();
-    ctx.fillStyle = "#000";
+    //ctx.fillStyle = "#000";
     ctx.beginPath();
     ctx.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
     ctx.fill();

@@ -138,6 +138,11 @@
         fillStyle = '#000000';
       }
       y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii].name + listOfNotes[iii].octave]+tmar+20+spac*ii;
+      if (listOfNotes[iii].selected = true) {
+        ctx.fillStyle = "#0000ff";
+      } else {
+        ctx.fillStyle = "#000000";
+      }
       drawNoteHead(x,y);
       drawLedgerLines(y);
       resetX();
