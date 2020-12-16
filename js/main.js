@@ -43,7 +43,6 @@
     "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
      "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
   }
-  var stavesHaveBeenDrawn = false;
   function increaseX_5() {x+=5;}
   function decreaseX_5() {x-=5;}
   function increaseY_5() {y+=5;}
@@ -64,13 +63,13 @@
     clearCanvas();
     x = 15;
     ii = 0;
-    listOfNotes = [];
+     = [reticle];
     notationConsoleDotLog("You just deleted everything.");
   }
   var ledgerLineRadius = 8;
   var notationConsole = document.getElementById("notationConsole");
   var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
-  var listOfNotes = [];
+  var scoreComponents = [];
   var yValueOfNoteRelativeToMiddleLine;
   var yValuesOfNotesRelativeToMiddleLine = {
     "b6": -70, "a6": -65, "g6": -60, "f6": -55, "e6": -50, "d6": -45, "c6": -40,
@@ -99,17 +98,17 @@
     }
     listOfNotesDisplay.scrollTop = listOfNotesDisplay.scrollHeight;
   }
-  /* ======================PERFORMANCE=======TEST===============================
-  // When window is done loading, wait 1 second and do performance test.
- let ptn = 1000;
-  window.onload(setTimeout(performanceTest(ptn), 1000));
-  function performanceTest(oooo) {
-    for (ooo=0;ooo<oooo;ooo++) {
-      createANote('b4');
-    }
-  }
-  =========================================================================== */
-  function createANote(idOfButton) {
+  /*======================PERFORMANCE=======TEST================================
+   *// When window is done loading, wait 1 second and do performance test.
+   *let ptn = 1000;
+   *window.onload(setTimeout(performanceTest(ptn), 1000));
+   *function performanceTest(oooo) {
+   *  for (ooo=0;ooo<oooo;ooo++) {
+   *    createANote('b4');
+   *  }
+   *}
+   *========================================================================= */
+  function createANote(idOfButton, accidentalValue, accidentalIsShown) {
     clearCanvas();
     if (idOfButton != undefined) {
       let noteName = idOfButton.slice(0,2);
