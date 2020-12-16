@@ -1,8 +1,4 @@
 
-    // function redrawEverything() {
-    //   //redraw everything
-    // }
-  //key binding:
   window.addEventListener("keydown", function(e) {
     // prevent space-bar and arrow-keys from scrolling the page
     // 37 39 38 40 32
@@ -12,7 +8,7 @@
     if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
         e.preventDefault();
     }
-}, false); // idk what the false is for or what it means
+}, false);
     $(document).keypress(function(e){
       notationConsoleDotLog("You pressed: " + e.which);
       createANote(keyMap[e.which]);
@@ -31,17 +27,44 @@
       } else if (e.which == 37) { //left
         decreaseX_5();
       } else if (e.which == 32) { //spacebar
-        drawStaves(quan,spac,tmar);
-        stavesHaveBeenDrawn = true;
+        let staves = new staves(12, 100, 50);
+        scoreComponents.push(staves);
+        updateRender();
       }
       notationConsoleDotLog("x=" + x + ", y=" + y);
       drawReticle(x,y);
     })
+    function updateRender(scoreComponents) {
+      startOver();
+
+    }
   var keyMap = {
     "122": "c3", "120": "d3",  "99": "e3", "118": "f3",  "98": "g3", "110": "a3", "109": "b3",
      "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
     "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
      "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+  }
+  const keySignatureNames = {
+    '-7':'c-flat',
+    '-6':'g-flat',
+    '-5':'d-flat',
+    '-4':'a-flat',
+    '-3':'e-flat',
+    '-2':'b-flat',
+    '-1':'f',
+    '0':'c',
+    '1':'g',
+    '2':'d',
+    '3':'a',
+    '4':'e',
+    '5':'b',
+    '6':'f-sharp',
+    '7':'c-sharp'
+  }
+  function alterKeySignature() {
+    let whichKey = keySignatureSelector.value;
+    let keySignatureName = keySignatureNames.whichKey
+    keySignatureImg.src = `../img/${keySignatureName}.png`
   }
   function increaseX_5() {x+=5;}
   function decreaseX_5() {x-=5;}
@@ -49,9 +72,8 @@
   function decreaseY_5() {y-=5;}
   function increaseXten() {x+=10;}
   function decreaseXten() {x-=10;}
-  var ii = 0;
-  var y = 50;
-  var x = 15;
+  let y = 50;
+  let x = 15;
   let quan = 12;
   let spac = 100;
   let tmar = 50;
@@ -62,14 +84,13 @@
   function startOver() {
     clearCanvas();
     x = 15;
-    ii = 0;
-    scoreComponents = [reticle];
-    notationConsoleDotLog("You just deleted everything.");
+    scoreComponents = [];
+    notationConsoleDotLog("Starting over. You just deleted everything.");
   }
   var ledgerLineRadius = 8;
   var notationConsole = document.getElementById("notationConsole");
   var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
-  var scoreComponents = [];
+  var scoreComponents = [reticle];
   var yValueOfNoteRelativeToMiddleLine;
   var yValuesOfNotesRelativeToMiddleLine = {
     "b6": -70, "a6": -65, "g6": -60, "f6": -55, "e6": -50, "d6": -45, "c6": -40,
@@ -99,7 +120,6 @@
     listOfNotesDisplay.scrollTop = listOfNotesDisplay.scrollHeight;
   }
   /*======================PERFORMANCE=======TEST================================
-   *// When window is done loading, wait 1 second and do performance test.
    *let ptn = 1000;
    *window.onload(setTimeout(performanceTest(ptn), 1000));
    *function performanceTest(oooo) {

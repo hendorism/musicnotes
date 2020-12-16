@@ -8,10 +8,7 @@ table tr td{
   text-align:center;
 }
 div.controls {
-  position: fixed;
-  top: 0;
   background-color: #d9f;
-  width: 100%;
 }
 button {
   /* font-family: arial; */
@@ -24,10 +21,9 @@ button {
   text-shadow: 2px 2px 4px #262626;
 }
 canvas#mnCanvas {
-  position: relative;
-  top: 500px;
+  position: static;
   border: 1px solid black;
-  z-index: -1;
+  z-index: 10;
 }
 div#notationConsole {
   position: fixed;

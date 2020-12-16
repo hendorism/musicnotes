@@ -1,6 +1,8 @@
 <html>
   <head>
+    <meta charset="UTF-8"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js/controller.js"></script>
     <title>music notes</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
@@ -57,27 +59,56 @@
       <td><button onclick="decreaseX_5()">x-=5</button></td>
       <td><button onclick="increaseY_5()">y+=5</button></td>
       <td><button onclick="decreaseY_5()">y-=5</button></td>
-      <td><button>&#9837;</button></td>
-      <td><button>&#9838;</button></td>
-      <td><button>&#9839;</button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
       <td><button onclick="createANote();">test</button></td>
     </tr>
     <tr>
-      <td><button>&#119132;</button></td>
-      <td><button>&#119133;</button></td>
-      <td><button>&#119134;</button></td>
-      <td><button>&#119135;</button></td>
-      <td><button>&#119136;</button></td>
-      <td><button>&#119137;</button></td>
-      <td><button>&#119138;</button></td>
-      <td><button>&#119139;</button></td>
-      <td><button>&#119140;</button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
+      <td><button></button></td>
     </tr>
+    <tr>
+      <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
+        <span id="show-accidental-boolean">"show accidental" = false</span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
+        <input type="range" id="key-signature-selector" name="key-signature-selector" value="0" min="-7" max="7" list="tickmarks" oninput="alterKeySignature()">
+        <datalist id="tickmarks">
+          <option value="-7"></option>
+          <option value="-6"></option>
+          <option value="-5"></option>
+          <option value="-4"></option>
+          <option value="-3"></option>
+          <option value="-2"></option>
+          <option value="-1"></option>
+          <option value="0"></option>
+          <option value="1"></option>
+          <option value="2"></option>
+          <option value="3"></option>
+          <option value="4"></option>
+          <option value="5"></option>
+          <option value="6"></option>
+          <option value="7"></option>
+        </datalist>
+        <label for="key-signature-selector">Key Signature Selector</label>
+        <img src="#">
+      </td>
+    </tr>
+    
   </table>
 </div>
 <a id="instruction-manual-link" href="instructions.html" target="_blank">
-  click for instructions
-</a>
+  click for instructions</a>
 <canvas id="mnCanvas"></canvas>
 <div id="notationConsole">
   <span>notation console</span>
