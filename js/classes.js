@@ -1,5 +1,5 @@
 function canvas(systemsQuantity, systemsSpacing, marginTop) {
-  // how many systems are goin got be on that page. is a function of all margins and spacing and page height.
+  // how many systems are going to be on that page. is a function of all margins and spacing and page height.
   this.systemsQuantity = systemsQuantity;
   // essentially a bottom-margin for systems in addition to whatever bottom margin for the bottom staff in that system
   this.systemsSpacing = systemsSpacing;
