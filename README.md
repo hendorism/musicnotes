@@ -2,9 +2,6 @@
 
 ##Aaron's music notation software.
 
-"Move fast and break things."
--Mark Zuckerberg
-
 This program is meant to be a notation app that is not so much for engraving and publishing as it is for practicing your composition skills and sight-reading.
 
 It is meant to fit nicely in any screen although so far it is optimized for my phone, Galaxy s7. When I say optimized I mean it kind of fits for now.
