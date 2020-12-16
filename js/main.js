@@ -63,7 +63,7 @@
     clearCanvas();
     x = 15;
     ii = 0;
-     = [reticle];
+    scoreComponents = [reticle];
     notationConsoleDotLog("You just deleted everything.");
   }
   var ledgerLineRadius = 8;
@@ -120,7 +120,7 @@
     //     this.sharpFlat = sharpFlat; // whether the note is natural, flat, sharp, double-sharp etc.
     //     this.selected = true; // if note is selected, notehed appears different color, and we can do things to it.
     //   }
-      listOfNotes.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
+      scoreComponents.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
       notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
     } else {
       notationConsoleDotLog("idOfButton is " + idOfButton);
