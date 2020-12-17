@@ -20,6 +20,9 @@ button {
   color: #ddeeff;
   text-shadow: 2px 2px 4px #262626;
 }
+datalist#key-signature-datalist {
+  line-height: 0.5em;
+}
 canvas#mnCanvas {
   position: static;
   border: 1px solid black;

@@ -1,7 +1,7 @@
 console.log("music_notation_v0018.js is working.");
 console.log("music_notation_v0018.js was made by Aaron Dull in 2019.");
 
-var c = document.getElementById("mnCanvas");
+var c = document.getElementById("canvasId");
 var ctx = c.getContext("2d");
 c.width = 400;
 c.height = 1200;
@@ -9,6 +9,7 @@ ctx.strokeStyle = "#000000";
 ctx.strokeRect(0, 0, c.width, c.height);
 ctx.fillStyle = "#eeeecc";
 ctx.fillRect(0,0,c.width, c.height);
+
 const noteHeadRadius = 4;
 const lineWidth = 1;
 const thickLineWidth = 2.5;

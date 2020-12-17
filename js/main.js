@@ -78,7 +78,7 @@
   let spac = 100;
   let tmar = 50;
   function clearCanvas() {
-    ctx.fillStyle = "#fefefe";
+    ctx.fillStyle = "#eeeecc";
     ctx.fillRect(0, 0, c.width, c.height);
   }
   function startOver() {
