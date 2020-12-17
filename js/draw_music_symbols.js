@@ -1,8 +1,8 @@
 console.log("music_notation_v0018.js is working.");
 console.log("music_notation_v0018.js was made by Aaron Dull in 2019.");
 
-var c = document.getElementById("canvasId");
-var ctx = c.getContext("2d");
+const c = document.getElementById("music-notation-canvas");
+const ctx = c.getContext("2d");
 c.width = 400;
 c.height = 1200;
 ctx.strokeStyle = "#000000";
@@ -14,7 +14,7 @@ const noteHeadRadius = 4;
 const lineWidth = 1;
 const thickLineWidth = 2.5;
 
-function drawReticle(x,y){
+function drawReticle(x,y,ctx){
     ctx.fillStyle = '#77f';
     ctx.beginPath();
     ctx.arc(x,y,4,0,Math.PI*2,true);
@@ -36,7 +36,7 @@ function crossBeams(q, x1, y1, x2, y2) {
   }
 }
 
-function drawTrebleCleff(x,y){
+function drawTrebleCleff(x,y,ctx){
     drawReticle(x,y);
     ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
@@ -126,13 +126,9 @@ function drawDoubleSharp(x,y){
 function drawNatural(x,y){
     //drawReticle(x,y);
     drawLine(x-2,y-8,x-2,y+5);
-    //left vertical top to bottom.
     drawLine(x-2,y+0,x+2,y-5);
-    //top mid left to right.
     drawLine(x-2,y+5,x+2,y-0);
-    //bottom mid left to right.
     drawLine(x+2,y-5,x+2,y+8);
-    //right vertical top to bottom.
 }
 
 function drawNoteHead(x,y){
@@ -144,31 +140,6 @@ function drawNoteHead(x,y){
     ctx.beginPath();
     ctx.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
     ctx.fill();
-}
-
-function drawNoteNatural(x,y){
-    drawNoteHead(x,y);
-    drawNatural(x-10,y);
-}
-
-function drawNoteFlat(x,y){
-    drawNoteHead(x,y);
-    drawFlat(x-9,y+0);
-}
-
-function drawNoteDoubleFlat(x,y){
-    drawNoteHead(x,y);
-    drawDoubleFlat(x-9,y+0);
-}
-
-function drawNoteSharp(x,y){
-    drawNoteHead(x,y);
-    drawSharp(x-10,y);
-}
-
-function drawNoteDoubleSharp(x,y){
-    drawNoteHead(x,y);
-    drawDoubleSharp(x-10,y);
 }
 
 function drawEighthRest(x,y){
@@ -204,26 +175,6 @@ function drawQuarterRest(x,y) {
   ctx.stroke();
 }
 
-/*
-function drawRest(d, x, y) {
-  if (d === 1) {
-    drawSixtyFourthRest(x, y);
-  } else if (d === 2) {
-    drawThirtySecondRest(x, y);
-  } else if (d === 3) {
-    drawSixteenthRest(x, y);
-  } else if (d === 4) {
-    drawEighthRest(x, y);
-  } else if (d === 5) {
-    drawQuarterRest(x, y);
-  } else if (d === 6) {
-    drawHalfRest(x, y);
-  } else if (d === 7) {
-    drawWholeRest(x, y);
-  }
-}
-*/
-
 function drawKeySignature(x,y,a){
     let orderOfFlats  = [0,-15,5,-10,10,-5,15];
     let orderOfSharps = [-20,-5,-25,-10,5,-15,0];
@@ -239,7 +190,7 @@ function drawKeySignature(x,y,a){
     }
 }
 
-function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6) {
+function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6,ctx) {
     ctx.lineWidth = lineWidth;
     drawLine(x1,y1,x2,y2);
     drawLine(x2,y2,x3,y3);
@@ -258,17 +209,6 @@ function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6) {
     //ctx.lineTo(x6, y6);
     //ctx.stroke();
 }
-
-
-
-
-/*
-function drawNote(a,x,y,sd,sl,sx){
-  if a=
-  drawNoteHead(x,y);
-}
-
-*/
 
 console.log("music_notation_v0018.js is finished working.");
 

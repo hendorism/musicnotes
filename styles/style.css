@@ -1,32 +1,36 @@
 * {
   padding: 0;
   margin: 0;
-  font-family: monospace;
+}
+body {
+  background-color: #d9fbe3;
 }
 table tr td{
   padding: 0;
   text-align:center;
 }
-div.controls {
-  background-color: #d9f;
-}
 button {
-  /* font-family: arial; */
   width: 50px;
   height: 50px;
   border-radius: 3px;
-  border: 0px solid black;
+  border: 1px solid black;
   background-color: #6688bb;
   color: #ddeeff;
-  text-shadow: 2px 2px 4px #262626;
+  text-shadow: 2px 2px 4px #2636f6;
+  transition: background-color 0.5s;
+}
+button:hover {
+  background-color: #032942;
+}
+button img {
+  background-color: transparent;
 }
 datalist#key-signature-datalist {
   line-height: 0.5em;
 }
-canvas#mnCanvas {
+#music-notation-canvas {
   position: static;
   border: 1px solid black;
-  z-index: 10;
 }
 div#notationConsole {
   position: fixed;
@@ -48,19 +52,6 @@ div#notationConsole span {
   background-color: #444444;
   border: 1px solid #000000;
 }
-div#listOfNotesDisplay {
-  position: fixed;
-  top: 530;
-  left: 400;
-  background-color: #442240;
-  color: #33ffee;
-  height: 300px;
-  width: 300px;
-  font-family: helvetica;
-  font-size: 12px;
-  word-wrap: break-word;
-  overflow: scroll;
-}
 .notationConsoleLineNumbers {
   color:#ddddef;
   background-color: #335599;
@@ -68,22 +59,26 @@ div#listOfNotesDisplay {
   font-size:16px;
 }
 a#instruction-manual-link {
+  font-size: 16px;
   transform: rotate(90deg);
-  letter-spacing:3px;
+  letter-spacing: 6px;
   text-transform: uppercase;
   text-decoration: none;
   position: fixed;
-  top: 130px;
-  left: 258px;
+  top: 110px;
+  left: 257px;
   z-index: 5;
-  color: #39ffb3;
-  height: 22px;
+  color: #39ccb3;
+  height: 28px;
   width: 250px;
-  background-color:#333333;
+  background-color:#393355;
   border-radius: 3.2px;
-  padding: 0px;
+  padding-top: 5px;
   text-align: center;
+  transition: color 2s, letter-spacing 3s, background-color 4s;
 }
 a#instruction-manual-link:hover {
-  color: #00ff00;
+  color: #49ffc9;
+  letter-spacing: 10px;
+  background-color: #060264;
 }

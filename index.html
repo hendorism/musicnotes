@@ -3,54 +3,54 @@
     <meta charset="UTF-8"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="js/controller.js"></script>
+    <script src="startOver.js"></script>
     <title>music notes</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
 </head>
 <body>
-<div class="controls" id="controls">
   <table>
     <tr>
-      <td><button onclick="createANote(this.id);" id="c6button">1</button></td>
+      <td><button onclick="createANote(this.id);" id="c6button"></button></td>
       <td><button onclick="createANote(this.id);" id="d6button"></button></td>
       <td><button onclick="createANote(this.id);" id="e6button"></button></td>
       <td><button onclick="createANote(this.id);" id="f6button"></button></td>
       <td><button onclick="createANote(this.id);" id="g6button"></button></td>
       <td><button onclick="createANote(this.id);" id="a6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b6button">7</button></td>
+      <td><button onclick="createANote(this.id);" id="b6button"></button></td>
     </tr>
     <tr>
-      <td><button onclick="createANote(this.id);" id="c5button">q</button></td>
+      <td><button onclick="createANote(this.id);" id="c5button"></button></td>
       <td><button onclick="createANote(this.id);" id="d5button"></button></td>
       <td><button onclick="createANote(this.id);" id="e5button"></button></td>
       <td><button onclick="createANote(this.id);" id="f5button"></button></td>
       <td><button onclick="createANote(this.id);" id="g5button"></button></td>
       <td><button onclick="createANote(this.id);" id="a5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b5button">u</button></td>
+      <td><button onclick="createANote(this.id);" id="b5button"></button></td>
     </tr>
     <tr>
-      <td><button onclick="createANote(this.id);" id="c4button">a</button></td>
+      <td><button onclick="createANote(this.id);" id="c4button"></button></td>
       <td><button onclick="createANote(this.id);" id="d4button"></button></td>
       <td><button onclick="createANote(this.id);" id="e4button"></button></td>
       <td><button onclick="createANote(this.id);" id="f4button"></button></td>
       <td><button onclick="createANote(this.id);" id="g4button"></button></td>
       <td><button onclick="createANote(this.id);" id="a4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b4button">j</button></td>
+      <td><button onclick="createANote(this.id);" id="b4button"></button></td>
     </tr>
     <tr>
-      <td><button onclick="createANote(this.id);" id="c3button">z</button></td>
+      <td><button onclick="createANote(this.id);" id="c3button"></button></td>
       <td><button onclick="createANote(this.id);" id="d3button"></button></td>
       <td><button onclick="createANote(this.id);" id="e3button"></button></td>
       <td><button onclick="createANote(this.id);" id="f3button"></button></td>
       <td><button onclick="createANote(this.id);" id="g3button"></button></td>
       <td><button onclick="createANote(this.id);" id="a3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b3button">m</button></td>
+      <td><button onclick="createANote(this.id);" id="b3button"></button></td>
     </tr>
     <tr>
-      <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
+      <td><button onclick=""></button></td>
       <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
-      <td><button onclick="startOver();">new</button></td>
-      <td><button onclick="drawTrebleCleff(x,y);console.log(i);">treble clef</button></td>
-      <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
+      <td><button onclick="startOver()">new</button></td>
+      <td><button onclick="drawTrebleCleff(x,y)">treble clef</button></td>
+      <td><button onclick="drawSharp(x,y)">sharp</button></td>
       <td><button onclick="increaseXten()">x+=10</button></td>
       <td><button onclick="decreaseXten()">x-=10</button></td>
     </tr>
@@ -62,11 +62,8 @@
       <td><button></button></td>
       <td><button></button></td>
       <td><button></button></td>
-      <td><button onclick="createANote();">test</button></td>
     </tr>
     <tr>
-      <td><button></button></td>
-      <td><button></button></td>
       <td><button></button></td>
       <td><button></button></td>
       <td><button></button></td>
@@ -80,64 +77,10 @@
         <span id="show-accidental-boolean">"show accidental" = false</span>
       </td>
     </tr>
-    <tr>
-      <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
-        <input type="range" id="key-signature-selector" name="key-signature-selector" value="0" min="-7" max="7" list="tickmarks" oninput="alterKeySignature()">
-        <datalist id="tickmarks">
-          <option value="-7"></option>
-          <option value="-6"></option>
-          <option value="-5"></option>
-          <option value="-4"></option>
-          <option value="-3"></option>
-          <option value="-2"></option>
-          <option value="-1"></option>
-          <option value="0"></option>
-          <option value="1"></option>
-          <option value="2"></option>
-          <option value="3"></option>
-          <option value="4"></option>
-          <option value="5"></option>
-          <option value="6"></option>
-          <option value="7"></option>
-        </datalist>
-        <label for="key-signature-selector">Key Signature Selector</label>
-        <canvas id="key-signature-display-canvas" width="20px" height="20px"></canvas>>
-      </td>
-    </tr>
-    <tr>
-      <td colspan="3">
-        <label for="key-signature-dropdown">Choose your key signature</label>
-        <input list="browsers" name="browser" id="browser">
-        <datalist id="key-signature-datalist">
-          <option value="Cb">
-          <option value="Gb">
-          <option value="Dd">
-          <option value="Ab">
-          <option value="Eb">
-          <option value="Bb">
-          <option value="F">
-          <option value="C">
-          <option value="G">
-          <option value="D">
-          <option value="A">
-          <option value="E">
-          <option value="B">
-          <option value="G#">
-          <option value="C#">
-        </datalist>
-        <button id="apply-key-signature-button">apply key signature</button>
-      </td>
-    </tr>
-    
   </table>
-</div>
-<a id="instruction-manual-link" href="instructions.html" target="_blank">
-  click for instructions</a>
-<canvas id="mnCanvas"></canvas>
-<div id="notationConsole">
-  <span>notation console</span>
-</div>
-<div id="listOfNotesDisplay"></div>
+<a id="instruction-manual-link" href="instructions.html" target="_blank">instructions</a>
+<canvas id="music-notation-canvas"></canvas>
+<div id="notationConsole"><span>notation console</span></div>
 <script src="js/classes.js"></script>
 <script src="js/draw_music_symbols.js"></script>
 <script src="js/main.js"></script>
