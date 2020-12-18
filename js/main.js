@@ -107,18 +107,13 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
 }
 
 function updateRender() {
-  for (iii=0; iii<listOfNotes.length; iii++) {
-    if (listOfNotes[iii].selected==true) {
+  for (iii=0; iii<scoreComponents.length; iii++) {
+    if (scoreComponents[iii].selected==true) {
       fillStyle = '#238fb3';
     } else {
       fillStyle = '#000000';
     }
-    y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii].name + listOfNotes[iii].octave]+tmar+20+spac*ii;
-    if (listOfNotes[iii].selected = true) {
-      ctx.fillStyle = "#0000ff";
-    } else {
-      ctx.fillStyle = "#000000";
-    }
+    y = yValuesOfNotesRelativeToMiddleLine[scoreComponents[iii].name + scoreComponents[iii].octave]+tmar+20+spac*ii;
     drawNoteHead(x,y);
     drawLedgerLines(y);
     resetX();
