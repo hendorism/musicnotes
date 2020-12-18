@@ -85,7 +85,7 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   clearCanvas();
   if (idOfButton != undefined) {
     let noteName = idOfButton.slice(0,2);
-    if () {
+    if ((some conditions)) {
       displayAccidental = true;
     } else {
       displayAccidental = false;

@@ -14,7 +14,7 @@ const noteHeadRadius = 4;
 const lineWidth = 1;
 const thickLineWidth = 2.5;
 
-function drawReticle(x,y,ctx){
+function drawReticle(x,y){
     ctx.fillStyle = '#77f';
     ctx.beginPath();
     ctx.arc(x,y,4,0,Math.PI*2,true);
@@ -36,7 +36,7 @@ function crossBeams(q, x1, y1, x2, y2) {
   }
 }
 
-function drawTrebleCleff(x,y,ctx){
+function drawTrebleCleff(x,y){
     drawReticle(x,y);
     ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
