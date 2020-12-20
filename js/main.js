@@ -81,15 +81,13 @@ function notationConsoleDotLog(notationConsoleLogEntry) {
   notationConsole.scrollTop = notationConsole.scrollHeight;
 }
 
+const accidentalControl = document.querySelector("#accidental-control")
+
 function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   clearCanvas();
   if (idOfButton != undefined) {
     let noteName = idOfButton.slice(0,2);
-    if ((some conditions)) {
-      displayAccidental = true;
-    } else {
-      displayAccidental = false;
-    }
+    decideAccidentalDisplay();
     scoreComponents.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
     notationConsoleDotLog('hi')
     notationConsoleDotLog(`scoreComponents=${scoreComponents}`)
@@ -105,6 +103,18 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   ii = 0;
   updateRender()
 }
+
+let noteHasAccidentalInKey;
+
+let lastOccurenceOfPitchHadSameAccidental;
+
+function decideAccidentalDisplay(); {
+    if (!noteHasAccidentalInKey || !lastOccurenceOfPitchHadSameAccidental) {
+      displayAccidental = true;
+    } else {
+      displayAccidental = false;
+    }
+} 
 
 function updateRender() {
   for (iii=0; iii<scoreComponents.length; iii++) {
