@@ -1,3 +1,5 @@
+$(document).ready(function(){
+
 window.addEventListener("keydown", function(e) {
   // prevent space-bar and arrow-keys from scrolling the page
   // 37 39 38 40 32
@@ -55,7 +57,6 @@ function clearCanvas() {
 }
 var ledgerLineRadius = 8;
 var notationConsole = document.getElementById("notationConsole");
-var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
 var scoreComponents = [];
 var yValueOfNoteRelativeToMiddleLine;
 var yValuesOfNotesRelativeToMiddleLine = {
@@ -81,7 +82,10 @@ function notationConsoleDotLog(notationConsoleLogEntry) {
   notationConsole.scrollTop = notationConsole.scrollHeight;
 }
 
-const accidentalControl = document.querySelector("#accidental-control")
+function createScoreComponent(component) {
+  scoreComponents.push(component)
+
+}
 
 function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   clearCanvas();
@@ -163,3 +167,6 @@ function resetX() {
     ii += 1;
   }
 }
+
+
+});

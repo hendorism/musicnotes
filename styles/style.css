@@ -17,13 +17,24 @@ button {
   background-color: #6688bb;
   color: #ddeeff;
   text-shadow: 2px 2px 4px #2636f6;
-  transition: background-color 0.5s, color 0.8s, font-size 0.1s, letter-spacing 1.6s;
+  transition: background-color 0.5s, color 0.8s, font-size 0.1s, letter-spacing 1.6s, text-shadow 1s;
 }
 button:hover {
   background-color: #032942;
   color: #33dd44;
   font-size: 0.75em;
   letter-spacing: 1px;
+}
+button.selected {
+  background-color: #66a8bb;
+  transition: background-color 0.5s, color 0.8s, font-size 0.1s, letter-spacing 1.6s, text-shadow 1s;
+}
+button.selected:hover {
+  background-color: #56c8cb;
+  color: #035d44;
+  font-size: 0.75em;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px #787fc7;
 }
 button img {
   background-color: transparent;
@@ -56,7 +67,7 @@ div#notationConsole span {
   background-color: #444444;
   border: 1px solid #33dd44;
   border-radius: 2px;
-  transition: font-size 0.05s;
+  transition: font-size 1s;
 }
 
 div#notationConsole span:hover {
@@ -68,10 +79,6 @@ div#notationConsole span:hover {
   background-color: #335599;
   font-family: monospace;
   font-size:16px;
-}
-
-.x-y-display {
-  
 }
 
 a#instruction-manual-link {
