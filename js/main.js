@@ -85,18 +85,11 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   clearCanvas();
   if (idOfButton != undefined) {
     let noteName = idOfButton.slice(0,2);
-    if ((some conditions)) {
-      displayAccidental = true;
-    } else {
-      displayAccidental = false;
-    }
     scoreComponents.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
-    notationConsoleDotLog('hi')
-    notationConsoleDotLog(`scoreComponents=${scoreComponents}`)
     notationConsoleDotLog(JSON.stringify(scoreComponents[scoreComponents.length-1]))
     notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
   } else {
-    notationConsoleDotLog("error: idOfButton is " + idOfButton);
+    notationConsoleDotLog(`error: idOfButton is ${idOfButton}`);
   }
   if (stavesHaveBeenDrawn == true) {
     drawStaves(quan, spac, tmar);
