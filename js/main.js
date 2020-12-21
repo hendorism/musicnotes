@@ -81,6 +81,8 @@ function notationConsoleDotLog(notationConsoleLogEntry) {
   notationConsole.scrollTop = notationConsole.scrollHeight;
 }
 
+const accidentalControl = document.querySelector("#accidental-control")
+
 function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   clearCanvas();
   if (idOfButton != undefined) {
@@ -98,6 +100,18 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   ii = 0;
   updateRender()
 }
+
+let noteHasAccidentalInKey;
+
+let lastOccurenceOfPitchHadSameAccidental;
+
+function decideAccidentalDisplay(); {
+    if (!noteHasAccidentalInKey || !lastOccurenceOfPitchHadSameAccidental) {
+      displayAccidental = true;
+    } else {
+      displayAccidental = false;
+    }
+} 
 
 function updateRender() {
   for (iii=0; iii<scoreComponents.length; iii++) {
