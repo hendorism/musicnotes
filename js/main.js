@@ -12,6 +12,7 @@ window.addEventListener("keydown", function(e) {
 }, false);
 $(document).keypress(function(e){
   notationConsoleDotLog(`You pressed: ${e.which}`);
+  new musicNote(keyMap)
   createANote(keyMap[e.which]);
 });
 
@@ -100,9 +101,8 @@ function createANote(idOfButton, accidentalValue, accidentalIsShown) {
   if (stavesHaveBeenDrawn == true) {
     drawStaves(quan, spac, tmar);
   }
-  x=15;
-  ii = 0;
-  updateRender()
+  resetX();
+  updateRender();
 }
 
 let noteHasAccidentalInKey;
@@ -118,7 +118,7 @@ function decideAccidentalDisplay(); {
 } 
 
 function updateRender() {
-  for (iii=0; iii<scoreComponents.length; iii++) {
+  for (let iii=0; iii<scoreComponents.length; iii++) {
     if (scoreComponents[iii].selected==true) {
       fillStyle = '#238fb3';
     } else {
@@ -130,7 +130,6 @@ function updateRender() {
     resetX();
   }
 }
-
 function startOver() {
   clearCanvas();
   x = 15;
