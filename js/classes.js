@@ -16,6 +16,8 @@ $(document).ready(function(){
     }
   }
 
+
+  
   class pointerReticle {
     constructor() {
       this.x = 10;
