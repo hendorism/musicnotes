@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  console.log("js/main.js has loaded");
 
 window.addEventListener("keydown", function(e) {
   // prevent space-bar and arrow-keys from scrolling the page
@@ -11,13 +12,13 @@ window.addEventListener("keydown", function(e) {
   }
 }, false);
 $(document).keypress(function(e){
-  notationConsoleDotLog(`You pressed: ${e.which}`);
+  notationConsoleDotLog(`keypress = ${e.which}`);
   new musicNote(keyMap)
   createANote(keyMap[e.which]);
 });
 
 $(document).keyup(function(e){
-  notationConsoleDotLog(`You pressed: ${e.which}`);
+  notationConsoleDotLog(`keyup = ${e.which}`);
   if (e.which == 8){
     startOver();
   } else if (e.which == 38) { //up
@@ -67,6 +68,7 @@ var yValuesOfNotesRelativeToMiddleLine = {
   "b3":  35, "a3":  40, "g3":  45, "f3":  50, "e3":  55, "d3":  60, "c3":  65
 }
 let displayAccidental;
+let accidentalValue;
 var notationConsoleEntryNumber = 0;
 
 function notationConsoleDotLog(notationConsoleLogEntry) {
@@ -77,7 +79,7 @@ function notationConsoleDotLog(notationConsoleLogEntry) {
   let entry = document.createTextNode(notationConsoleLogEntry);
   entryNumberSpan.class = "notation-console-entry-number-span";
   entryNumberSpan.appendChild(entryNumber);
-  notationConsole.appendChild(lineBreak);
+  notationConsole.appendChild(lineB reak);
   notationConsole.appendChild(entryNumberSpan);
   notationConsole.appendChild(entry);
   notationConsole.scrollTop = notationConsole.scrollHeight;
@@ -88,7 +90,7 @@ function createScoreComponent(component) {
 
 }
 
-function createANote(idOfButton, accidentalValue, accidentalIsShown) {
+function createANote(idOfButton, accidentalValue) {
   clearCanvas();
   if (idOfButton != undefined) {
     let noteName = idOfButton.slice(0,2);
@@ -115,7 +117,7 @@ function decideAccidentalDisplay(); {
     } else {
       displayAccidental = false;
     }
-} 
+}
 
 function updateRender() {
   for (let iii=0; iii<scoreComponents.length; iii++) {
@@ -130,13 +132,14 @@ function updateRender() {
     resetX();
   }
 }
+
 function startOver() {
   clearCanvas();
   x = 15;
   scoreComponents = [];
   notationConsoleDotLog("Starting over. You just deleted everything.");
 }
-  
+
 function drawLedgerLines(yy) {
   let middleLineY = tmar+spac*ii+20;
   let noteHeadY_minus_middleLineY = yy-middleLineY;

@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  
+  console.log("js/classes.js has loaded")
   class staves {
     constructor(stavesQuantity, stavesSpacing, stavesTopMargin) {
       this.draw = drawStaves(stavesQuantity, stavesSpacing, stavesTopMargin);
@@ -17,7 +17,7 @@ $(document).ready(function(){
   }
 
 
-  
+
   class pointerReticle {
     constructor() {
       this.x = 10;
