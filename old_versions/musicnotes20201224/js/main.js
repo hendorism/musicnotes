@@ -38,7 +38,7 @@ console.log("hi how are you, this is main.js")
           "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
           "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
         }
-        
+        // this is a comment
         // let scale = 1;
         let x = 100;
         let y = 100;
