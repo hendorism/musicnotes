@@ -70,7 +70,7 @@ var yValuesOfNotesRelativeToMiddleLine = {
 let displayAccidental;
 let accidentalValue;
 var notationConsoleEntryNumber = 0;
-//this is a test
+
 function notationConsoleDotLog(notationConsoleLogEntry) {
   notationConsoleEntryNumber ++;
   let lineBreak = document.createElement("BR");
