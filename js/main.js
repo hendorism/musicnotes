@@ -22,17 +22,16 @@ $(document).keyup(function(e){
   if (e.which == 8){
     startOver();
   } else if (e.which == 38) { //up
-    decreaseY_5();
+    y -= 5;
   } else if (e.which == 39) { //right
-    increaseX_5();
+    x += 5;
   } else if (e.which == 40) { //down
-    increaseY_5();
+    y += 5;
   } else if (e.which == 37) { //left
-    decreaseX_5();
+    x -= 5;
   } else if (e.which == 32) { //spacebar
     notationConsoleDotLog("spacebar")
   }
-  drawReticle(x,y);
   notationConsoleDotLog("x=" + x + ", y=" + y);
   updateRender();
 })
@@ -42,12 +41,6 @@ var keyMap = {
   "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
   "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
 }
-function increaseX_5() {x+=5;}
-function decreaseX_5() {x-=5;}
-function increaseY_5() {y+=5;}
-function decreaseY_5() {y-=5;}
-function increaseXten() {x+=10;}
-function decreaseXten() {x-=10;}
 let y = 50;
 let x = 15;
 let quan = 12;
@@ -67,18 +60,16 @@ var yValuesOfNotesRelativeToMiddleLine = {
   "b4":   0, "a4":   5, "g4":  10, "f4":  15, "e4":  20, "d4":  25, "c4":  30,
   "b3":  35, "a3":  40, "g3":  45, "f3":  50, "e3":  55, "d3":  60, "c3":  65
 }
-let displayAccidental;
-let accidentalValue;
 var notationConsoleEntryNumber = 0;
 
 function notationConsoleDotLog(notationConsoleLogEntry) {
   notationConsoleEntryNumber ++;
   let lineBreak = document.createElement("BR");
-  let entryNumberSpan = document.createElement("SPAN");
   let entryNumber = document.createTextNode(notationConsoleEntryNumber + ": ");
-  let entry = document.createTextNode(notationConsoleLogEntry);
+  let entryNumberSpan = document.createElement("SPAN");
   entryNumberSpan.class = "notation-console-entry-number-span";
   entryNumberSpan.appendChild(entryNumber);
+  let entry = document.createTextNode(notationConsoleLogEntry);
   notationConsole.appendChild(lineBreak);
   notationConsole.appendChild(entryNumberSpan);
   notationConsole.appendChild(entry);
@@ -102,18 +93,6 @@ function createANote(idOfButton) {
   }
   resetX();
   updateRender();
-}
-
-let noteHasAccidentalInKey;
-
-let lastOccurenceOfPitchHadSameAccidental;
-
-function decideAccidentalDisplay(); {
-    if (!noteHasAccidentalInKey || !lastOccurenceOfPitchHadSameAccidental) {
-      displayAccidental = true;
-    } else {
-      displayAccidental = false;
-    }
 }
 
 function updateRender() {

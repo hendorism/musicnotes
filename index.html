@@ -50,14 +50,14 @@
       <td><button onclick="startOver()">new</button></td>
       <td><button onclick="drawTrebleCleff(x,y)">treble clef</button></td>
       <td><button onclick="drawSharp(x,y)">sharp</button></td>
-      <td><button onclick="increaseXten()">x+=10</button></td>
-      <td><button onclick="decreaseXten()">x-=10</button></td>
+      <td><button onclick="x+=10">x+=10</button></td>
+      <td><button onclick="x-=10">x-=10</button></td>
     </tr>
     <tr>
-      <td><button onclick="increaseX_5()">x+=5</button></td>
-      <td><button onclick="decreaseX_5()">x-=5</button></td>
-      <td><button onclick="increaseY_5()">y+=5</button></td>
-      <td><button onclick="decreaseY_5()">y-=5</button></td>
+      <td><button onclick="x+=5">x+=5</button></td>
+      <td><button onclick="x-=5">x-=5</button></td>
+      <td><button onclick="y+=5">y+=5</button></td>
+      <td><button onclick="y-=5">y-=5</button></td>
       <td><button></button></td>
       <td><button></button></td>
       <td><button></button></td>
@@ -71,11 +71,6 @@
       <td><button id="double-sharp-button">double-sharp</button></td>
       <td><button></button></td>
     </tr>
-    <tr>
-      <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
-        <span id="show-accidental-boolean">"show accidental" = false</span>
-      </td>
-    </tr>
   </table>
 <a id="instruction-manual-link" href="instructions.html" target="_blank">instructions</a>
 <canvas id="music-notation-canvas"></canvas>
@@ -84,11 +79,9 @@
     broken right now. Please come back another time and try to use my app.</p>
     <p>See <a href="https://github.com/hendorism/musicnotes" target="_blank">MusicNotes</a> on github.</p>
     <p>Also try the <a href="http://everettmusicdojo-musicnotes.s3-website.us-east-2.amazonaws.com/" target="_blank">currently working version.</a></p>
-<div id="x-y-display" class="x-y-display"></div>
 
 
 
-<script src="js/classes.js"></script>
 <script src="js/controller.js"></script>
 <script src="js/draw_music_symbols.js"></script>
 </body>
