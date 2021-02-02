@@ -79,18 +79,15 @@ function notationConsoleDotLog(notationConsoleLogEntry) {
   let entry = document.createTextNode(notationConsoleLogEntry);
   entryNumberSpan.class = "notation-console-entry-number-span";
   entryNumberSpan.appendChild(entryNumber);
-  notationConsole.appendChild(lineB reak);
+  notationConsole.appendChild(lineBreak);
   notationConsole.appendChild(entryNumberSpan);
   notationConsole.appendChild(entry);
   notationConsole.scrollTop = notationConsole.scrollHeight;
 }
 
-function createScoreComponent(component) {
-  scoreComponents.push(component)
 
-}
 
-function createANote(idOfButton, accidentalValue) {
+function createANote(idOfButton) {
   clearCanvas();
   if (idOfButton != undefined) {
     let noteName = idOfButton.slice(0,2);

@@ -46,7 +46,7 @@ datalist#key-signature-datalist {
   position: static;
   border: 1px solid black;
 }
-div#notationConsole {
+#notationConsole {
   position: fixed;
   top: 0;
   left: 400;
@@ -61,7 +61,7 @@ div#notationConsole {
   word-wrap: break-word;
   text-shadow: 2px 2px 4px #9999bb;
 }
-div#notationConsole span {
+#notationConsole span {
   margin: 0px 4px 0px 4px;
   padding: 2px;
   background-color: #444444;
@@ -70,8 +70,16 @@ div#notationConsole span {
   transition: font-size 1s;
 }
 
-div#notationConsole span:hover {
+#notationConsole span:hover {
   font-size: 1.06em;
+}
+
+#notationConsole a {
+  color: #f41239;
+}
+
+#notationConsole a:hover {
+ color: #a47269;
 }
 
 .notationConsoleLineNumbers {
