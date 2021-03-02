@@ -20,17 +20,16 @@ $(document).keyup(function(e){
   if (e.which == 8){
     startOver();
   } else if (e.which == 38) { //up
-    decreaseY_5();
+    y -= 5;
   } else if (e.which == 39) { //right
-    increaseX_5();
+    x += 5;
   } else if (e.which == 40) { //down
-    increaseY_5();
+    y += 5;
   } else if (e.which == 37) { //left
-    decreaseX_5();
+    x -= 5;
   } else if (e.which == 32) { //spacebar
     notationConsoleDotLog("spacebar")
   }
-  drawReticle(x,y);
   notationConsoleDotLog("x=" + x + ", y=" + y);
   updateRender();
 })
@@ -41,12 +40,6 @@ var keyMap = {
   "49": "r1",  "50": "r2",  "51": "r3",  "52": "r4",  "53": "r5",  "54": "r6",  "55": "r7",
   "219": "do", "221": "uo"
 }
-function increaseX_5() {x+=5;}
-function decreaseX_5() {x-=5;}
-function increaseY_5() {y+=5;}
-function decreaseY_5() {y-=5;}
-function increaseXten() {x+=10;}
-function decreaseXten() {x-=10;}
 let y = 50;
 let x = 15;
 let quan = 12;
