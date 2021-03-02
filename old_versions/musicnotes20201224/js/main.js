@@ -1,6 +1,4 @@
-console.log("hi how are you, this is main.js")
-
-  console.log("main.js has loaded");
+console.log("main.js has loaded")
   
   window.addEventListener("keydown", function (e) {
       if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
@@ -32,12 +30,21 @@ console.log("hi how are you, this is main.js")
           console.log(`x=${x}, y=${y}`);
           updateRender();
       });
+      let restSubdivisionBase = 3;
       var keyMap = {
           "122": "c3", "120": "d3",  "99": "e3", "118": "f3",  "98": "g3", "110": "a3", "109": "b3",
           "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
           "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
-          "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+          "49": "1r",  "2r": "3r",  "4r": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+          ""
         }
+        //1234567 = 6th octave
+        //qwertyu = 5th octave
+        //asdfghj = 4th octave
+        //zxcvbnm = 3rd octave
+        //octave shift: "[" = down, "]" = up
+        //
+
         // this is a comment
         // let scale = 1;
         let x = 100;

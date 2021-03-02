@@ -1,20 +1,18 @@
-$(document).ready(function(){
-  console.log("js/main.js has loaded");
+  $(document).ready(function(){
+    //jquery
+console.log("js/main.js has loaded");
 
 window.addEventListener("keydown", function(e) {
+  // 37   39   38   40   32
+  // <    >    ^    D    SP
   // prevent space-bar and arrow-keys from scrolling the page
-  // 37 39 38 40 32
-  // LE RI UP DO SB
-  //
-  //
   if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       e.preventDefault();
   }
 }, false);
 $(document).keypress(function(e){
   notationConsoleDotLog(`keypress = ${e.which}`);
-  new musicNote(keyMap)
-  createANote(keyMap[e.which]);
+  musicalInput(keyMap[e.which]);
 });
 
 $(document).keyup(function(e){
@@ -40,7 +38,8 @@ var keyMap = {
   "122": "c3", "120": "d3",  "99": "e3", "118": "f3",  "98": "g3", "110": "a3", "109": "b3",
   "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
   "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
-  "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+  "49": "r1",  "50": "r2",  "51": "r3",  "52": "r4",  "53": "r5",  "54": "r6",  "55": "r7",
+  "219": "do", "221": "uo"
 }
 function increaseX_5() {x+=5;}
 function decreaseX_5() {x-=5;}
@@ -53,12 +52,7 @@ let x = 15;
 let quan = 12;
 let spac = 100;
 let tmar = 50;
-function clearCanvas() {
-  ctx.fillStyle = "#eeeecc";
-  ctx.fillRect(0, 0, c.width, c.height);
-}
 var ledgerLineRadius = 8;
-var notationConsole = document.getElementById("notationConsole");
 var scoreComponents = [];
 var yValueOfNoteRelativeToMiddleLine;
 var yValuesOfNotesRelativeToMiddleLine = {
@@ -67,58 +61,20 @@ var yValuesOfNotesRelativeToMiddleLine = {
   "b4":   0, "a4":   5, "g4":  10, "f4":  15, "e4":  20, "d4":  25, "c4":  30,
   "b3":  35, "a3":  40, "g3":  45, "f3":  50, "e3":  55, "d3":  60, "c3":  65
 }
-let displayAccidental;
-let accidentalValue;
-var notationConsoleEntryNumber = 0;
+//let displayAccidental;
+let accidentalValue = 0;
+console.log("accidentalValue = " + accidentalValue);
+console.log("hello");
 
-function notationConsoleDotLog(notationConsoleLogEntry) {
-  notationConsoleEntryNumber ++;
-  let lineBreak = document.createElement("BR");
-  let entryNumberSpan = document.createElement("SPAN");
-  let entryNumber = document.createTextNode(notationConsoleEntryNumber + ": ");
-  let entry = document.createTextNode(notationConsoleLogEntry);
-  entryNumberSpan.class = "notation-console-entry-number-span";
-  entryNumberSpan.appendChild(entryNumber);
-  notationConsole.appendChild(lineB reak);
-  notationConsole.appendChild(entryNumberSpan);
-  notationConsole.appendChild(entry);
-  notationConsole.scrollTop = notationConsole.scrollHeight;
+function clearCanvas() {
+  ctx.fillStyle = "#eeeecc";
+  ctx.fillRect(0, 0, c.width, c.height);
 }
-
-function createScoreComponent(component) {
-  scoreComponents.push(component)
-
-}
-
-function createANote(idOfButton, accidentalValue) {
-  clearCanvas();
-  if (idOfButton != undefined) {
-    let noteName = idOfButton.slice(0,2);
-    scoreComponents.push(new musicNote(noteName.slice(0,1), noteName.slice(1,2), 0));
-    notationConsoleDotLog(JSON.stringify(scoreComponents[scoreComponents.length-1]))
-    notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
-  } else {
-    notationConsoleDotLog(`error: idOfButton is ${idOfButton}`);
-  }
-  if (stavesHaveBeenDrawn == true) {
-    drawStaves(quan, spac, tmar);
-  }
+function updateCanvas() {
   resetX();
+  clearCanvas();
   updateRender();
 }
-
-let noteHasAccidentalInKey;
-
-let lastOccurenceOfPitchHadSameAccidental;
-
-function decideAccidentalDisplay(); {
-    if (!noteHasAccidentalInKey || !lastOccurenceOfPitchHadSameAccidental) {
-      displayAccidental = true;
-    } else {
-      displayAccidental = false;
-    }
-}
-
 function updateRender() {
   for (let iii=0; iii<scoreComponents.length; iii++) {
     if (scoreComponents[iii].selected==true) {
@@ -132,34 +88,49 @@ function updateRender() {
     resetX();
   }
 }
+function setAccidentalValue(accidentalValueInput) {
+  accidentalValue = accidentalValueInput;
+  console.log("accidentalValue = " + accidentalValue);
+}
+let musicalInputValue;
+function musicalInput(musicalInputCode) {
+  if (musicalInputCode != undefined) {
+    musicalInputValue = musicalInputCode.slice(0,2);
+    scoreComponents.push(new musicNote(musicalInputValue.slice(0,1), musicalInputValue.slice(1,2), accidentalValue));
+    notationConsoleDotLog(JSON.stringify(scoreComponents[scoreComponents.length-1]))
+    notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
+  } else {
+    notationConsoleDotLog(`error: musicalInputCode is ${musicalInputCode}`);
+  }
+  if (stavesHaveBeenDrawn == true) {
+    drawStaves(quan, spac, tmar);
+  }
+  updateCanvas();
+}
+
+// function musicalInput(musicalInputCode, accidentalValue) {
+
+// }
+
+
+//let noteHasAccidentalInKey;
+
+//let lastOccurenceOfPitchHadSameAccidental;
+
+// function decideAccidentalDisplay(); {
+//     if (!noteHasAccidentalInKey || !lastOccurenceOfPitchHadSameAccidental) {
+//       displayAccidental = true;
+//     } else {
+//       displayAccidental = false;
+//     }
+// }
+
 
 function startOver() {
   clearCanvas();
   x = 15;
   scoreComponents = [];
   notationConsoleDotLog("Starting over. You just deleted everything.");
-}
-
-function drawLedgerLines(yy) {
-  let middleLineY = tmar+spac*ii+20;
-  let noteHeadY_minus_middleLineY = yy-middleLineY;
-  if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===0) {
-      for (ledgerLineNumber=0; ledgerLineNumber>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
-          drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
-      }
-  } else if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===1) {
-      for (ledgerLineNumber=0; ledgerLineNumber-1>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
-          drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
-      }
-  } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===0) {
-      for (ledgerLineNumber=0; ledgerLineNumber<=(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
-          drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
-      }
-  } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===1) {
-      for (ledgerLineNumber=0; ledgerLineNumber<(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
-          drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
-      }
-  }
 }
 
 function resetX() {
@@ -169,6 +140,7 @@ function resetX() {
     ii += 1;
   }
 }
+
 
 
 });

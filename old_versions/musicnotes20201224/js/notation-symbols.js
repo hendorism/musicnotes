@@ -154,8 +154,8 @@ function drawEighthRest(x,y){
   ctx.lineTo(x+4,y+17);
   ctx.stroke();
 }
-
-function drawQuarterRest(x,y) {
+let dotted;
+function drawQuarterRest(x,y,dotted) {
   let m = 10;
   ctx.strokeStyle = "#000000";
   ctx.lineWidth = 1;
@@ -169,6 +169,9 @@ function drawQuarterRest(x,y) {
   ctx.lineTo(x+1,y-10);
   ctx.bezierCurveTo(x-5, y-9, x-3, y-3, x, y);
   ctx.fill();
+  if (dotted) {
+      drawDot(x+5,y);
+  }
   ctx.stroke();
 }
 

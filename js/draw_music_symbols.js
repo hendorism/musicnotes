@@ -1,4 +1,5 @@
   $(document).ready(function(){
+//jquery
 console.log("music_notation_v0018.js is working.");
 console.log("music_notation_v0018.js was made by Aaron Dull in 2019.");
 
@@ -31,6 +32,28 @@ function drawStaves(stavesQuantity,stavesSpacing,topMargin){
     }
 }
 
+function drawLedgerLines(yy) {
+    let middleLineY = tmar+spac*ii+20;
+    let noteHeadY_minus_middleLineY = yy-middleLineY;
+    if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===0) {
+        for (ledgerLineNumber=0; ledgerLineNumber>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
+            drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===1) {
+        for (ledgerLineNumber=0; ledgerLineNumber-1>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
+            drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===0) {
+        for (ledgerLineNumber=0; ledgerLineNumber<=(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
+            drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===1) {
+        for (ledgerLineNumber=0; ledgerLineNumber<(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
+            drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
+        }
+    }
+  }
+  
 function crossBeams(q, x1, y1, x2, y2) {
   for (i=0; i<q; i++) {
     drawThickLine(x1, y1+5*i, x2, y2+5*i);

@@ -69,9 +69,11 @@ div#notationConsole span {
   border-radius: 2px;
   transition: font-size 1s;
 }
-
 div#notationConsole span:hover {
   font-size: 1.06em;
+}
+div#notationConsole a {
+  color: #dddddd;
 }
 
 .notationConsoleLineNumbers {

@@ -2,92 +2,102 @@
   <head>
     <meta charset="UTF-8"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <script src="js/classes.js"></script>
+    <script src="js/controller.js"></script>
+    <script src="js/draw_music_symbols.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/notation_console.js"></script>
     <title>music notes</title>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
-</head>
-<body>
-  <table>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a6button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b6button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a5button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b5button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a4button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b4button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick="createANote(this.id);" id="c3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="d3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="e3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="f3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="g3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="a3button"></button></td>
-      <td><button onclick="createANote(this.id);" id="b3button"></button></td>
-    </tr>
-    <tr>
-      <td><button onclick=""></button></td>
-      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
-      <td><button onclick="startOver()">new</button></td>
-      <td><button onclick="drawTrebleCleff(x,y)">treble clef</button></td>
-      <td><button onclick="drawSharp(x,y)">sharp</button></td>
-      <td><button onclick="increaseXten()">x+=10</button></td>
-      <td><button onclick="decreaseXten()">x-=10</button></td>
-    </tr>
-    <tr>
-      <td><button onclick="increaseX_5()">x+=5</button></td>
-      <td><button onclick="decreaseX_5()">x-=5</button></td>
-      <td><button onclick="increaseY_5()">y+=5</button></td>
-      <td><button onclick="decreaseY_5()">y-=5</button></td>
-      <td><button></button></td>
-      <td><button></button></td>
-      <td><button></button></td>
-    </tr>
-    <tr>
-      <td><button></button></td>
-      <td><button id="double-flat-button">double-flat</button></td>
-      <td><button id="flat-button">flat</button></td>
-      <td><button class="selected" id="natural-button">natural</button></td>
-      <td><button id="sharp-button">sharp</button></td>
-      <td><button id="double-sharp-button">double-sharp</button></td>
-      <td><button></button></td>
-    </tr>
-    <tr>
-      <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
-        <span id="show-accidental-boolean">"show accidental" = false</span>
-      </td>
-    </tr>
-  </table>
-<a id="instruction-manual-link" href="instructions.html" target="_blank">instructions</a>
-<canvas id="music-notation-canvas"></canvas>
-<div id="notationConsole"><span>notation console</span>
-  <p style="font-size:16px;margin: 12px 8px 4px 8px;">Everything is
-    broken right now. Please come back another time and try to use my app.</p>
-<div id="x-y-display" class="x-y-display"></div>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td><button onclick="musicalInput(this.id);" id="c6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="d6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="e6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="f6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="g6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="a6button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="b6button"></button></td>
+      </tr>
+      <tr>
+        <td><button onclick="musicalInput(this.id);" id="c5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="d5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="e5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="f5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="g5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="a5button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="b5button"></button></td>
+      </tr>
+      <tr>
+        <td><button onclick="musicalInput(this.id);" id="c4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="d4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="e4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="f4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="g4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="a4button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="b4button"></button></td>
+      </tr>
+      <tr>
+        <td><button onclick="musicalInput(this.id);" id="c3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="d3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="e3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="f3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="g3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="a3button"></button></td>
+        <td><button onclick="musicalInput(this.id);" id="b3button"></button></td>
+      </tr>
+      <tr>
+        <td><button onclick=""></button></td>
+        <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
+        <td><button onclick="startOver()">new</button></td>
+        <td><button onclick="drawTrebleCleff(x,y)">treble clef</button></td>
+        <td><button onclick="drawSharp(x,y)">sharp</button></td>
+        <td><button onclick="increaseXten()">x+=10</button></td>
+        <td><button onclick="decreaseXten()">x-=10</button></td>
+      </tr>
+      <tr>
+        <td><button onclick="increaseX_5()">x+=5</button></td>
+        <td><button onclick="decreaseX_5()">x-=5</button></td>
+        <td><button onclick="increaseY_5()">y+=5</button></td>
+        <td><button onclick="decreaseY_5()">y-=5</button></td>
+        <td><button>octave<br>up</button></td>
+        <td><button>octave<br>down</button></td>
+        <td><button onclick="setAccidentalValue(-1)">testifnifnifn</button></td>
+      </tr>
+      <tr>
+        <td><button></button></td>
+        <td><button data-id="-2" id="double-flat-button"  onclick="accidentalValue = this.data-id">double-flat</button></td>
+        <td><button data-id="-1" id="flat-button"         onclick="accidentalValue = this.data-id">flat</button></td>
+        <td><button data-id="0"  id="natural-button"      onclick="accidentalValue = this.data-id" class="selected">natural</button></td>
+        <td><button data-id="1"  id="sharp-button"        onclick="accidentalValue = this.data-id">sharp</button></td>
+        <td><button data-id="2"  id="double-sharp-button" onclick="accidentalValue = this.data-id">double-sharp</button></td>
+        <td><button></button></td>
+      </tr>
+      <tr>
+        <td colspan="7" style="background-color:#333333;color:#bbbbbb;height:35px;">
+          <span id="show-accidental-boolean">"show accidental" = false</span>
+        </td>
+      </tr>
+    </table>
+    <a id="instruction-manual-link" href="instructions.html" target="_blank">instructions</a>
+    <canvas id="music-notation-canvas"></canvas>
+    <div id="notationConsole"><span>notation console</span>
+      <p style="font-size:16px;margin: 12px 8px 4px 8px;">
+        <a href="http://everettmusicdojo-musicnotes.s3-website.us-east-2.amazonaws.com/">
+          more stable version hosted on aws</a><br>
+          <h3>To use the app: start typing...</h3>
+          zxcvbnm = 3rd octave C, B, D, E, F, G, A, B...<br>
+          asdfghj = 4th octave<br>
+          qwertyu = 5th octave<br>
+          space bar = prints staves onto the canvas<br>
+          [ = octave shift down<br>
+          ] = octave shift up<br>
+        </p>
+        <div id="x-y-display" class="x-y-display"></div>
+        
 
-
-
-<script src="js/classes.js"></script>
-<script src="js/controller.js"></script>
-<script src="js/draw_music_symbols.js"></script>
-</body>
-</html>
+      </body>
+      </html>
+      
