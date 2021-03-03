@@ -13,7 +13,7 @@ $(document).ready(function(){
     let entry = document.createTextNode(notationConsoleLogEntry);
     entryNumberSpan.class = "notation-console-entry-number-span";
     entryNumberSpan.appendChild(entryNumber);
-    notationConsole.appendChild(lineB reak);
+    notationConsole.appendChild(lineBreak);
     notationConsole.appendChild(entryNumberSpan);
     notationConsole.appendChild(entry);
     notationConsole.scrollTop = notationConsole.scrollHeight;

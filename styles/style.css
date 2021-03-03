@@ -17,21 +17,20 @@ button {
   background-color: #6688bb;
   color: #ddeeff;
   text-shadow: 2px 2px 4px #2636f6;
-  transition: background-color 0.5s, color 0.8s, font-size 0.1s, letter-spacing 1.6s, text-shadow 1s;
+  transition: background-color 0.3s, color 0.3s, font-size 0.3s, letter-spacing 0.3s, text-shadow 0.3s;
 }
 button:hover {
-  background-color: #032942;
+  background-color: #0688bb;
   color: #33dd44;
   font-size: 0.75em;
   letter-spacing: 1px;
 }
 button.selected {
   background-color: #66a8bb;
-  transition: background-color 0.5s, color 0.8s, font-size 0.1s, letter-spacing 1.6s, text-shadow 1s;
+  transition: background-color 0.3s, color 0.3s, font-size 0.3s, letter-spacing 0.3s, text-shadow 0.3s;
 }
 button.selected:hover {
-  background-color: #56c8cb;
-  color: #035d44;
+  background-color: #0668bb;
   font-size: 0.75em;
   letter-spacing: 1px;
   text-shadow: 2px 2px 4px #787fc7;

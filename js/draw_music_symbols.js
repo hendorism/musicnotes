@@ -31,7 +31,7 @@ function drawStaves(stavesQuantity,stavesSpacing,topMargin){
         }
     }
 }
-
+var ledgerLineRadius = 8;
 function drawLedgerLines(yy) {
     let middleLineY = tmar+spac*ii+20;
     let noteHeadY_minus_middleLineY = yy-middleLineY;

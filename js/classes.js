@@ -31,4 +31,4 @@ function musicNote(noteName, octave, accidental) {
 //   }
 // }
 
-// });
+});
