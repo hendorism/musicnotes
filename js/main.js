@@ -90,7 +90,6 @@ function musicalInput(musicalInputCode) {
   if (musicalInputCode != undefined) {
     musicalInputValue = musicalInputCode.slice(0,2);
     scoreComponents.push(new musicNote(musicalInputValue.slice(0,1), musicalInputValue.slice(1,2), accidentalValue));
-    notationConsoleDotLog(JSON.stringify(scoreComponents[scoreComponents.length-1]))
     notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
   } else {
     notationConsoleDotLog(`error: musicalInputCode is ${musicalInputCode}`);
