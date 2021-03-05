@@ -4,11 +4,11 @@
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="js/classes.js"></script>
-    <script src="js/controller.js"></script>
+    <script src="js/classes.js">           </script>
+    <script src="js/controller.js">        </script>
     <script src="js/draw_music_symbols.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/notation_console.js"></script>
+    <script src="js/main.js">              </script>
+    <script src="js/notation_console.js">  </script>
   </head>
   <body>
     <table>
@@ -62,8 +62,8 @@
         <td><button onclick="decreaseX_5()">x-=5</button></td>
         <td><button onclick="increaseY_5()">y+=5</button></td>
         <td><button onclick="decreaseY_5()">y-=5</button></td>
-        <td><button onclick="octaveUp()">octave<br>up</button></td>
-        <td><button onclick="octaveDown()">octave<br>down</button></td>
+        <td><button onclick="shiftOctave('u')">octave<br>up</button></td>
+        <td><button onclick="shiftOctave('d')">octave<br>down</button></td>
         <td><button></button></td>
       </tr>
       <tr>
@@ -79,21 +79,27 @@
     <!-- mark is a fantastic recorder player -->
     <a id="instruction-manual-link" href="instructions.html" target="_blank">instructions</a>
     <canvas id="music-notation-canvas"></canvas>
-    <div id="notationConsole"><span>notation console</span>
+    <div id="notationConsole">
+      <span>notation console</span>
       <p style="font-size:16px;margin: 12px 8px 4px 8px;">
         <a href="http://everettmusicdojo-musicnotes.s3-website.us-east-2.amazonaws.com/">
-          more stable version hosted on aws</a><br>
-          <h3>To use the app: start typing...</h3>
+          more stable version hosted on aws
+        </a>
+        <br>
+        <h3>
+          To use the app: start typing...
+        </h3>
           zxcvbnm = 3rd octave C, B, D, E, F, G, A, B...<br>
           asdfghj = 4th octave<br>
           qwertyu = 5th octave<br>
           space bar = prints staves onto the canvas<br>
           [ = octave shift down<br>
           ] = octave shift up<br>
-        </p>
-        <div id="x-y-display" class="x-y-display"></div>
-        
+      </p>
+      <div id="x-y-display" class="x-y-display">
+      </div>
+    </div>
+
 
       </body>
       </html>
-      

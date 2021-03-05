@@ -22,7 +22,8 @@ function musicNote(noteName, octave, accidental) {
   this.octave = octave;
   this.accidental = accidental;
 }
-
+let brobrobrobro = new musicNote("c", "4", "-1");
+console.log(brobrobrobro);
 
 // class pointerReticle {
 //   constructor() {

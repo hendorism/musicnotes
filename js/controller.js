@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    
+
     console.log('controller.js is in the building.');
     const doubleFlatButton = document.querySelector("#double-flat-button");
     const flatButton = document.querySelector("#flat-button");
@@ -17,7 +17,7 @@ $(document).ready(function(){
         }
     }
 
-    $("#double-flat-button").click(function(){
+    $("#double-flat-button").click(function() {
         deselectAllAccidentalButtons();
         $("#double-flat-button").addClass("selected");
         accidentalValue = 'double-flat'
