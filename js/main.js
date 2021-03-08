@@ -73,11 +73,21 @@ function musicalInput(musicalInputCode) {
     if (noteNames.includes(musicalInputCode.slice(0,1))) {
       let noteName = musicalInputCode.slice(0,1);
     } else if (musicalInputCode.slice(1,2) == "o") {
+	    //change this code ^^^^
+	    // this should check first if (musicalInputCode.slice(1,2) == "o") and handle octave shift and then handles cases where (noteNames.includes(musicalInputCode.slice(0,1)))
       shiftOctave(musicalInputCode.slice(0,1));
     }
     let newComponent = new musicNote(noteName, octave, accidentalValue);
+	  //change this code ^^^^
+	  // this line ^^^^ should execute if (noteNames.includes(musicalInputCode.slice(0,1)))
+	  // also remove accidentalValue
+	  // also remove accidentalValue from musicNote class
     scoreComponents.push(newComponent);
+	  //change this code ^^^^
+	  //this line ^^^^ too should execute if (noteNames.includes(musicalInputCode.slice(0,1)))
     notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
+	  //change this line ^^^^
+	  //listOfNotes[listOfNotes.length-1]; should be scoreComponents[scoreComponents.length-1];
   } else {
     notationConsoleDotLog(`error: musicalInputCode is ${musicalInputCode}`);
   }
@@ -86,6 +96,23 @@ function musicalInput(musicalInputCode) {
   }
   updateCanvas();
 }
+
+/*
+ * scoreComponents should contain objects
+ * representing the following things:
+ * staves = {
+ *   quan: quan,
+ *   spac: spac,
+ *   tmar: tmar,
+ *   spacAdjust: []
+ * }
+ * clefs = {
+ *   noteNameAndOctaveOfCenterLine: noteNameAndOctaveOfCenterLine
+ *   reticlePointVerticalOffset: reticlePointVerticleOffset
+ * }
+ * key sigs 
+ * barlines
+ */
 
 function updateCanvas() {
   resetX();
