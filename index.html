@@ -3,50 +3,51 @@
     <title>music notes</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="js/classes.js">           </script>
-    <script src="js/controller.js">        </script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/notation_console.js">  </script>
     <script src="js/draw_music_symbols.js"></script>
     <script src="js/main.js">              </script>
-    <script src="js/notation_console.js">  </script>
+    <script src="js/classes.js">           </script>
+    <script src="js/controller.js">        </script>
   </head>
   <body>
     <table>
       <tr>
-        <td><button onclick="musicalInput(this.data-id)" data-id="c6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="d6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="e6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="f6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="g6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="a6button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="b6button"></button></td>
+        <td><button class="noteButton" id="c6button">1</button></td>
+        <td><button class="noteButton" id="d6button">2</button></td>
+        <td><button class="noteButton" id="e6button">3</button></td>
+        <td><button class="noteButton" id="f6button">4</button></td>
+        <td><button class="noteButton" id="g6button">5</button></td>
+        <td><button class="noteButton" id="a6button">6</button></td>
+        <td><button class="noteButton" id="b6button">7</button></td>
       </tr>
       <tr>
-        <td><button onclick="musicalInput(this.data-id)" data-id="c5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="d5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="e5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="f5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="g5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="a5button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="b5button"></button></td>
+        <td><button class="noteButton" id="c5button">q</button></td>
+        <td><button class="noteButton" id="d5button">w</button></td>
+        <td><button class="noteButton" id="e5button">e</button></td>
+        <td><button class="noteButton" id="f5button">r</button></td>
+        <td><button class="noteButton" id="g5button">t</button></td>
+        <td><button class="noteButton" id="a5button">y</button></td>
+        <td><button class="noteButton" id="b5button">u</button></td>
       </tr>
       <tr>
-        <td><button onclick="musicalInput(this.data-id)" data-id="c4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="d4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="e4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="f4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="g4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="a4button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="b4button"></button></td>
+        <td><button class="noteButton" id="c4button">a</button></td>
+        <td><button class="noteButton" id="d4button">s</button></td>
+        <td><button class="noteButton" id="e4button">d</button></td>
+        <td><button class="noteButton" id="f4button">f</button></td>
+        <td><button class="noteButton" id="g4button">g</button></td>
+        <td><button class="noteButton" id="a4button">h</button></td>
+        <td><button class="noteButton" id="b4button">j</button></td>
       </tr>
       <tr>
-        <td><button onclick="musicalInput(this.data-id)" data-id="c3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="d3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="e3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="f3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="g3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="a3button"></button></td>
-        <td><button onclick="musicalInput(this.data-id)" data-id="b3button"></button></td>
+        <td><button class="noteButton" id="c3button">z</button></td>
+        <td><button class="noteButton" id="d3button">x</button></td>
+        <td><button class="noteButton" id="e3button">c</button></td>
+        <td><button class="noteButton" id="f3button">v</button></td>
+        <td><button class="noteButton" id="g3button">b</button></td>
+        <td><button class="noteButton" id="a3button">n</button></td>
+        <td><button class="noteButton" id="b3button">m</button></td>
       </tr>
       <tr>
         <td><button onclick="console.log('you are a jelly donut!')"></button></td>
@@ -97,9 +98,7 @@
           ] = octave shift up<br>
       </p>
       <div id="x-y-display" class="x-y-display">
-      </div>
-    </div>
-
-
-      </body>
-      </html>
+      </div><!-- x, y display -->
+    </div><!-- notaion console -->
+  </body>
+</html>

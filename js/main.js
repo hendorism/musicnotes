@@ -1,5 +1,6 @@
 $(document).ready(function() { //jquery
 console.log("js/main.js has loaded");
+
 window.addEventListener("keydown", function(e) { // prevent keys from scrolling the page
   // 37   39   38   40   32
   // <    >    ^    D    SP
@@ -7,13 +8,14 @@ window.addEventListener("keydown", function(e) { // prevent keys from scrolling 
       e.preventDefault(); // (prevent default behavior)
   }
 }, false); // false?
+
 $(document).keypress(function(e) {
-  notationConsoleDotLog( `keypress = ${e.which}` );
+  notationConsoleLog( `keypress = ${e.which}` );
   musicalInput( keyMap[e.which] );
 });
 
 $(document).keyup(function(e) {
-  notationConsoleDotLog(`keyup = ${e.which}`);
+  notationConsoleLog(`keyup = ${e.which}`);
   if (e.which == 8){
     startOver();
   } else if (e.which == 38) { //up
@@ -25,9 +27,9 @@ $(document).keyup(function(e) {
   } else if (e.which == 37) { //left
     x -= 5;
   } else if (e.which == 32) { //spacebar
-    notationConsoleDotLog("spacebar")
+    notationConsoleLog("spacebar")
   }
-  notationConsoleDotLog("x=" + x + ", y=" + y);
+  notationConsoleLog("x=" + x + ", y=" + y);
   updateRender();
 })
 var keyMap = {
@@ -63,38 +65,34 @@ function shiftOctave( shiftDirection ) {
   } else if (shiftDirection == 'd') {
     octaveShift -= 1;
   }
-  notationConsoleDotLog("Octave shift = " + octaveShift);
+  notationConsoleLog("Octave shift = " + octaveShift);
 }
 let noteNames = ["a", "b", "c", "d", "e", "f", "g"];
 
 ///////////////////////===== drawing stuff to page =====/////////
 function musicalInput(musicalInputCode) {
-  if (musicalInputCode != undefined) {
-    if (noteNames.includes(musicalInputCode.slice(0,1))) {
-      let noteName = musicalInputCode.slice(0,1);
-    } else if (musicalInputCode.slice(1,2) == "o") {
-	    //change this code ^^^^
-	    // this should check first if (musicalInputCode.slice(1,2) == "o") and handle octave shift and then handles cases where (noteNames.includes(musicalInputCode.slice(0,1)))
-      shiftOctave(musicalInputCode.slice(0,1));
-    }
-    let newComponent = new musicNote(noteName, octave, accidentalValue);
-	  //change this code ^^^^
-	  // this line ^^^^ should execute if (noteNames.includes(musicalInputCode.slice(0,1)))
-	  // also remove accidentalValue
-	  // also remove accidentalValue from musicNote class
-    scoreComponents.push(newComponent);
-	  //change this code ^^^^
-	  //this line ^^^^ too should execute if (noteNames.includes(musicalInputCode.slice(0,1)))
-    notationConsoleDotLog('new note: ' + listOfNotes[listOfNotes.length-1]);
-	  //change this line ^^^^
-	  //listOfNotes[listOfNotes.length-1]; should be scoreComponents[scoreComponents.length-1];
+  if (musicalInputCode == undefined) {
+    notationConsoleLog(`error: musicalInputCode is ${musicalInputCode}`);
   } else {
-    notationConsoleDotLog(`error: musicalInputCode is ${musicalInputCode}`);
+    if (musicalInputCode.slice(1,2) == "o") {
+      shiftOctave(musicalInputCode.slice(0,1));
+    } else if (noteNames.includes(musicalInputCode.slice(0,1))) {
+      makeNewNote(musicalInputCode.slice(0,1), musicalInputCode.slice(1,2));
+    } else {
+      notationConsoleLog("You are a fuzzy bunny.");
+    }
+    if (stavesHaveBeenDrawn == true) {
+      drawStaves(quan, spac, tmar);
+    }
+    updateCanvas();
   }
-  if (stavesHaveBeenDrawn == true) {
-    drawStaves(quan, spac, tmar);
-  }
-  updateCanvas();
+}
+
+function makeNewNote() {
+  let noteName = musicalInputCode.slice(0,1);
+  let newComponent = new musicNote(noteName, octave);
+  scoreComponents.push(newComponent);
+  notationConsoleLog('new note: ' + scoreComponents[scoreComponents.length-1]);
 }
 
 /*
@@ -110,7 +108,7 @@ function musicalInput(musicalInputCode) {
  *   noteNameAndOctaveOfCenterLine: noteNameAndOctaveOfCenterLine
  *   reticlePointVerticalOffset: reticlePointVerticleOffset
  * }
- * key sigs 
+ * key sigs
  * barlines
  */
 
@@ -157,7 +155,7 @@ function startOver() {
   clearCanvas();
   x = 15;
   scoreComponents = [];
-  notationConsoleDotLog("Starting over. You just deleted everything.");
+  notationConsoleLog("Starting over. You just deleted everything.");
 }
 
 });

@@ -1,5 +1,4 @@
-  $(document).ready(function(){
-//jquery
+$(document).ready(function(){ //jquery
 console.log("js/classes.js has loaded")
 // class staves {
 //   constructor(stavesQuantity, stavesSpacing, stavesTopMargin) {
@@ -17,19 +16,13 @@ console.log("js/classes.js has loaded")
 //   }
 // }
 
-function musicNote(noteName, octave, accidental) {
+function musicNote(noteName, octave) {
   this.noteName = noteName;
   this.octave = octave;
-  this.accidental = accidental;
 }
+
 let brobrobrobro = new musicNote("c", "4", "-1");
 console.log(brobrobrobro);
 
-// class pointerReticle {
-//   constructor() {
-//     this.x = 10;
-//     this.y = 100;
-//   }
-// }
 
 });

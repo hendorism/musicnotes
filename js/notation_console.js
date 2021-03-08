@@ -5,7 +5,7 @@ $(document).ready(function(){
 
   var notationConsoleEntryNumber = 0;
 
-  function notationConsoleDotLog(notationConsoleLogEntry) {
+  function notationConsoleLog(notationConsoleLogEntry) {
     notationConsoleEntryNumber ++;
     let lineBreak = document.createElement("BR");
     let entryNumberSpan = document.createElement("SPAN");

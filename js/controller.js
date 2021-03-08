@@ -42,5 +42,8 @@ $(document).ready(function(){
         $("#double-sharp-button").addClass("selected");
         accidentalValue = 'double-sharp'
     });
+    $(".noteButton").click(function(){
+      musicalInput( $( this ).id );
+    });
 
   });
