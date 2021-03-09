@@ -138,7 +138,7 @@ function updateRender() { //draw stuff
     } else {
       fillStyle = '#000000';
     }
-    y = yValuesOfNotesRelativeToMiddleLine[scoreComponents[iii].name + scoreComponents[iii].octave]+tmar+20+spac*ii;
+    y = yValuesOfNotesRelativeToMiddleLine[scoreComponents[iii].noteName + scoreComponents[iii].octave]+tmar+20+spac*ii;
     drawNoteHead(x,y);
     drawLedgerLines(y);
     resetX();
