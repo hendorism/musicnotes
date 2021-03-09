@@ -1,5 +1,5 @@
-  $(document).ready(function(){
-//jquery
+  $(document).ready(function(){ //jquery
+
 console.log("music_notation_v0018.js is working.");
 console.log("music_notation_v0018.js was made by Aaron Dull in 2019.");
 
@@ -209,7 +209,7 @@ function drawKeySignature(x,y,a){
     }
 }
 
-function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6,ctx) {
+function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6) {
     ctx.lineWidth = lineWidth;
     drawLine(x1,y1,x2,y2);
     drawLine(x2,y2,x3,y3);
@@ -230,27 +230,4 @@ function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6,ctx) {
 }
 
 console.log("music_notation_v0018.js is finished working.");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  });
+}); //end jquery

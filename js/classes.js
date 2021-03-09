@@ -15,7 +15,7 @@ console.log("js/classes.js has loaded")
 //     this.selected = true; // if note is selected, notehed appears different color, and we can do things to it.
 //   }
 // }
-
+});// end jquery
 function musicNote(noteName, octave) {
   this.noteName = noteName;
   this.octave = octave;
@@ -23,6 +23,3 @@ function musicNote(noteName, octave) {
 
 let brobrobrobro = new musicNote("c", "4", "-1");
 console.log(brobrobrobro);
-
-
-});

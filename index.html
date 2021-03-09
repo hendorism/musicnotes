@@ -4,7 +4,11 @@
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" href="styles/style.css">
     <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
-    <script src="js/jquery.min.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
+    <!-- <script src="js/jquery.min.js"></script> -->
     <script src="js/notation_console.js">  </script>
     <script src="js/draw_music_symbols.js"></script>
     <script src="js/main.js">              </script>
@@ -14,67 +18,69 @@
   <body>
     <table>
       <tr>
-        <td><button class="noteButton" id="c6button">1</button></td>
-        <td><button class="noteButton" id="d6button">2</button></td>
-        <td><button class="noteButton" id="e6button">3</button></td>
-        <td><button class="noteButton" id="f6button">4</button></td>
-        <td><button class="noteButton" id="g6button">5</button></td>
-        <td><button class="noteButton" id="a6button">6</button></td>
-        <td><button class="noteButton" id="b6button">7</button></td>
+        <td><button class="note-button" id="c6button">1</button></td>
+        <td><button class="note-button" id="d6button">2</button></td>
+        <td><button class="note-button" id="e6button">3</button></td>
+        <td><button class="note-button" id="f6button">4</button></td>
+        <td><button class="note-button" id="g6button">5</button></td>
+        <td><button class="note-button" id="a6button">6</button></td>
+        <td><button class="note-button" id="b6button">7</button></td>
       </tr>
       <tr>
-        <td><button class="noteButton" id="c5button">q</button></td>
-        <td><button class="noteButton" id="d5button">w</button></td>
-        <td><button class="noteButton" id="e5button">e</button></td>
-        <td><button class="noteButton" id="f5button">r</button></td>
-        <td><button class="noteButton" id="g5button">t</button></td>
-        <td><button class="noteButton" id="a5button">y</button></td>
-        <td><button class="noteButton" id="b5button">u</button></td>
+        <td><button class="note-button" id="c5button">q</button></td>
+        <td><button class="note-button" id="d5button">w</button></td>
+        <td><button class="note-button" id="e5button">e</button></td>
+        <td><button class="note-button" id="f5button">r</button></td>
+        <td><button class="note-button" id="g5button">t</button></td>
+        <td><button class="note-button" id="a5button">y</button></td>
+        <td><button class="note-button" id="b5button">u</button></td>
       </tr>
       <tr>
-        <td><button class="noteButton" id="c4button">a</button></td>
-        <td><button class="noteButton" id="d4button">s</button></td>
-        <td><button class="noteButton" id="e4button">d</button></td>
-        <td><button class="noteButton" id="f4button">f</button></td>
-        <td><button class="noteButton" id="g4button">g</button></td>
-        <td><button class="noteButton" id="a4button">h</button></td>
-        <td><button class="noteButton" id="b4button">j</button></td>
+        <td><button class="note-button" id="c4button">a</button></td>
+        <td><button class="note-button" id="d4button">s</button></td>
+        <td><button class="note-button" id="e4button">d</button></td>
+        <td><button class="note-button" id="f4button">f</button></td>
+        <td><button class="note-button" id="g4button">g</button></td>
+        <td><button class="note-button" id="a4button">h</button></td>
+        <td><button class="note-button" id="b4button">j</button></td>
       </tr>
       <tr>
-        <td><button class="noteButton" id="c3button">z</button></td>
-        <td><button class="noteButton" id="d3button">x</button></td>
-        <td><button class="noteButton" id="e3button">c</button></td>
-        <td><button class="noteButton" id="f3button">v</button></td>
-        <td><button class="noteButton" id="g3button">b</button></td>
-        <td><button class="noteButton" id="a3button">n</button></td>
-        <td><button class="noteButton" id="b3button">m</button></td>
+        <td><button class="note-button" id="c3button">z</button></td>
+        <td><button class="note-button" id="d3button">x</button></td>
+        <td><button class="note-button" id="e3button">c</button></td>
+        <td><button class="note-button" id="f3button">v</button></td>
+        <td><button class="note-button" id="g3button">b</button></td>
+        <td><button class="note-button" id="a3button">n</button></td>
+        <td><button class="note-button" id="b3button">m</button></td>
       </tr>
       <tr>
-        <td><button onclick="console.log('you are a jelly donut!')"></button></td>
-        <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
-        <td><button onclick="startOver()">new</button></td>
-        <td><button onclick="drawTrebleCleff(x,y)">treble clef</button></td>
-        <td><button onclick="drawSharp(x,y)">sharp</button></td>
-        <td><button onclick="increaseXten()">x+=10</button></td>
-        <td><button onclick="decreaseXten()">x-=10</button></td>
-      </tr>
-      <tr>
-        <td><button onclick="increaseX_5()">x+=5</button></td>
-        <td><button onclick="decreaseX_5()">x-=5</button></td>
-        <td><button onclick="increaseY_5()">y+=5</button></td>
-        <td><button onclick="decreaseY_5()">y-=5</button></td>
-        <td><button onclick="shiftOctave('u')">octave<br>up</button></td>
-        <td><button onclick="shiftOctave('d')">octave<br>down</button></td>
+        <td><button id="draw-staves-button">draw staves</button></td>
+        <td><button></button></td>
+        <td><button id="start-over-button">new</button></td>
+        <!-- startOver() -->
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
         <td><button></button></td>
       </tr>
       <tr>
+      <td>
+        <button id="octave-up-button">octave<br>up</button></td><!-- shiftOctave('u') -->
         <td><button></button></td>
-        <td><button data-id="-2" id="double-flat-button"             >double-flat</button></td>
-        <td><button data-id="-1" id="flat-button"                    >flat</button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+      </tr>
+      <tr>
+        <td><button id="octave-down-button">octave<br>down</button></td><!-- shiftOctave('d') -->
+        <td><button></button></td>
+        <td><button data-id="-2" id="double-flat-button">double-flat</button></td>
+        <td><button data-id="-1" id="flat-button">flat</button></td>
         <td><button data-id="0"  id="natural-button" class="selected">natural</button></td>
-        <td><button data-id="1"  id="sharp-button"                   >sharp</button></td>
-        <td><button data-id="2"  id="double-sharp-button"            >double-sharp</button></td>
-        <td><button></button></td>
+        <td><button data-id="1"  id="sharp-button">sharp</button></td>
+        <td><button data-id="2"  id="double-sharp-button">double-sharp</button></td>
       </tr>
     </table>
     <!-- mark is a fantastic recorder player -->

@@ -11,6 +11,7 @@ window.addEventListener("keydown", function(e) { // prevent keys from scrolling 
 
 $(document).keypress(function(e) {
   notationConsoleLog( `keypress = ${e.which}` );
+  notationConsoleLog( `keyMap[e.which] = ${keyMap[e.which]}` );
   musicalInput( keyMap[e.which] );
 });
 
@@ -28,15 +29,20 @@ $(document).keyup(function(e) {
     x -= 5;
   } else if (e.which == 32) { //spacebar
     notationConsoleLog("spacebar")
+  } else {
+    return null;
   }
   notationConsoleLog("x=" + x + ", y=" + y);
   updateRender();
 })
+
+}); // end jquery
+
 var keyMap = {
   "122":"c3","120":"d3", "99":"e3","118":"f3", "98":"g3","110":"a3","109":"b3",
    "97":"c4","115":"d4","100":"e4","102":"f4","103":"g4","104":"a4","106":"b4",
   "113":"c5","119":"d5","101":"e5","114":"f5","116":"g5","121":"a5","117":"b5",
-   "49":"r1", "50":"r2", "51":"r3", "52":"r4", "53":"r5", "54":"r6", "55":"r7",
+   "49":"c6", "50":"d6", "51":"e6", "52":"f6", "53":"g6", "54":"a6", "55":"b6",
   "219":"do","221":"uo"
 }
 let y = 50;
@@ -64,6 +70,8 @@ function shiftOctave( shiftDirection ) {
     octaveShift += 1;
   } else if (shiftDirection == 'd') {
     octaveShift -= 1;
+  } else {
+    return null;
   }
   notationConsoleLog("Octave shift = " + octaveShift);
 }
@@ -157,5 +165,3 @@ function startOver() {
   scoreComponents = [];
   notationConsoleLog("Starting over. You just deleted everything.");
 }
-
-});

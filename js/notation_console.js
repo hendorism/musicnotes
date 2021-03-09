@@ -2,7 +2,7 @@ $(document).ready(function(){
   console.log("js/notation_console.js has loaded");
 
   var notationConsole = document.getElementById("notationConsole");
-
+}); // end jquery
   var notationConsoleEntryNumber = 0;
 
   function notationConsoleLog(notationConsoleLogEntry) {
@@ -18,5 +18,3 @@ $(document).ready(function(){
     notationConsole.appendChild(entry);
     notationConsole.scrollTop = notationConsole.scrollHeight;
   }
-
-});
