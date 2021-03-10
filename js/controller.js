@@ -48,8 +48,8 @@ $("#double-sharp-button").click(function(){
     accidentalValue = 'double-sharp'
 });
 $(".note-button").click(function(){
-  console.log( $( this ).id );
-  musicalInput( $( this ).id );
+  console.log( $(".note-button").attr("id") );
+  musicalInput( $(".note-button").attr("id") );
 });
 // more buttons
 $("#draw-staves-button").click(function(){
