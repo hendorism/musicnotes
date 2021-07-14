@@ -87,7 +87,7 @@ function musicalInput(musicalInputCode) {
     } else if (noteNames.includes(musicalInputCode.slice(0,1))) {
       makeNewNote(musicalInputCode.slice(0,1), musicalInputCode.slice(1,2));
     } else {
-      notationConsoleLog("You are a fuzzy bunny.");
+      notationConsoleLog("Invalid music input: ${musicalInputCode}");
     }
     if (stavesHaveBeenDrawn == true) {
       drawStaves(quan, spac, tmar);

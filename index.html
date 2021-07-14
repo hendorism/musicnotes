@@ -103,7 +103,59 @@
           [ = octave shift down<br>
           ] = octave shift up<br>
       </p>
+      
+<p style="font-size:16px;margin: 12px 8px 4px 8px;">
+  You can use this app to write down little
+  melodies in any key.
+
+  The idea right now is you can think of the
+  staff as being any clef and any key, so a
+  melody can be place anywhere vertically
+  in the staff.
+l
+  For example, "Mary Had a Little Lamb"
+  written in the key of A could be:
+  <canvas id="mary-had-a-little-lamb-canvas" width="400" height="150"></canvas>
+
+  <script>
+var maryHadALittleLambCanvas = document.getElementById("mary-had-a-little-lamb-canvas");
+var ctx = maryHadALittleLambCanvas.getContext("2d");
+for(i=0; i<5; i++) {
+  ctx.beginPath();
+  ctx.moveTo(10, 50+10*i);
+  ctx.lineTo(390, 50+10*i);
+  ctx.stroke();
+}
+
+
+function drawTrebleCleff(x,y){
+    drawReticle(x,y);
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000';
+    ctx.beginPath ();
+    ctx.moveTo (x-5,y+20);
+    ctx.bezierCurveTo (
+    x+3,y+40,
+    x+4,y+15,
+    x-4,y-40);
+    ctx.bezierCurveTo (
+    x+16,y-35,
+    x-20,y-4,
+    x-4,y+14);
+    ctx.bezierCurveTo (
+    x+16,y+35,
+    x+10,y-45,
+    x-4,y+5);
+    ctx.stroke ();
+}
+  </script>
+      
+</p>
+
+
+
       <div id="x-y-display" class="x-y-display">
+  
       </div><!-- x, y display -->
     </div><!-- notaion console -->
   </body>
