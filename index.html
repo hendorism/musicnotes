@@ -127,6 +127,18 @@ for(i=0; i<5; i++) {
   ctx.stroke();
 }
 
+let maryHadA = [3,2,1,2,3,3,3,2,2,2,3,5,5,
+3,2,1,2,3,3,3,3,2,2,3,2,1,8];
+
+for (i=0; i<maryHadA.length; i++) {
+ drawNoteHead(20+10*i,70*maryHadA[i]);
+}
+
+function drawNoteHead(x,y){
+    ctx.beginPath();
+    ctx.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
+    ctx.fill();
+}
 
 function drawTrebleCleff(x,y){
     drawReticle(x,y);
