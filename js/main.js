@@ -5,9 +5,15 @@ window.addEventListener("keydown", function(e) { // prevent keys from scrolling 
   // 37   39   38   40   32
   // <    >    ^    D    SP
   if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) { // not sure
-      e.preventDefault(); // (prevent default behavior)
+    e.preventDefault(); // (prevent default behavior)
+    /* The default behavior of direction arrow keys
+     * is to scroll the page. The default behavior
+     * of space bar is to scroll down the height of
+     * the viewport.
+     */
   }
-}, false); // false?
+}, false); // Why does this say false?
+	// What does that mean?
 
 $(document).keypress(function(e) {
   notationConsoleLog( `keypress = ${e.which}` );
