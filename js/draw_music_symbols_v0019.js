@@ -138,7 +138,7 @@ function drawTimeSignature(x,y,n,d){
     ctx.fillText(d,x-7,y+20);
 }
 
-function drawLine(x1,y1,x2,y2){
+function drawLine(x1,y1,x2,y2,ctx){
     ctx.lineWidth = lineWidth;
     ctx.beginPath();
     ctx.moveTo( x1, y1 );
