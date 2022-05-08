@@ -167,6 +167,7 @@ function makeNote(noteName) {
 function printSequence() {
 	clearPage();
 	drawStaves();
+	consoleLog("clear, staves");
 	let e = 0;
 	let x = xStart;
 	for (ii=0; ii<notes_sequence1.length; ii++) {
@@ -176,7 +177,6 @@ function printSequence() {
         }
         let y = top_margin + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing + staves_spacing*e;
         drawNoteHead(x, y);
-        drawLedgerLines(y);
         x += note_spacing;
     }
 }
@@ -223,81 +223,10 @@ function consoleLog(consoleEntry) {
     noteConsole.scrollTop = noteConsole.scrollHeight;
 }
 
-function drawLedgerLines(yy) {
-  consoleLog("drawLedgerLines()");
-  consoleLog("x = " + x);
-  consoleLog("y = " + y);
-  consoleLog("yy = " + yy);
-  consoleLog("e = " + e);
-  let middle_line_y = top_margin+staves_spacing*e+2*staff_spacing;
-  consoleLog("middle_line_y = " + middle_line_y);
-  let note_head_y_minus_middle_line_y = yy-middle_line_y;
-  consoleLog("note_head_y_minus_middle_line_y = " + note_head_y_minus_middle_line_y);
-  if (note_head_y_minus_middle_line_y<=-3*staff_spacing && -note_head_y_minus_middle_line_y%2===0) {
-    for (ledger_line_number=0; ledger_line_number>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
-      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===1) {
-    for (ledger_line_number=0; ledger_line_number-1>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
-      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===0) {
-    for (ledger_line_number=0; ledger_line_number<=(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
-      drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===1) {
-    for (ledger_line_number=0; ledger_line_number<(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++)
-      { drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
-    }
-  }
-}
+
 
 	
 </script>
 
 
 </body></html>
-<!--
-model for using fretboard instead
-of piano white keys for note input...
-
-fretboard:
-0  _____
-1  _____
-2  _____
-3  __=__
-4  _____
-5  __=__
-6  _____
-7  __=__
-8  _____
-9  __=__
-10 _____
-11 _____
-12 _=_=_
-13 _____
-14 _____
-15 __=__
-16 _____
-17 __=__
-18 _____
-19 __=__
-20 _____
-21 __=__
-22 _____
-23 _____
-24 _=_=_
-
-user is told "imagine you have here
-a guitar with one string. Use the up and down
-buttons to tune the string up and down a
-half-step. Then click the desired fret to put
-that pitch in the score."
-
-if (accidental set to double flat) {
-  if (input = 0) {
-    output
-  }
-}
-
--->
