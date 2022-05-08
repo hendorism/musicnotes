@@ -104,7 +104,7 @@ let notes_sequence1 = [];
 let note_head_radius = staff_spacing*0.5;
 let line_thickness = 1;
 let thick_line_thickness = 2.5;
-let xStart = 50;
+let xStart = 30;
 let side_margin = 10;
 let staves_quantity = 12;
 let staves_spacing = 100;
@@ -160,25 +160,22 @@ function clearPage() {
 function makeNote(noteName) {
   notes_sequence1.push(noteName);
   consoleLog(noteName + " pushed to notes_sequence1");
-  consoleLog("calling function printSequence()");
   printSequence();
 }
 
 function printSequence() {
-	consoleLog("function printSequence() running...");
 	clearPage();
 	drawStaves();
 	let e = 0;
 	let x = xStart;
-	consoleLog(" clear page, draw staves");
 	for (ii=0; ii<notes_sequence1.length; ii++) {
-        let y = top_margin + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing + staves_spacing*e;
-        drawNoteHead(x, y);
-        x += note_spacing;
-        if (x>canv1.width-side_margin) {
+        if (x+15>canv1.width-side_margin) {
             x=xStart;
             e+=1;
         }
+        let y = top_margin + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing + staves_spacing*e;
+        drawNoteHead(x, y);
+        x += note_spacing;
     }
 }
 
