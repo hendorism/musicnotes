@@ -115,44 +115,40 @@ let ledger_line_radius = 8;
 canv1.width = 600;
 canv1.height = 400;
 
+let y_values = {
+  b6: -7,
+  a6: -6.5,
+  g6: -6,
+  f6: -5.5,
+  e6: -5,
+  d6: -4.5,
+  c6: -4,
+  b5: -3.5,
+  a5: -3,
+  g5: -2.5,
+  f5: -2,
+  e5: -1.5,
+  d5: -1,
+  c5: -0.5,
+  b4: 0.0,
+  a4: 0.5,
+  g4: 1.0,
+  f4: 1.5,
+  e4: 2.0,
+  d4: 2.5,
+  c4: 3.0,
+  b3: 3.5,
+  a3: 4.0,
+  g3: 4.5,
+  f3: 5.0,
+  e3: 5.5,
+  d3: 6.0,
+  c3: 6.5
+}
+
 clearPage();
 drawStaves();
 
-let clefs = [
-  {
-    name: "treble",
-    c4_offset: 6
-  },
-  {
-    name: "bass",
-    c4_offset: -6
-  }
-];
-
-let accidental_modifiers = [
-  {
-    name: "double-sharp",
-    active: false
-  },
-  {
-    name: "sharp",
-    active: false
-  },
-  {
-    name: "natural",
-    active: true
-  },
-  {
-    name: "flat",
-    active = false
-  },
-  {
-    name: "double-flat",
-    active: false
-  }
-];
-
-consoleLog(accidental_modifiers);
 
 function clearPage() {
     ctx1.fillStyle = "#eeffbb";
@@ -177,9 +173,9 @@ function printSequence() {
             x=xStart;
             e+=1;
         }
-        let y = top_margin + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing + staves_spacing*e;
+        let y = top_margin + staves_spacing*e + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing;
+        consoleLog("x="+x+", y="+y+", e="+e+", note="+notes_sequence1[ii]);
         drawNoteHead(x, y);
-        drawLedgerLines(y);
         x += note_spacing;
     }
 }
@@ -225,36 +221,6 @@ function consoleLog(consoleEntry) {
     noteConsole.appendChild(entry);
     noteConsole.scrollTop = noteConsole.scrollHeight;
 }
-
-function drawLedgerLines(yy) {
-  consoleLog("drawLedgerLines()");
-  consoleLog("x = " + x);
-  consoleLog("y = " + y);
-  consoleLog("yy = " + yy);
-  consoleLog("e = " + e);
-  let middle_line_y = top_margin+staves_spacing*e+2*staff_spacing;
-  consoleLog("middle_line_y = " + middle_line_y);
-  let note_head_y_minus_middle_line_y = yy-middle_line_y;
-  consoleLog("note_head_y_minus_middle_line_y = " + note_head_y_minus_middle_line_y);
-  if (note_head_y_minus_middle_line_y<=-3*staff_spacing && -note_head_y_minus_middle_line_y%2===0) {
-    for (ledger_line_number=0; ledger_line_number>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
-      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===1) {
-    for (ledger_line_number=0; ledger_line_number-1>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
-      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===0) {
-    for (ledger_line_number=0; ledger_line_number<=(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
-      drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
-    }
-  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===1) {
-    for (ledger_line_number=0; ledger_line_number<(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++)
-      { drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
-    }
-  }
-}
-
 	
 </script>
 
