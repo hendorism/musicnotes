@@ -15,13 +15,11 @@ div#notationConsole {
 }
 </style></head>
 <body>
-	above canvas<br>
+	
 <canvas id="canvas1"></canvas><br>
-below canvas<br>
-	above note console<br>
-<div id="notationConsole">
-notation console<br>
 
+<div id="notationConsole">
+notation console:<br>
 </div>
 
 <table class="controls">
@@ -89,46 +87,41 @@ notation console<br>
         <td><button data-id="2"  id="double-sharp-button">double-sharp</button></td>
       </tr>
     </table>
+    
+    
 <script>
 let staff_spacing = 10;
 let keyMap = {
-  "122":"c3", "120":"d3","99":"e3","118":"f3", "98":"g3","110":"a3","109":"b3", "97":"c4","115":"d4","100":"e4","102":"f4","103":"g4","104":"a4","106":"b4", "113":"c5","119":"d5","101":"e5","114":"f5","116":"g5","121":"a5","117":"b5", "49":"c6", "50":"d6", "51":"e6", "52":"f6", "53":"g6", "54":"a6", "55":"b6", "219":"do","221":"uo"
+  "122":"c3", "120":"d3","99":"e3","118":"f3", "98":"g3","110":"a3","109":"b3",
+  "97":"c4","115":"d4","100":"e4","102":"f4","103":"g4","104":"a4","106":"b4",
+  "113":"c5","119":"d5","101":"e5","114":"f5","116":"g5","121":"a5","117":"b5",
+  "49":"c6", "50":"d6", "51":"e6", "52":"f6", "53":"g6", "54":"a6", "55":"b6",
+  "219":"do","221":"uo"
 }
 let y_values = {
-  "b6": -7*staff_spacing,
-  "a6": -6.5*staff_spacing,
-  "g6": -6*staff_spacing,
-  "f6": -5.5*staff_spacing,
-  "e6": -5*staff_spacing,
-  "d6": -4.5*staff_spacing,
-  "c6": -4*staff_spacing,
-  "b5": -3.5*staff_spacing,
-  "a5": -3*staff_spacing,
-  "g5": -2.5*staff_spacing,
-  "f5": -2*staff_spacing,
-  "e5": -1.5*staff_spacing,
-  "d5": -1*staff_spacing,
-  "c5": -0.5*staff_spacing,
-  "b4": 0.0*staff_spacing,
-  "a4": 0.5*staff_spacing,
-  "g4": 1.0*staff_spacing,
-  "f4": 1.5*staff_spacing,
-  "e4": 2.0*staff_spacing,
-  "d4": 2.5*staff_spacing,
-  "c4": 3.0*staff_spacing,
-  "b3": 3.5*staff_spacing,
-  "a3": 4.0*staff_spacing,
-  "g3": 4.5*staff_spacing,
-  "f3": 5.0*staff_spacing,
-  "e3": 5.5*staff_spacing,
-  "d3": 6.0*staff_spacing,
-  "c3": 6.5*staff_spacing
+  "b6": -7, "a6": -6.5, "g6": -6, "f6": -5.5, "e6": -5, "d6": -4.5, "c6": -4,
+  "b5": -3.5, "a5": -3, "g5": -2.5, "f5": -2, "e5": -1.5, "d5": -1, "c5": -0.5,
+  "b4": 0.0, "a4": 0.5, "g4": 1.0, "f4": 1.5, "e4": 2.0, "d4": 2.5, "c4": 3.0,
+  "b3": 3.5, "a3": 4.0, "g3": 4.5, "f3": 5.0, "e3": 5.5, "d3": 6.0, "c3": 6.5
 }
 let note_spacing = 15;
 let top_margin = 30;
 let notes_sequence1 = [];
+let canv1 = document.getElementById("canvas1");
+let ctx1 = canv1.getContext("2d");
+let note_head_radius = staff_spacing*0.5;
+let line_thickness = 1;
+let thick_line_thickness =2.5;
+let x = 50;
+  
+canv1.width = 600;
+canv1.height = 400;
+ctx1.fillStyle = "#eeffbb";
+ctx1.fillRect(0,0,canv1.width, canv1.height);
+ctx1.strokeStyle = "#000000";
+ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+
 function makeNote(noteName) {
-	notationConsoleLog("making a note: " + noteName);
 	notes_sequence1.push(noteName);
     renderPage();
 }
@@ -141,7 +134,7 @@ function clearPage() {
 function printNotes() {
     for (i=0; i<notes_sequence1.length; i++) {
     	let x = 30+note_spacing*i;
-	    let y = y_values[noteName]*staff_spacing+top_margin+2*staff_spacing;
+	    let y = top_margin+2*staff_spacing+y_values[notes_sequence1[i]]*staff_spacing;
         drawNoteHead(x,y);
     }
 }
@@ -149,16 +142,6 @@ function renderPage() {
 	clearPage();
 	printNotes();
 }
-let canv1 = document.getElementById("canvas1");
-let ctx1 = canv1.getContext("2d");
-
-canv1.width = 600;
-canv1.height = 400;
-ctx1.fillStyle = "#eeffbb";
-ctx1.fillRect(0,0,canv1.width, canv1.height);
-ctx1.strokeStyle = "#000000";
-ctx1.strokeRect(0, 0, canv1.width, canv1.height);
-
 function drawNoteHead(x,y){
 	ctx1.strokeStyle = "#000000";
 	ctx1.fillStyle = "#000000";
@@ -166,47 +149,6 @@ function drawNoteHead(x,y){
     ctx1.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
     ctx1.fill();
 }
-
-drawNoteHead(100,100);
-
-let note_head_radius = staff_spacing*0.5;
-let line_thickness = 1;
-let thick_line_thickness =2.5;
-let x = 50;
-
-
-
-
-
-
-notationConsoleLog("your mom");
-
-  const notationConsole = document.getElementById("notationConsole");
-  let notationConsoleEntryNumber = 0;
-  
-  function notationConsoleLog(notationConsoleLogEntry) {
-    notationConsoleEntryNumber ++;
-    let lineBreak = document.createElement("BR");
-    let entryNumberSpan = document.createElement("SPAN");
-    let entryNumber = document.createTextNode(notationConsoleEntryNumber + ": ");
-    let entry = document.createTextNode(notationConsoleLogEntry);
-    entryNumberSpan.class = "notation-console-entry-number-span";
-    entryNumberSpan.appendChild(entryNumber);
-    notationConsole.appendChild(lineBreak);
-    notationConsole.appendChild(entryNumberSpan);
-    notationConsole.appendChild(entry);
-    notationConsole.scrollTop = notationConsole.scrollHeight;
-  }
-
-
-
-</script>
-
-<script>
-    let paragraphElement = document.createElement("p");
-    let paragraphContent = document.createTextNode("hey this a paragraph");
-    notationConsole.appendChild(paragraphElement);
-    paragraphElement.appendChild(paragraphContent);
 
 
 </script>
