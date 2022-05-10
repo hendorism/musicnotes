@@ -1,0 +1,278 @@
+<!-- version-20220507-01 -->
+<!-- https://hendorism.github.io/musicnotes/version-20220507-01.html -->
+<html>
+<head>
+<style>
+* {
+    padding: 0;
+    margin: 0;
+}
+table.controls button {
+    width:80;
+    height:80;
+}
+.notation-console-entry-number-span {
+    color: #eeeeee;
+    background-color: #003344;
+}
+#note-console {
+    background-color: #ddeeff;
+}
+</style></head>
+<body>
+	
+<canvas id="canvas1"></canvas><br>
+
+<table class="controls">
+      <tr>
+        <td><button class="note-button" id="c6button" onclick="makeNote('c6');">1</button></td>
+        <td><button class="note-button" id="d6button" onclick="makeNote('d6');">2</button></td>
+        <td><button class="note-button" id="e6button" onclick="makeNote('e6');">3</button></td>
+        <td><button class="note-button" id="f6button" onclick="makeNote('f6');">4</button></td>
+        <td><button class="note-button" id="g6button" onclick="makeNote('g6');">5</button></td>
+        <td><button class="note-button" id="a6button" onclick="makeNote('a6');">6</button></td>
+        <td><button class="note-button" id="b6button" onclick="makeNote('b6');">7</button></td>
+      </tr>
+      <tr>
+        <td><button class="note-button" id="c5button" onclick="makeNote('c5');">q</button></td>
+        <td><button class="note-button" id="d5button" onclick="makeNote('d5');">w</button></td>
+        <td><button class="note-button" id="e5button" onclick="makeNote('e5');">e</button></td>
+        <td><button class="note-button" id="f5button" onclick="makeNote('f5');">r</button></td>
+        <td><button class="note-button" id="g5button" onclick="makeNote('g5');">t</button></td>
+        <td><button class="note-button" id="a5button" onclick="makeNote('a5');">y</button></td>
+        <td><button class="note-button" id="b5button" onclick="makeNote('b5');">u</button></td>
+      </tr>
+      <tr>
+        <td><button class="note-button" id="c4button" onclick="makeNote('c4');">a</button></td>
+        <td><button class="note-button" id="d4button" onclick="makeNote('d4');">s</button></td>
+        <td><button class="note-button" id="e4button" onclick="makeNote('e4');">d</button></td>
+        <td><button class="note-button" id="f4button" onclick="makeNote('f4');">f</button></td>
+        <td><button class="note-button" id="g4button" onclick="makeNote('g4');">g</button></td>
+        <td><button class="note-button" id="a4button" onclick="makeNote('a4');">h</button></td>
+        <td><button class="note-button" id="b4button" onclick="makeNote('b4');">j</button></td>
+      </tr>
+      <tr>
+        <td><button class="note-button" id="c3button" onclick="makeNote('c3');">z</button></td>
+        <td><button class="note-button" id="d3button" onclick="makeNote('d3');">x</button></td>
+        <td><button class="note-button" id="e3button" onclick="makeNote('e3');">c</button></td>
+        <td><button class="note-button" id="f3button" onclick="makeNote('f3');">v</button></td>
+        <td><button class="note-button" id="g3button" onclick="makeNote('g3');">b</button></td>
+        <td><button class="note-button" id="a3button" onclick="makeNote('a3');">n</button></td>
+        <td><button class="note-button" id="b3button" onclick="makeNote('b3');">m</button></td>
+      </tr>
+      <tr>
+        <td><button id="octave-up-button">octave<br>up</button></td><!-- shiftOctave('u') -->
+        <td><button>^</button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+      </tr>
+      <tr>
+        <td><button id="left-button"><</button></td>
+        <td><button></button></td>
+        <td><button id="right-button">></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+        <td><button></button></td>
+      </tr>
+      <tr>
+        <td><button id="octave-down-button">octave<br>down</button></td><!-- shiftOctave('d') -->
+        <td><button id="down-button" onclick="downButton()">\/</button></td>
+        <td><button data-id="-2" id="double-flat-button">double-flat</button></td>
+        <td><button data-id="-1" id="flat-button">flat</button></td>
+        <td><button data-id="0"  id="natural-button" class="selected">natural</button></td>
+        <td><button data-id="1"  id="sharp-button">sharp</button></td>
+        <td><button data-id="2"  id="double-sharp-button">double-sharp</button></td>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <div id="note-console"></div>
+        </td>
+      </tr>
+    </table>
+    
+    <script>
+let staff_spacing = 10;
+let note_spacing = 15;
+let top_margin = 30;
+let notes_sequence1 = [];
+let note_head_radius = staff_spacing*0.5;
+let line_thickness = 1;
+let thick_line_thickness = 2.5;
+let xStart = 30;
+let side_margin = 10;
+let staves_quantity = 12;
+let staves_spacing = 100;
+let canv1 = document.getElementById("canvas1");
+let ctx1 = canv1.getContext("2d");
+let noteConsole = document.getElementById("note-console");
+let noteConsoleEntryNumber = 0;
+let ledger_line_radius = 8;
+
+canv1.width = 600;
+canv1.height = 400;
+
+let y_values = {
+  b6: -7,
+  a6: -6.5,
+  g6: -6,
+  f6: -5.5,
+  e6: -5,
+  d6: -4.5,
+  c6: -4,
+  b5: -3.5,
+  a5: -3,
+  g5: -2.5,
+  f5: -2,
+  e5: -1.5,
+  d5: -1,
+  c5: -0.5,
+  b4: 0.0,
+  a4: 0.5,
+  g4: 1.0,
+  f4: 1.5,
+  e4: 2.0,
+  d4: 2.5,
+  c4: 3.0,
+  b3: 3.5,
+  a3: 4.0,
+  g3: 4.5,
+  f3: 5.0,
+  e3: 5.5,
+  d3: 6.0,
+  c3: 6.5
+}
+
+clearPage();
+drawStaves();
+
+
+function clearPage() {
+    ctx1.fillStyle = "#eeffbb";
+    ctx1.fillRect(0,0,canv1.width, canv1.height);
+    ctx1.strokeStyle = "#000000";
+    ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+}
+
+function makeNote(noteName) {
+  notes_sequence1.push(noteName);
+  consoleLog(noteName + " pushed to notes_sequence1");
+  printSequence();
+}
+
+function printSequence() {
+	clearPage();
+	drawStaves();
+	let e = 0;
+	let x = xStart;
+	for (ii=0; ii<notes_sequence1.length; ii++) {
+        if (x+15>canv1.width-side_margin) {
+            x=xStart;
+            e+=1;
+        }
+        let y = top_margin + staves_spacing*e + 2*staff_spacing + y_values[notes_sequence1[ii]]*staff_spacing;
+        consoleLog("x="+x+", y="+y+", e="+e+", note="+notes_sequence1[ii]);
+        drawNoteHead(x, y);
+        x += note_spacing;
+    }
+}
+
+function drawNoteHead(x,y){
+	ctx1.strokeStyle = "#000000";
+	ctx1.fillStyle = "#000000";
+    ctx1.beginPath();
+    ctx1.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
+    ctx1.fill();
+}
+
+function drawStaves() {
+  for(e=0;e<staves_quantity;e++){
+    for(i=0;i<5;i++){
+      let x1 = side_margin;
+      let y1 = top_margin+10*i+staves_spacing*e;
+      let x2 = canv1.width-side_margin;
+      let y2 = top_margin+10*i+staves_spacing*e;
+      drawLine(x1, y1, x2, y2);
+    }
+  }
+}
+
+function drawLine(x1,y1,x2,y2){
+    ctx1.lineWidth = line_thickness;
+    ctx1.beginPath();
+    ctx1.moveTo( x1, y1 );
+    ctx1.lineTo( x2, y2 );
+    ctx1.stroke();
+}
+
+function consoleLog(consoleEntry) {
+    noteConsoleEntryNumber ++;
+    let lineBreak = document.createElement("BR");
+    let entryNumberSpan = document.createElement("SPAN");
+    let entryNumber = document.createTextNode(noteConsoleEntryNumber + ": ");
+    let entry = document.createTextNode(consoleEntry);
+    entryNumberSpan.class = "notation-console-entry-number-span";
+    entryNumberSpan.appendChild(entryNumber);
+    noteConsole.appendChild(lineBreak);
+    noteConsole.appendChild(entryNumberSpan);
+    noteConsole.appendChild(entry);
+    noteConsole.scrollTop = noteConsole.scrollHeight;
+}
+	
+</script>
+
+
+</body></html>
+<!--
+model for using fretboard instead
+of piano white keys for note input...
+fretboard:
+0  _____
+1  _____
+2  _____
+3  __=__
+4  _____
+5  __=__
+6  _____
+7  __=__
+8  _____
+9  __=__
+10 _____
+11 _____
+12 _=_=_
+13 _____
+14 _____
+15 __=__
+16 _____
+17 __=__
+18 _____
+19 __=__
+20 _____
+21 __=__
+22 _____
+23 _____
+24 _=_=_
+user is told "imagine you have here
+a guitar with one string. Use the up and down
+buttons to tune the string up and down a
+half-step. Then click the desired fret to put
+that pitch in the score."
+if (accidental set to double flat) {
+  if (input = 0) {
+    output
+  }
+}
+-->
+    
+    
+    
+    
+
+
+
+</body>
+	
+</html>
