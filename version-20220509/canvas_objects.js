@@ -17,3 +17,12 @@ class Circle {
 
 let circle = new Circle(200, 200, 23, "red");
 circle.draw(ctx1);
+
+class MusicNote {
+    constructor(name, octave, accidental) {
+        this.name = name;
+        this.octave = octave;
+        this.accidental = accidental;
+    }
+}
+
