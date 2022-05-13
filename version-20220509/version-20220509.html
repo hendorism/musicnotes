@@ -231,6 +231,8 @@
   let ledger_line_radius = 8;
   let accidental = "natural";
   let accidental_x_offset = 2*note_head_radius;
+  let ledgerLineRadius = 8;
+  let x;
   
   canv1.width = 600;
   canv1.height = 300;
@@ -266,7 +268,7 @@
     clearPage();
     drawStaves();
     let e = 0;
-    let x = xStart;
+    x = xStart;
     for (ii=0; ii<notes_sequence1.length; ii++) {
       if (x+15>canv1.width-side_margin) {
         x=xStart;
@@ -275,8 +277,31 @@
       let noteName = notes_sequence1[ii].name+notes_sequence1[ii].octave;
       let y = top_margin + 2*staff_spacing + y_values[noteName]*staff_spacing + staves_spacing*e;
       drawNoteHead(x, y);
+      drawLedgerLines(x, y, e);
       drawAccidental(x, y, notes_sequence1[ii].accidental);
       x += note_spacing;
+    }
+  }
+  
+  function drawLedgerLines(x, y, e) {
+    let middle_line_y = top_margin+staves_spacing*e+2*staff_spacing;
+    let note_head_y_minus_middle_line_y = y-middle_line_y;
+    if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===0) {
+      for (ledger_line_number=0; ledger_line_number>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
+        drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
+      }
+    } else if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===1) {
+      for (ledger_line_number=0; ledger_line_number-1>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
+        drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
+      }
+    } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===0) {
+      for (ledger_line_number=0; ledger_line_number<=(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
+        drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
+      }
+    } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===1) {
+      for (ledger_line_number=0; ledger_line_number<(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
+        drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
+      }
     }
   }
   
@@ -424,8 +449,6 @@ function drawDoubleSharp(x,y){
     ctx1.font = "16px arial"
     ctx1.fillText("x",x1,y1);
 }
-
-
 
 </script>
 </html>
