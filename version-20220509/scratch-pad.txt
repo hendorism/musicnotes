@@ -20,3 +20,14 @@
 <td><button class="note-key" id="g6button" onclick="makeNote('g6');">G6</button></td>
 <td><button class="note-key" id="a6button" onclick="makeNote('a6');">A6</button></td>
 <td><button class="note-key" id="b6button" onclick="makeNote('b6');">B6</button></td>
+
+
+
+user clicks on <button id="barline"> to place a barline in the score.
+
+the app then counts the beats in the bar and auto-prints a time-signature.
+
+if the time-sig is same as previous measure, no time-sig is printed.
+
+user can right-click or long-press on time-sig to pull up a context menu to select denominator.
+
