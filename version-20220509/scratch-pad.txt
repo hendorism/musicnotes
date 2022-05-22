@@ -1,3 +1,25 @@
+user clicks on <button id="barline"> to place a barline in the score.
+
+the app then counts the beats in the bar and auto-prints a time-signature.
+
+if the time-sig is same as previous measure, no time-sig is printed.
+
+user can right-click or long-press on time-sig to pull up a context menu to select denominator.
+
+
+
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+
+
+
+
+
 <td><button class="note-key" id="b3button" onclick="makeNote('b3');">B3</button></td>
 <td><button class="note-key" id="c4button" onclick="makeNote('c4');">C4</button></td>
 <td><button class="note-key" id="d4button" onclick="makeNote('d4');">D4</button></td>
@@ -22,12 +44,948 @@
 <td><button class="note-key" id="b6button" onclick="makeNote('b6');">B6</button></td>
 
 
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
+=====================================================================================
 
-user clicks on <button id="barline"> to place a barline in the score.
 
-the app then counts the beats in the bar and auto-prints a time-signature.
 
-if the time-sig is same as previous measure, no time-sig is printed.
+<td><button class="note-key" id="b3button" onclick="makeNote('b3');">B3</button></td>
 
-user can right-click or long-press on time-sig to pull up a context menu to select denominator.
+<td><button class="note-key" id="c4button" onclick="makeNote('c4');">C4</button></td>
+
+<td><button class="note-key" id="d4button" onclick="makeNote('d4');">D4</button></td>
+
+<td><button class="note-key" id="e4button" onclick="makeNote('e4');">E4</button></td>
+
+<td><button class="note-key" id="f4button" onclick="makeNote('f4');">F4</button></td>
+
+<td><button class="note-key" id="g4button" onclick="makeNote('g4');">G4</button></td>
+
+<td><button class="note-key" id="a4button" onclick="makeNote('a4');">A4</button></td>
+
+<td><button class="note-key" id="b4button" onclick="makeNote('b4');">B4</button></td>
+
+<td><button class="note-key" id="c5button" onclick="makeNote('c5');">C5</button></td>
+
+<td><button class="note-key" id="d5button" onclick="makeNote('d5');">D5</button></td>
+
+<td><button class="note-key" id="e5button" onclick="makeNote('e5');">E5</button></td>
+
+<td><button class="note-key" id="f5button" onclick="makeNote('f5');">F5</button></td>
+
+<td><button class="note-key" id="g5button" onclick="makeNote('g5');">G5</button></td>
+
+<td><button class="note-key" id="a5button" onclick="makeNote('a5');">A5</button></td>
+
+<td><button class="note-key" id="b5button" onclick="makeNote('b5');">B5</button></td>
+
+<td><button class="note-key" id="c6button" onclick="makeNote('c6');">C6</button></td>
+
+<td><button class="note-key" id="d6button" onclick="makeNote('d6');">D6</button></td>
+
+<td><button class="note-key" id="e6button" onclick="makeNote('e6');">E6</button></td>
+
+<td><button class="note-key" id="f6button" onclick="makeNote('f6');">F6</button></td>
+
+<td><button class="note-key" id="g6button" onclick="makeNote('g6');">G6</button></td>
+
+<td><button class="note-key" id="a6button" onclick="makeNote('a6');">A6</button></td>
+
+<td><button class="note-key" id="b6button" onclick="makeNote('b6');">B6</button></td>
+
+
+
+
+
+
+
+let order_of_flats =  ['b', 'e', 'a', 'd', 'g', 'c', 'f'];
+
+let order_of_sharps = ['f', 'c', 'g', 'd', 'a', 'e', 'b'];
+
+let alphabet =        ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+
+let accidentals = ['double-flat', 'flat', 'natural', 'sharp', 'double-sharp']
+
+function printSequence() {
+
+  clearPage();
+
+  drawStaves();
+
+  let e = 0;
+
+  x = xStart;
+
+  for (ii=0; ii<notes_sequence1.length; ii++) {
+
+    if (x+15>canv1.width-side_margin) {
+
+      x=xStart;
+
+      e+=1;
+
+    }
+
+    let noteName = notes_sequence1[ii].name+notes_sequence1[ii].octave;
+
+    let y = top_margin + 2*staff_spacing + y_values[noteName]*staff_spacing + staves_spacing*e;
+
+    drawNoteHead(x, y);
+
+    drawLedgerLines(x, y, e);
+
+    let noteLetter = notes_sequence1[ii].name;
+
+let draw_accidental = true;
+
+    if (key_signature > 0) {
+
+	  for (i=0; i<key_signature); i++) {
+
+		if (order_of_sharps_name.includes(noteLetter, i) == true) {
+
+		  draw_accidental = false;
+
+		} else {
+
+		  draw_accidental = true;
+
+		}
+
+	  }
+
+	} else if (key_signature < 0) {
+
+	  for (i=0; i>key_signature; i--) {
+
+		if (order_of_flats_name.includes(noteLetter, i) == true) {
+
+		  draw_accidental = false;
+
+		} else {
+
+		  draw_accidental = true;
+
+		}
+
+	  }
+
+	}  
+	
+
+		set_draw_accidental();
+
+	if (draw_accidental == true) {
+
+      drawAccidental(x, y, notes_sequence1[ii].accidental);
+
+	}
+
+    x += note_spacing;
+
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+<html>
+  <head>
+    <title>musicnotes20220509</title>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    button.accidental {
+        width:51;
+        height:40;
+        margin: -1px;
+    }
+    button.note-key {
+        width: 22;
+        height: 60;
+        margin: -2px;
+        font-size: 11px;
+    }
+    button.white-key {
+      background-color: #ddeeff;
+      color: #1b1b1b;
+    }
+    button.black-key {
+      background-color: #1b1b1b;
+      color: #ddeeff;
+    }
+    .notation-console-entry-number-span {
+        color: #eeeeee;
+        background-color: #003344;
+    }
+    div#note-console {
+        height: 200px;
+        width: 100%;
+        background-color: #ddeeff;
+        font-family: monospace;
+      }
+      button.color-scheme {
+        background-color: #272727;
+        color: #55bbcc;
+        padding: 10px;
+      }
+      button.set-key-sig {
+        background-color: #272727;
+        color: #55bbcc;
+        padding: 10px;
+      }
+      p.intro {
+        font-family: monospace;
+      }
+      </style>
+</head>
+
+<body>
+  <p class="intro">Thanks for using musicnotes app.</p><br>
+  <p class="intro">Right-click the canvas to "save image as..."
+    This will save a .png image of your song.</p><br>
+  <p class="intro">Hit the "color scheme" button to
+    make the page black and white for printing.</p>
+  <table>
+    
+    <tr>
+      
+    <td><button class="accidental" onclick="setAccidental(this.id)" data-id="2"  id="double-sharp">##</button></td>
+    <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'double-sharp');">C2</button></td>
+    <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-sharp');">D2</button></td>
+    <td><button class="note-key black-key" id="e2button" onclick="makeNote('e2', 'double-sharp');">E2</button></td>
+    <td><button class="note-key white-key" id="f2button" onclick="makeNote('f2', 'double-sharp');">F2</button></td>
+    <td><button class="note-key white-key" id="g2button" onclick="makeNote('g2', 'double-sharp');">G2</button></td>
+    <td><button class="note-key white-key" id="a2button" onclick="makeNote('a2', 'double-sharp');">A2</button></td>
+    <td><button class="note-key black-key" id="b2button" onclick="makeNote('b2', 'double-sharp');">B2</button></td>
+    <td><button class="note-key white-key" id="c3button" onclick="makeNote('c3', 'double-sharp');">C3</button></td>
+    <td><button class="note-key white-key" id="d3button" onclick="makeNote('d3', 'double-sharp');">D3</button></td>
+    <td><button class="note-key black-key" id="e3button" onclick="makeNote('e3', 'double-sharp');">E3</button></td>
+    <td><button class="note-key white-key" id="f3button" onclick="makeNote('f3', 'double-sharp');">F3</button></td>
+    <td><button class="note-key white-key" id="g3button" onclick="makeNote('g3', 'double-sharp');">G3</button></td>
+    <td><button class="note-key white-key" id="a3button" onclick="makeNote('a3', 'double-sharp');">A3</button></td>
+    <td><button class="note-key black-key" id="b3button" onclick="makeNote('b3', 'double-sharp');">B3</button></td>
+    <td><button class="note-key white-key" id="c4button" onclick="makeNote('c4', 'double-sharp');">C4</button></td>
+    <td><button class="note-key white-key" id="d4button" onclick="makeNote('d4', 'double-sharp');">D4</button></td>
+    <td><button class="note-key black-key" id="e4button" onclick="makeNote('e4', 'double-sharp');">E4</button></td>
+    <td><button class="note-key white-key" id="f4button" onclick="makeNote('f4', 'double-sharp');">F4</button></td>
+    <td><button class="note-key white-key" id="g4button" onclick="makeNote('g4', 'double-sharp');">G4</button></td>
+    <td><button class="note-key white-key" id="a4button" onclick="makeNote('a4', 'double-sharp');">A4</button></td>
+    <td><button class="note-key black-key" id="b4button" onclick="makeNote('b4', 'double-sharp');">B4</button></td>
+    <td><button class="note-key white-key" id="c5button" onclick="makeNote('c5', 'double-sharp');">C5</button></td>
+    <td><button class="note-key white-key" id="d5button" onclick="makeNote('d5', 'double-sharp');">D5</button></td>
+    <td><button class="note-key black-key" id="e5button" onclick="makeNote('e5', 'double-sharp');">E5</button></td>
+    <td><button class="note-key white-key" id="f5button" onclick="makeNote('f5', 'double-sharp');">F5</button></td>
+    <td><button class="note-key white-key" id="g5button" onclick="makeNote('g5', 'double-sharp');">G5</button></td>
+    <td><button class="note-key white-key" id="a5button" onclick="makeNote('a5', 'double-sharp');">A5</button></td>
+    <td><button class="note-key black-key" id="b5button" onclick="makeNote('b5', 'double-sharp');">B5</button></td>
+    <td><button class="note-key white-key" id="c6button" onclick="makeNote('c6', 'double-sharp');">C6</button></td>
+    <td><button class="note-key white-key" id="d6button" onclick="makeNote('d6', 'double-sharp');">D6</button></td>
+    <td><button class="note-key black-key" id="e6button" onclick="makeNote('e6', 'double-sharp');">E6</button></td>
+    <td><button class="note-key white-key" id="f6button" onclick="makeNote('f6', 'double-sharp');">F6</button></td>
+    <td><button class="note-key white-key" id="g6button" onclick="makeNote('g6', 'double-sharp');">G6</button></td>
+    <td><button class="note-key white-key" id="a6button" onclick="makeNote('a6', 'double-sharp');">A6</button></td>
+    <td><button class="note-key black-key" id="b6button" onclick="makeNote('b6', 'double-sharp');">B6</button></td>
+    <td><button class="note-key white-key" id="c7button" onclick="makeNote('c7', 'double-sharp');">C7</button></td>
+    <td><button class="note-key white-key" id="d7button" onclick="makeNote('d7', 'double-sharp');">D7</button></td>
+    <td><button class="note-key black-key" id="e7button" onclick="makeNote('e7', 'double-sharp');">E7</button></td>
+    <td><button class="note-key white-key" id="f7button" onclick="makeNote('f7', 'double-sharp');">F7</button></td>
+    <td><button class="note-key white-key" id="g7button" onclick="makeNote('g7', 'double-sharp');">G7</button></td>
+    <td><button class="note-key white-key" id="a7button" onclick="makeNote('a7', 'double-sharp');">A7</button></td>
+    <td><button class="note-key black-key" id="b7button" onclick="makeNote('b7', 'double-sharp');">B7</button></td>
+    
+    <td><button class="color-scheme" onclick="colorSchemeCycle()">color scheme</button></td>
+  </tr>
+  <tr>
+    
+    
+    <td><button class="accidental" onclick="setAccidental(this.id)" data-id="1"  id="sharp">#</button></td>
+      <td><button class="note-key black-key" id="c2button" onclick="makeNote('c2', 'sharp');">C2</button></td>
+      <td><button class="note-key black-key" id="d2button" onclick="makeNote('d2', 'sharp');">D2</button></td>
+      <td><button class="note-key white-key" id="e2button" onclick="makeNote('e2', 'sharp');">E2</button></td>
+      <td><button class="note-key black-key" id="f2button" onclick="makeNote('f2', 'sharp');">F2</button></td>
+      <td><button class="note-key black-key" id="g2button" onclick="makeNote('g2', 'sharp');">G2</button></td>
+      <td><button class="note-key black-key" id="a2button" onclick="makeNote('a2', 'sharp');">A2</button></td>
+      <td><button class="note-key white-key" id="b2button" onclick="makeNote('b2', 'sharp');">B2</button></td>
+      <td><button class="note-key black-key" id="c3button" onclick="makeNote('c3', 'sharp');">C3</button></td>
+      <td><button class="note-key black-key" id="d3button" onclick="makeNote('d3', 'sharp');">D3</button></td>
+      <td><button class="note-key white-key" id="e3button" onclick="makeNote('e3', 'sharp');">E3</button></td>
+      <td><button class="note-key black-key" id="f3button" onclick="makeNote('f3', 'sharp');">F3</button></td>
+      <td><button class="note-key black-key" id="g3button" onclick="makeNote('g3', 'sharp');">G3</button></td>
+      <td><button class="note-key black-key" id="a3button" onclick="makeNote('a3', 'sharp');">A3</button></td>
+      <td><button class="note-key white-key" id="b3button" onclick="makeNote('b3', 'sharp');">B3</button></td>
+      <td><button class="note-key black-key" id="c4button" onclick="makeNote('c4', 'sharp');">C4</button></td>
+      <td><button class="note-key black-key" id="d4button" onclick="makeNote('d4', 'sharp');">D4</button></td>
+      <td><button class="note-key white-key" id="e4button" onclick="makeNote('e4', 'sharp');">E4</button></td>
+      <td><button class="note-key black-key" id="f4button" onclick="makeNote('f4', 'sharp');">F4</button></td>
+      <td><button class="note-key black-key" id="g4button" onclick="makeNote('g4', 'sharp');">G4</button></td>
+      <td><button class="note-key black-key" id="a4button" onclick="makeNote('a4', 'sharp');">A4</button></td>
+      <td><button class="note-key white-key" id="b4button" onclick="makeNote('b4', 'sharp');">B4</button></td>
+      <td><button class="note-key black-key" id="c5button" onclick="makeNote('c5', 'sharp');">C5</button></td>
+      <td><button class="note-key black-key" id="d5button" onclick="makeNote('d5', 'sharp');">D5</button></td>
+      <td><button class="note-key white-key" id="e5button" onclick="makeNote('e5', 'sharp');">E5</button></td>
+      <td><button class="note-key black-key" id="f5button" onclick="makeNote('f5', 'sharp');">F5</button></td>
+      <td><button class="note-key black-key" id="g5button" onclick="makeNote('g5', 'sharp');">G5</button></td>
+      <td><button class="note-key black-key" id="a5button" onclick="makeNote('a5', 'sharp');">A5</button></td>
+      <td><button class="note-key white-key" id="b5button" onclick="makeNote('b5', 'sharp');">B5</button></td>
+      <td><button class="note-key black-key" id="c6button" onclick="makeNote('c6', 'sharp');">C6</button></td>
+      <td><button class="note-key black-key" id="d6button" onclick="makeNote('d6', 'sharp');">D6</button></td>
+      <td><button class="note-key white-key" id="e6button" onclick="makeNote('e6', 'sharp');">E6</button></td>
+      <td><button class="note-key black-key" id="f6button" onclick="makeNote('f6', 'sharp');">F6</button></td>
+      <td><button class="note-key black-key" id="g6button" onclick="makeNote('g6', 'sharp');">G6</button></td>
+      <td><button class="note-key black-key" id="a6button" onclick="makeNote('a6', 'sharp');">A6</button></td>
+      <td><button class="note-key white-key" id="b6button" onclick="makeNote('b6', 'sharp');">B6</button></td>
+      <td><button class="note-key black-key" id="c7button" onclick="makeNote('c7', 'sharp');">C7</button></td>
+      <td><button class="note-key black-key" id="d7button" onclick="makeNote('d7', 'sharp');">D7</button></td>
+      <td><button class="note-key white-key" id="e7button" onclick="makeNote('e7', 'sharp');">E7</button></td>
+      <td><button class="note-key black-key" id="f7button" onclick="makeNote('f7', 'sharp');">F7</button></td>
+      <td><button class="note-key black-key" id="g7button" onclick="makeNote('g7', 'sharp');">G7</button></td>
+      <td><button class="note-key black-key" id="a7button" onclick="makeNote('a7', 'sharp');">A7</button></td>
+      <td><button class="note-key white-key" id="b7button" onclick="makeNote('b7', 'sharp');">B7</button></td>
+      <td><button class="set-key-sig" onclick="setKeySignatureEqualsTrue()">set key</button></td>
+    </tr>
+  <tr>
+    
+    
+    <td><button class="accidental" onclick="setAccidental(this.id)" data-id="0"  id="natural" class="selected">natural</button></td>
+      <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'natural');">C2</button></td>
+      <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'natural');">D2</button></td>
+      <td><button class="note-key white-key" id="e2button" onclick="makeNote('e2', 'natural');">E2</button></td>
+      <td><button class="note-key white-key" id="f2button" onclick="makeNote('f2', 'natural');">F2</button></td>
+      <td><button class="note-key white-key" id="g2button" onclick="makeNote('g2', 'natural');">G2</button></td>
+      <td><button class="note-key white-key" id="a2button" onclick="makeNote('a2', 'natural');">A2</button></td>
+      <td><button class="note-key white-key" id="b2button" onclick="makeNote('b2', 'natural');">B2</button></td>
+      <td><button class="note-key white-key" id="c3button" onclick="makeNote('c3', 'natural');">C3</button></td>
+      <td><button class="note-key white-key" id="d3button" onclick="makeNote('d3', 'natural');">D3</button></td>
+      <td><button class="note-key white-key" id="e3button" onclick="makeNote('e3', 'natural');">E3</button></td>
+      <td><button class="note-key white-key" id="f3button" onclick="makeNote('f3', 'natural');">F3</button></td>
+      <td><button class="note-key white-key" id="g3button" onclick="makeNote('g3', 'natural');">G3</button></td>
+      <td><button class="note-key white-key" id="a3button" onclick="makeNote('a3', 'natural');">A3</button></td>
+      <td><button class="note-key white-key" id="b3button" onclick="makeNote('b3', 'natural');">B3</button></td>
+      <td><button class="note-key white-key" id="c4button" onclick="makeNote('c4', 'natural');">C4</button></td>
+      <td><button class="note-key white-key" id="d4button" onclick="makeNote('d4', 'natural');">D4</button></td>
+      <td><button class="note-key white-key" id="e4button" onclick="makeNote('e4', 'natural');">E4</button></td>
+      <td><button class="note-key white-key" id="f4button" onclick="makeNote('f4', 'natural');">F4</button></td>
+      <td><button class="note-key white-key" id="g4button" onclick="makeNote('g4', 'natural');">G4</button></td>
+      <td><button class="note-key white-key" id="a4button" onclick="makeNote('a4', 'natural');">A4</button></td>
+      <td><button class="note-key white-key" id="b4button" onclick="makeNote('b4', 'natural');">B4</button></td>
+      <td><button class="note-key white-key" id="c5button" onclick="makeNote('c5', 'natural');">C5</button></td>
+      <td><button class="note-key white-key" id="d5button" onclick="makeNote('d5', 'natural');">D5</button></td>
+      <td><button class="note-key white-key" id="e5button" onclick="makeNote('e5', 'natural');">E5</button></td>
+      <td><button class="note-key white-key" id="f5button" onclick="makeNote('f5', 'natural');">F5</button></td>
+      <td><button class="note-key white-key" id="g5button" onclick="makeNote('g5', 'natural');">G5</button></td>
+      <td><button class="note-key white-key" id="a5button" onclick="makeNote('a5', 'natural');">A5</button></td>
+      <td><button class="note-key white-key" id="b5button" onclick="makeNote('b5', 'natural');">B5</button></td>
+      <td><button class="note-key white-key" id="c6button" onclick="makeNote('c6', 'natural');">C6</button></td>
+      <td><button class="note-key white-key" id="d6button" onclick="makeNote('d6', 'natural');">D6</button></td>
+      <td><button class="note-key white-key" id="e6button" onclick="makeNote('e6', 'natural');">E6</button></td>
+      <td><button class="note-key white-key" id="f6button" onclick="makeNote('f6', 'natural');">F6</button></td>
+      <td><button class="note-key white-key" id="g6button" onclick="makeNote('g6', 'natural');">G6</button></td>
+      <td><button class="note-key white-key" id="a6button" onclick="makeNote('a6', 'natural');">A6</button></td>
+      <td><button class="note-key white-key" id="b6button" onclick="makeNote('b6', 'natural');">B6</button></td>
+      <td><button class="note-key white-key" id="c7button" onclick="makeNote('c7', 'natural');">C7</button></td>
+      <td><button class="note-key white-key" id="d7button" onclick="makeNote('d7', 'natural');">D7</button></td>
+      <td><button class="note-key white-key" id="e7button" onclick="makeNote('e7', 'natural');">E7</button></td>
+      <td><button class="note-key white-key" id="f7button" onclick="makeNote('f7', 'natural');">F7</button></td>
+      <td><button class="note-key white-key" id="g7button" onclick="makeNote('g7', 'natural');">G7</button></td>
+      <td><button class="note-key white-key" id="a7button" onclick="makeNote('a7', 'natural');">A7</button></td>
+      <td><button class="note-key white-key" id="b7button" onclick="makeNote('b7', 'natural');">B7</button></td>
+    </tr>
+  <tr>
+    
+    
+    <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-1" id="flat">b</button></td>
+    <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'flat');">C2</button></td>
+    <td><button class="note-key black-key" id="d2button" onclick="makeNote('d2', 'flat');">D2</button></td>
+    <td><button class="note-key black-key" id="e2button" onclick="makeNote('e2', 'flat');">E2</button></td>
+    <td><button class="note-key white-key" id="f2button" onclick="makeNote('f2', 'flat');">F2</button></td>
+    <td><button class="note-key black-key" id="g2button" onclick="makeNote('g2', 'flat');">G2</button></td>
+    <td><button class="note-key black-key" id="a2button" onclick="makeNote('a2', 'flat');">A2</button></td>
+    <td><button class="note-key black-key" id="b2button" onclick="makeNote('b2', 'flat');">B2</button></td>
+    <td><button class="note-key white-key" id="c3button" onclick="makeNote('c3', 'flat');">C3</button></td>
+    <td><button class="note-key black-key" id="d3button" onclick="makeNote('d3', 'flat');">D3</button></td>
+    <td><button class="note-key black-key" id="e3button" onclick="makeNote('e3', 'flat');">E3</button></td>
+    <td><button class="note-key white-key" id="f3button" onclick="makeNote('f3', 'flat');">F3</button></td>
+    <td><button class="note-key black-key" id="g3button" onclick="makeNote('g3', 'flat');">G3</button></td>
+    <td><button class="note-key black-key" id="a3button" onclick="makeNote('a3', 'flat');">A3</button></td>
+    <td><button class="note-key black-key" id="b3button" onclick="makeNote('b3', 'flat');">B3</button></td>
+    <td><button class="note-key white-key" id="c4button" onclick="makeNote('c4', 'flat');">C4</button></td>
+    <td><button class="note-key black-key" id="d4button" onclick="makeNote('d4', 'flat');">D4</button></td>
+    <td><button class="note-key black-key" id="e4button" onclick="makeNote('e4', 'flat');">E4</button></td>
+    <td><button class="note-key white-key" id="f4button" onclick="makeNote('f4', 'flat');">F4</button></td>
+    <td><button class="note-key black-key" id="g4button" onclick="makeNote('g4', 'flat');">G4</button></td>
+    <td><button class="note-key black-key" id="a4button" onclick="makeNote('a4', 'flat');">A4</button></td>
+    <td><button class="note-key black-key" id="b4button" onclick="makeNote('b4', 'flat');">B4</button></td>
+    <td><button class="note-key white-key" id="c5button" onclick="makeNote('c5', 'flat');">C5</button></td>
+    <td><button class="note-key black-key" id="d5button" onclick="makeNote('d5', 'flat');">D5</button></td>
+    <td><button class="note-key black-key" id="e5button" onclick="makeNote('e5', 'flat');">E5</button></td>
+    <td><button class="note-key white-key" id="f5button" onclick="makeNote('f5', 'flat');">F5</button></td>
+    <td><button class="note-key black-key" id="g5button" onclick="makeNote('g5', 'flat');">G5</button></td>
+    <td><button class="note-key black-key" id="a5button" onclick="makeNote('a5', 'flat');">A5</button></td>
+    <td><button class="note-key black-key" id="b5button" onclick="makeNote('b5', 'flat');">B5</button></td>
+    <td><button class="note-key white-key" id="c6button" onclick="makeNote('c6', 'flat');">C6</button></td>
+    <td><button class="note-key black-key" id="d6button" onclick="makeNote('d6', 'flat');">D6</button></td>
+    <td><button class="note-key black-key" id="e6button" onclick="makeNote('e6', 'flat');">E6</button></td>
+    <td><button class="note-key white-key" id="f6button" onclick="makeNote('f6', 'flat');">F6</button></td>
+    <td><button class="note-key black-key" id="g6button" onclick="makeNote('g6', 'flat');">G6</button></td>
+    <td><button class="note-key black-key" id="a6button" onclick="makeNote('a6', 'flat');">A6</button></td>
+    <td><button class="note-key black-key" id="b6button" onclick="makeNote('b6', 'flat');">B6</button></td>
+    <td><button class="note-key white-key" id="c7button" onclick="makeNote('c7', 'flat');">C7</button></td>
+    <td><button class="note-key black-key" id="d7button" onclick="makeNote('d7', 'flat');">D7</button></td>
+    <td><button class="note-key black-key" id="e7button" onclick="makeNote('e7', 'flat');">E7</button></td>
+    <td><button class="note-key white-key" id="f7button" onclick="makeNote('f7', 'flat');">F7</button></td>
+    <td><button class="note-key black-key" id="g7button" onclick="makeNote('g7', 'flat');">G7</button></td>
+    <td><button class="note-key black-key" id="a7button" onclick="makeNote('a7', 'flat');">A7</button></td>
+    <td><button class="note-key black-key" id="b7button" onclick="makeNote('b7', 'flat');">B7</button></td>
+    </tr>
+    <tr>
+      
+      
+      <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-2" id="double-flat">bb</button></td>
+      <td><button class="note-key black-key" id="c2button" onclick="makeNote('c2', 'double-flat');">C2</button></td>
+      <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-flat');">D2</button></td>
+      <td><button class="note-key white-key" id="e2button" onclick="makeNote('e2', 'double-flat');">E2</button></td>
+      <td><button class="note-key black-key" id="f2button" onclick="makeNote('f2', 'double-flat');">F2</button></td>
+      <td><button class="note-key white-key" id="g2button" onclick="makeNote('g2', 'double-flat');">G2</button></td>
+      <td><button class="note-key white-key" id="a2button" onclick="makeNote('a2', 'double-flat');">A2</button></td>
+      <td><button class="note-key white-key" id="b2button" onclick="makeNote('b2', 'double-flat');">B2</button></td>
+      <td><button class="note-key black-key" id="c3button" onclick="makeNote('c3', 'double-flat');">C3</button></td>
+      <td><button class="note-key white-key" id="d3button" onclick="makeNote('d3', 'double-flat');">D3</button></td>
+      <td><button class="note-key white-key" id="e3button" onclick="makeNote('e3', 'double-flat');">E3</button></td>
+      <td><button class="note-key black-key" id="f3button" onclick="makeNote('f3', 'double-flat');">F3</button></td>
+      <td><button class="note-key white-key" id="g3button" onclick="makeNote('g3', 'double-flat');">G3</button></td>
+      <td><button class="note-key white-key" id="a3button" onclick="makeNote('a3', 'double-flat');">A3</button></td>
+      <td><button class="note-key white-key" id="b3button" onclick="makeNote('b3', 'double-flat');">B3</button></td>
+      <td><button class="note-key black-key" id="c4button" onclick="makeNote('c4', 'double-flat');">C4</button></td>
+      <td><button class="note-key white-key" id="d4button" onclick="makeNote('d4', 'double-flat');">D4</button></td>
+      <td><button class="note-key white-key" id="e4button" onclick="makeNote('e4', 'double-flat');">E4</button></td>
+      <td><button class="note-key black-key" id="f4button" onclick="makeNote('f4', 'double-flat');">F4</button></td>
+      <td><button class="note-key white-key" id="g4button" onclick="makeNote('g4', 'double-flat');">G4</button></td>
+      <td><button class="note-key white-key" id="a4button" onclick="makeNote('a4', 'double-flat');">A4</button></td>
+      <td><button class="note-key white-key" id="b4button" onclick="makeNote('b4', 'double-flat');">B4</button></td>
+      <td><button class="note-key black-key" id="c5button" onclick="makeNote('c5', 'double-flat');">C5</button></td>
+      <td><button class="note-key white-key" id="d5button" onclick="makeNote('d5', 'double-flat');">D5</button></td>
+      <td><button class="note-key white-key" id="e5button" onclick="makeNote('e5', 'double-flat');">E5</button></td>
+      <td><button class="note-key black-key" id="f5button" onclick="makeNote('f5', 'double-flat');">F5</button></td>
+      <td><button class="note-key white-key" id="g5button" onclick="makeNote('g5', 'double-flat');">G5</button></td>
+      <td><button class="note-key white-key" id="a5button" onclick="makeNote('a5', 'double-flat');">A5</button></td>
+      <td><button class="note-key white-key" id="b5button" onclick="makeNote('b5', 'double-flat');">B5</button></td>
+      <td><button class="note-key black-key" id="c6button" onclick="makeNote('c6', 'double-flat');">C6</button></td>
+      <td><button class="note-key white-key" id="d6button" onclick="makeNote('d6', 'double-flat');">D6</button></td>
+      <td><button class="note-key white-key" id="e6button" onclick="makeNote('e6', 'double-flat');">E6</button></td>
+      <td><button class="note-key black-key" id="f6button" onclick="makeNote('f6', 'double-flat');">F6</button></td>
+      <td><button class="note-key white-key" id="g6button" onclick="makeNote('g6', 'double-flat');">G6</button></td>
+      <td><button class="note-key white-key" id="a6button" onclick="makeNote('a6', 'double-flat');">A6</button></td>
+      <td><button class="note-key white-key" id="b6button" onclick="makeNote('b6', 'double-flat');">B6</button></td>
+      <td><button class="note-key black-key" id="c7button" onclick="makeNote('c7', 'double-flat');">C7</button></td>
+      <td><button class="note-key white-key" id="d7button" onclick="makeNote('d7', 'double-flat');">D7</button></td>
+      <td><button class="note-key white-key" id="e7button" onclick="makeNote('e7', 'double-flat');">E7</button></td>
+      <td><button class="note-key black-key" id="f7button" onclick="makeNote('f7', 'double-flat');">F7</button></td>
+      <td><button class="note-key white-key" id="g7button" onclick="makeNote('g7', 'double-flat');">G7</button></td>
+      <td><button class="note-key white-key" id="a7button" onclick="makeNote('a7', 'double-flat');">A7</button></td>
+      <td><button class="note-key white-key" id="b7button" onclick="makeNote('b7', 'double-flat');">B7</button></td>
+    </tr>
+  </table>
+  <canvas id="canvas1"></canvas>
+<br>
+  <br>
+  <div id="note-console"></div>
+
+<p class="intro">Last updated: 5/14/2022</p>
+
+  <script>
+    
+class MusicNote {
+  constructor(name, octave, accidental) {
+    this.name = name;
+    this.octave = octave;
+    this.accidental = accidental;
+  }
+}
+    
+let color_schemes = [
+  {
+    name: "printer",
+    ink: "#000000",
+    parchment: "#ffffff"
+  },
+  {
+    name: "parchment",
+    ink: "#000000",
+    parchment: "#eeffbb"
+  },
+  {
+    name: "dark mode",
+    ink: "#55bbcc",
+    parchment: "#272727"
+  }
+];
+    
+let staff_spacing = 10;
+let note_spacing = 30;
+let top_margin = 60;
+let notes_sequence1 = [];
+let note_head_radius = staff_spacing*0.5;
+let line_thickness = 1;
+let thick_line_thickness = 2.5;
+let xStart = 13*staff_spacing;
+let side_margin = 10;
+let staves_quantity = 12;
+let staves_spacing = 100;
+let canv1 = document.getElementById("canvas1");
+let ctx1 = canv1.getContext("2d");
+let noteConsole = document.getElementById("note-console");
+let noteConsoleEntryNumber = 0;
+let ledger_line_radius = 8;
+let accidental = "natural";
+let accidental_x_offset = 2*note_head_radius;
+let ledgerLineRadius = 8;
+let x;
+let color_scheme = "parchment";
+let ink;
+let parchment;
+let key_signature;
+let set_key_signature = false;
+let keysig_x_offset = 3*staff_spacing;
+
+canv1.width = 700;
+canv1.height = 600;
+
+colorSchemeSet();
+clearPage();
+drawStaves();
+
+let y_values = {
+  b7: -10.5, a7: -10.0, g7: -9.5, f7: -9.0, e7: -8.5, d7: -8.0, c7: -7.5,  
+  b6:  -7.0, a6:  -6.5, g6: -6.0, f6: -5.5, e6: -5.0, d6: -4.5, c6: -4.0,
+  b5:  -3.5, a5:  -3.0, g5: -2.5, f5: -2.0, e5: -1.5, d5: -1.0, c5: -0.5,
+  b4:   0.0, a4:   0.5, g4:  1.0, f4:  1.5, e4:  2.0, d4:  2.5, c4:  3.0,
+  b3:   3.5, a3:   4.0, g3:  4.5, f3:  5.0, e3:  5.5, d3:  6.0, c3:  6.5,
+  b2:   7.0, a2:   7.5, g2:  8.0, f2:  8.5, e2:  9.0, d2:  9.5, c2: 10.0
+}
+let order_of_flats = [
+//b,    e,   a,  d, g,    c,   f
+  0, -1.5, 0.5, -1, 1, -0.5, 1.5,
+//b,    e,   a,  d, g,    c,   f
+  0, -1.5, 0.5, -1, 1, -0.5, 1.5,
+];
+let order_of_sharps = [
+// f,    c,    g,  d,   a,    e, b
+  -2, -0.5, -2.5, -1, 0.5, -1.5, 0,
+// f,    c,    g,  d,   a,    e, b
+  -2, -0.5, -2.5, -1, 0.5, -1.5, 0,
+];
+
+let order_of_flats_by_name = ['b', 'e', 'a', 'd', 'g', 'c', 'f'];
+let order_of_sharps_by_name = ['f', 'c', 'g', 'd', 'a', 'e', 'b'];
+let accidentals = ['double-flat', 'flat', 'natural', 'sharp', 'double-sharp'];
+let octaves = ['0', '1', '2', '3', '4', '5', '6', '7'];
+
+let notes_in_key = [
+  {
+    name: "c",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "d",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "e",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "f",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "g",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "a",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  },
+  {
+    name: "b",
+    modified_by_key: "natural",
+    modified_by_previous_accidental: "natural",
+  }
+];
+
+function setKeySignatureEqualsTrue() {
+  set_key_signature = true;
+}
+
+function colorSchemeCycle() {
+  console.log("cycling color scheme");
+  if (color_scheme == "parchment") {
+    color_scheme = "dark mode";
+  } else if (color_scheme == "dark mode") {
+    color_scheme = "printer";
+  } else if (color_scheme == "printer") {
+    color_scheme = "parchment";
+  }
+  colorSchemeSet();
+  printSequence();
+}
+
+function colorSchemeSet() {
+  for (i=0; i<color_schemes.length; i++) {
+    if (color_schemes[i].name == color_scheme) {
+      ink = color_schemes[i].ink;
+      parchment = color_schemes[i].parchment;
+    }
+  }    
+}
+
+function clearPage() {
+  ctx1.fillStyle = parchment;
+  ctx1.fillRect(0,0,canv1.width, canv1.height);
+  ctx1.strokeStyle = ink;
+  ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+}
+
+const key_signatures = {
+  "cdouble-flat": -14,
+  "ddouble-flat": -12,
+  "edouble-flat": -10,
+  "fdouble-flat": -15,
+  "gdouble-flat": -13,
+  "adouble-flat": -11,
+  "bdouble-flat": -9,
+  "cflat": -7,
+  "dflat": -5,
+  "eflat": -3,
+  "fflat": -8,
+  "gflat": -5,
+  "aflat": -4,
+  "bflat": -2,
+  "cnatural": 0,
+  "dnatural": 2,
+  "enatural": 4,
+  "fnatural": -1,
+  "gnatural": 1,
+  "anatural": 3,
+  "bnatural": 5,
+  "csharp": 7,
+  "dsharp": 9,
+  "esharp": 11,
+  "fsharp": 6,
+  "gsharp": 8,
+  "asharp": 10,
+  "bsharp": 12,
+  "cdouble-sharp": 14,
+  "ddouble-sharp": 16,
+  "edouble-sharp": 18,
+  "fdouble-sharp": 13,
+  "gdouble-sharp": 15,
+  "adouble-sharp": 17,
+  "bdouble-sharp": 19
+};
+
+function makeNote(noteName, accidental_setting) {
+  if (set_key_signature == true) {
+    let key_name = noteName.slice(0,1)+accidental_setting;
+    for (i=0; i<key_signature; i++) {
+      if (order_of_sharps_by_name[i])
+      notes_in_key[order_of_sharps_by_name.indexOf(alphabet[i])].modified_by_key = 
+    }
+    console.log(key_name);
+    for (i=0; i<notes_in_key.length; i++) {
+      if (notes_in_key[i].name == noteName.slice(0, 1)) {
+        notes_in_key[i].modified_by_previous_accidental = accidental_setting;
+      }
+    }
+    key_signature = key_signatures[key_name];
+    printSequence();
+    set_key_signature = false;
+  } else {
+    setAccidental(accidental_setting);
+    let name = noteName.slice(0, 1);
+    let octave = noteName.slice(1, 2);
+    let note = new MusicNote(name, octave, accidental);
+    notes_sequence1.push(note);
+    consoleLog(noteName + " " + note.accidental + " pushed to notes_sequence1");
+    printSequence();
+  }
+}
+
+function drawKeySignature(x,y,a){
+  //drawReticle(x,y);
+  if (a<0) {
+    for(i=0;i>a;i-=1){
+      let xx = x+5*-i+keysig_x_offset;
+      let yy = y+(order_of_flats[-i]-1)*staff_spacing
+      drawFlat(xx, yy);
+    }
+  } else if (a>0) {
+    for(i=0;i<a;i++){
+      let xx = x+5*i+keysig_x_offset;
+      let yy = y+(order_of_sharps[i]-1)*staff_spacing;
+      drawSharp(xx, yy);
+    }
+  }
+}
+
+function printSequence() {
+  clearPage();
+  drawStaves();
+  let e = 0;
+  x = xStart;
+  for (ii=0; ii<notes_sequence1.length; ii++) {
+    if (x+15>canv1.width-side_margin) {
+      x=xStart;
+      e+=1;
+    }
+    let noteName = notes_sequence1[ii].name+notes_sequence1[ii].octave;
+    let y = top_margin + 2*staff_spacing + y_values[noteName]*staff_spacing + staves_spacing*e;
+    drawNoteHead(x, y);
+    drawLedgerLines(x, y, e);
+    consoleLog(key_signature);
+    drawAccidental(x, y, notes_sequence1[ii].accidental);
+    x += note_spacing;
+  }
+}
+
+function drawStaves() {
+  for(e=0;e<staves_quantity;e++){
+    for(i=0;i<5;i++){
+      let x1 = side_margin;
+      let y1 = top_margin+10*i+staves_spacing*e;
+      let x2 = canv1.width-side_margin;
+      let y2 = top_margin+10*i+staves_spacing*e;
+      drawLine(x1, y1, x2, y2);
+    }
+    let x = side_margin+staff_spacing;
+    let y = top_margin+3*staff_spacing+e*staves_spacing;
+    drawTrebleClef(x,y);
+    drawKeySignature(x, y, key_signature);
+  }
+}
+
+function drawLedgerLines(x, y, e) {
+  let middle_line_y = top_margin+staves_spacing*e+2*staff_spacing;
+  let note_head_y_minus_middle_line_y = y-middle_line_y;
+  if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===0) {
+    for (ledger_line_number=0; ledger_line_number>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
+      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
+    }
+  } else if (note_head_y_minus_middle_line_y<=-30 && -note_head_y_minus_middle_line_y%2===1) {
+    for (ledger_line_number=0; ledger_line_number-1>(note_head_y_minus_middle_line_y+20)/10; ledger_line_number--) {
+      drawLine(x-ledger_line_radius, middle_line_y-30+10*ledger_line_number, x+ledger_line_radius, middle_line_y-30+10*ledger_line_number);
+    }
+  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===0) {
+    for (ledger_line_number=0; ledger_line_number<=(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
+      drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
+    }
+  } else if (note_head_y_minus_middle_line_y>=30 && note_head_y_minus_middle_line_y%2===1) {
+    for (ledger_line_number=0; ledger_line_number<(note_head_y_minus_middle_line_y-30)/10; ledger_line_number++) {
+      drawLine(x-ledger_line_radius, middle_line_y+30+10*ledger_line_number, x+ledger_line_radius, middle_line_y+30+10*ledger_line_number);
+    }
+  }
+}
+
+function drawAccidental(x, y, accidental) {
+  if (accidental == "double-flat") {
+    drawDoubleFlat(x, y);
+  } else if (accidental == "flat") {
+    drawFlat(x, y);
+  } else if (accidental == "natural") {
+    drawNatural(x, y);
+  } else if (accidental == "sharp") {
+    drawSharp(x, y);
+  } else if (accidental == "double-sharp") {
+    drawDoubleSharp(x, y);
+  }
+}
+
+function drawReticle(x,y){
+    ctx1.fillStyle = '#3bf';
+    ctx1.beginPath();
+    ctx1.arc(x,y,2,0,Math.PI*2,true);
+    ctx1.closePath();
+    ctx1.fill();
+}
+
+function drawNoteHead(x,y){
+  ctx1.strokeStyle = ink;
+  ctx1.fillStyle = ink;
+  ctx1.beginPath();
+  ctx1.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
+  ctx1.fill();
+}
+
+function drawTrebleClef(x, y){
+    //drawReticle(x, y);
+    ctx1.fillStyle = ink;
+    ctx1.strokeStyle = ink;
+    let x1 = x-5;
+    let y1 = y+2*staff_spacing;
+    let x2 = x+3;
+    let y2 = y+4*staff_spacing;
+    let x3 = x+4;
+    let y3 = y+1.5*staff_spacing;
+    let x4 = x-4;
+    let y4 = y-4*staff_spacing;
+    let x5 = x+16;
+    let y5 = y-3.5*staff_spacing;
+    let x6 = x-20
+    let y6 = y-0.4*staff_spacing;
+    let x7 = x-4;
+    let y7 = y+1.4*staff_spacing;
+    let x8 = x+16;
+    let y8 = y+3.5*staff_spacing;
+    let x9 = x+10;
+    let y9 = y-4.5*staff_spacing;
+    let x10 = x-4;
+    let y10 = y+0.5*staff_spacing;
+    ctx1.beginPath ();
+    ctx1.moveTo (x1, y1);
+    ctx1.bezierCurveTo (x2,y2,x3,y3,x4,y4);
+    ctx1.bezierCurveTo (x5,y5,x6,y6,x7,y7);
+    ctx1.bezierCurveTo (x8,y8,x9,y9,x10,y10);
+    ctx1.stroke ();
+}
+
+function drawLine(x1,y1,x2,y2){
+  ctx1.lineWidth = line_thickness;
+  ctx1.beginPath();
+  ctx1.moveTo( x1, y1 );
+  ctx1.lineTo( x2, y2 );
+  ctx1.stroke();
+}
+
+function consoleLog(consoleEntry) {
+    noteConsoleEntryNumber ++;
+    let lineBreak = document.createElement("BR");
+    let entryNumberSpan = document.createElement("SPAN");
+    let entryNumber = document.createTextNode(noteConsoleEntryNumber + ": ");
+    let entry = document.createTextNode(consoleEntry);
+    entryNumberSpan.class = "notation-console-entry-number-span";
+    entryNumberSpan.appendChild(entryNumber);
+    noteConsole.appendChild(lineBreak);
+    noteConsole.appendChild(entryNumberSpan);
+    noteConsole.appendChild(entry);
+    noteConsole.scrollTop = noteConsole.scrollHeight;
+}
+
+function setAccidental(value) {
+  accidental = value;
+}
+
+function drawFlat(x,y){
+    //drawReticle (x,y);
+    let x1 = x-1-accidental_x_offset;
+    let y1 = y-13;
+    let x2 = x-3-accidental_x_offset;
+    let y2 = y+4;
+    let x3 = x+5-accidental_x_offset;
+    let y3 = y+1;
+    let x4 = x+5-accidental_x_offset;
+    let y4 = y-5;
+    let x5 = x-3-accidental_x_offset;
+    let y5 = y-1;
+    let x6 = x+5-accidental_x_offset;
+    let y6 = y-5;
+    let x7 = x+5-accidental_x_offset;
+    let y7 = y+1;
+    let x8 = x-3-accidental_x_offset;
+    let y8 = y+4;
+    ctx1.beginPath();
+    ctx1.moveTo(x1, y1);
+    ctx1.lineTo(x2, y2);
+    ctx1.bezierCurveTo(x3,y3, x4,y4, x5,y5);
+    ctx1.bezierCurveTo(x6,y6, x7,y7, x8,y8);
+    ctx1.stroke();
+
+    // ctx.moveTo(x-1,y-13);
+    // ctx.lineTo(x-3,y+4);
+    // ctx.bezierCurveTo( x+5,y+1, x+5,y-5, x-3,y-1   );
+    // ctx.bezierCurveTo( x+5,y-5, x+5,y+1, x-3,y+4   );
+}
+
+function drawDoubleFlat(x,y){
+    //drawReticle(x,y);
+    let x1 = x+3-accidental_x_offset;
+    let y1 = y;
+    let x2 = x+8-accidental_x_offset;
+    let y2 = y;
+    drawFlat(x1,y1);
+    drawFlat(x2,y2);
+}
+
+function drawNatural(x,y){
+    //drawReticle(x,y);
+    let x1 = x-2-accidental_x_offset;
+    let y1 = y-8;
+    let x2 = x-2-accidental_x_offset;
+    let y2 = y+5;
+    let x3 = x-2-accidental_x_offset;
+    let y3 = y+0;
+    let x4 = x+2-accidental_x_offset;
+    let y4 = y-5;
+    let x5 = x-2-accidental_x_offset;
+    let y5 = y+5;
+    let x6 = x+2-accidental_x_offset;
+    let y6 = y-0;
+    let x7 = x+2-accidental_x_offset;
+    let y7 = y-5;
+    let x8 = x+2-accidental_x_offset;
+    let y8 = y+8;
+    drawLine(x1,y1,x2,y2);
+    drawLine(x3,y3,x4,y4);
+    drawLine(x5,y5,x6,y6);
+    drawLine(x7,y7,x8,y8);
+    // drawLine(x-2,y-8,x-2,y+5);
+    // drawLine(x-2,y+0,x+2,y-5);
+    // drawLine(x-2,y+5,x+2,y-0);
+    // drawLine(x+2,y-5,x+2,y+8);
+}
+
+function drawSharp(x,y){
+    //drawReticle(x,y);
+    let x1 = x-4-accidental_x_offset;
+    let y1 = y+7;
+    ctx1.font = "18px arial"
+    ctx1.fillText("#",x1,y1);
+}
+
+function drawDoubleSharp(x,y){
+    //drawReticle(x,y);
+    let x1 = x-4-accidental_x_offset;
+    let y1 = y+5;
+    ctx1.font = "16px arial"
+    ctx1.fillText("x",x1,y1);
+}
+
+</script>
+</html>
+
+
+
+
+
+
 
