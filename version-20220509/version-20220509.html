@@ -340,7 +340,7 @@ let note_head_radius = staff_spacing*0.5;
 let line_thickness = 1;
 let thick_line_thickness = 2.5;
 let xStart = 13*staff_spacing;
-let side_margin = 10;
+let side_margin = 30;
 let staves_quantity = 12;
 let staves_spacing = 100;
 let canv1 = document.getElementById("canvas1");
@@ -358,6 +358,7 @@ let parchment;
 let key_signature;
 let set_key_signature = false;
 let keysig_x_offset = 3*staff_spacing;
+let boffset = 0.5*staff_spacing;
 
 canv1.width = 700;
 canv1.height = 600;
@@ -525,6 +526,12 @@ function drawStaves() {
     let y = top_margin+3*staff_spacing+e*staves_spacing;
     drawTrebleClef(x,y);
     drawKeySignature(x, y, key_signature);
+    if (e%2==0) {
+      let x = side_margin-boffset;
+      let y = top_margin+staves_spacing*e-0.5*boffset;
+      let h = staves_spacing+4*staff_spacing+boffset;
+      drawSquareBracket(x,y,h);
+    }
   }
 }
 
@@ -722,6 +729,38 @@ function drawDoubleSharp(x,y){
     ctx1.font = "16px arial"
     ctx1.fillText("x",x1,y1);
 }
+
+
+consoleLog("hello");
+
+function drawThickLine(xx1,yy1,xx2,yy2) {
+  ctx1.lineWidth = thick_line_thickness;
+  ctx1.beginPath();
+  ctx1.moveTo(xx1,yy1);
+  ctx1.lineTo(xx2,yy2);
+  ctx1.stroke();
+}
+
+function drawSquareBracket(x, y, h) {
+  let angle_slope = 0.8;
+  let bcl = 1;
+  let dx = bcl/angle_slope;
+  let dy = angle_slope/bcl;
+  let x1 = x+dx*staff_spacing;
+  let y1 = y-dy*staff_spacing;
+  let x2 = x;
+  let y2 = y;
+  let x3 = x;
+  let y3 = y+h;
+  let x4 = x+dx*staff_spacing;
+  let y4 = y+dy*staff_spacing+h;
+  drawThickLine(x1,y1,x2,y2);
+  drawThickLine(x2,y2,x3,y3);
+  drawThickLine(x3,y3,x4,y4);
+}
+
+
+
 
 </script>
 </html>
