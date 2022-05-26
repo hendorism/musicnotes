@@ -1,6 +1,68 @@
-class Staff {
-    constructor(clef, key) {
-      this.clef = clef;
-      this.key = key;
+<html>
+<head>
+<title>version-20220515</title>
+<style>
+body {
+  background-color: #33336f;
+  color: #debf35;
+  font-family: monospace;
+  font-size: 2.8vmin;
+}
+div#note-console {
+  background-color: #ddddff;
+  color: #333333;
+  height: 500px;
+  width: 100%;
+}
+    .notation-console-entry-number-span {
+        color: #eeeeee;
+        background-color: #003344;
     }
-  }
+</style>
+</head>
+
+<body>
+musicnotes version-20220515<br>
+<canvas id="canvas1"></canvas>
+  <div id="note-console">
+<h3>console:</h3></div>
+
+<script>
+let canv1 = document.getElementById("canvas1");
+let ctx1 = canv1.getContext("2d");
+
+let noteConsole = document.getElementById("note-console");
+let noteConsoleEntryNumber = 0;
+function consoleLog(consoleEntry) {
+    noteConsoleEntryNumber ++;
+    let lineBreak = document.createElement("BR");
+    let entryNumberSpan = document.createElement("SPAN");
+    let entryNumber = document.createTextNode(noteConsoleEntryNumber + ": ");
+    let entry = document.createTextNode(consoleEntry);
+    entryNumberSpan.class = "notation-console-entry-number-span";
+    entryNumberSpan.appendChild(entryNumber);
+    noteConsole.appendChild(lineBreak);
+    noteConsole.appendChild(entryNumberSpan);
+    noteConsole.appendChild(entry);
+    noteConsole.scrollTop = noteConsole.scrollHeight;
+}
+consoleLog("(canv1.width, canv1.height) = (" + canv1.width + ", " + canv1.height + ")");
+window.addEventListener('resize', resizeCanvas, false);
+function resizeCanvas() {
+  canv1.width = window.innerWidth;
+  canv1.height = window.innerHeight;
+  consoleLog('canvas has been resized');
+  consoleLog("(canv1.width, canv1.height) = (" + canv1.width + ", " + canv1.height + ")");
+  drawStuff();
+}
+resizeCanvas();
+function drawStuff() {
+  ctx1.fillStyle = '#ffffff';
+  ctx1.fillRect(0,0,canv1.width, canv1.height);
+  ctx1.strokeStyle = '#00ff00';
+  ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+}
+
+</script>
+</body>
+</html>
