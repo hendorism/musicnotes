@@ -15,30 +15,41 @@ body {
 div#note-console {
   background-color: #ddddff;
   color: #333333;
-  height: 500px;
+  height: 400px;
   width: 100%;
-  font-family: monospace; 
+  font-family: monospace;
   border-radius: 6px;
   overflow: scroll;
   word-wrap: break-word;
   text-shadow: 2px 2px 4px #9999bb;
   font-size: 16px;
 }
+input#note-text-input {
+  height: 300px;
+  width: 300px;
+}
 .notation-console-entry-number-span {
   color: #eeeeee;
   background-color: #003344;
 }
 </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  </head>
-  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
 <body>
-  musicnotes version-20220515<br>
-  <canvas id="canvas1"></canvas>
-  <div id="note-console">
-    <h3>console:</h3></div>
-    
-    <script>
+
+<h4>musicnotes version-20220515</h4>
+
+<canvas id="canvas1"></canvas>
+
+<table><tr><td>
+<div id="note-console">
+  <h3>console:</h3>
+</div></td>
+
+<td><input type="text" id="note-text-input"></input></td>
+</tr></table>
+
+<script>
 let topMargin = 100;
 let staffSpacing = 10;
 let sideMargin = 30;
@@ -50,6 +61,58 @@ let noteConsoleEntryNumber = 0;
 let accidental = "natural";
 let set_key_signature = false;
 let set_accidental = false;
+let key_signature = "c"
+let active_voice = 0;
+
+let color_scheme = {
+  ink: "#00ffb5",
+  parchment: "#223277",
+  selected: "#de2b6a"
+}
+
+let key_signatures = {
+  "cb": -7,
+  "gb": -6,
+  "db": -5,
+  "ab": -4,
+  "eb": -3,
+  "bb": -2,
+  "f": -1,
+  "c": 0,
+  "g": 1,
+  "d": 2,
+  "a": 3,
+  "e": 4,
+  "b": 5,
+  "f#": 6,
+  "c#": 7
+}
+
+let clefs = ["treble-clef", "bass-clef"];
+
+let voices = [
+  {
+    name: 1,
+    clef: "treble-clef",
+    key: key_signature,
+    notes: [],
+    staff: 1
+  },
+  {
+    name: 2,
+    clef: "bass-clef",
+    key: key_signature,
+    notes: [],
+    staff: 2
+  }
+];
+
+function makeNote(noteName, accidental) {
+  let name = noteName.slice(0, 1);
+  let octave = noteName.slice(1, 2);
+  let note = new MusicNote(name, octave, accidental)
+  voices[active_voice].notes.push(note);
+}
 
 let accidentals = [
   "double-flat",
@@ -72,7 +135,7 @@ let keyMap = {
   48: "natural",
   189: "sharp",
   187: "double-sharp",
-  13: "color-scheme"
+  13: "color-scheme" // 13 = enter
 }
 
 consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
@@ -94,30 +157,21 @@ function drawStuff() {
   ctx1.strokeStyle = '#00ffb5';
   ctx1.strokeRect(0, 0, canv1.width, canv1.height);
   drawStaves();
+  printNotes();
 }
 
-function drawStaves() {
-  for (e=0; e<3; e++) {
-    for (i=0; i<5; i++) {
-      let x1 = sideMargin;
-      let y1 = topMargin+staffSpacing*i+stavesSpacing*e;
-      let x2 = canv1.width-sideMargin;
-      let y2 = y1;
-      consoleLog("(e, i, x1, y1, x2, y2) = (" + e + ", " + i + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ")");
-      ctx1.lineWidth = 1;
-      ctx1.strokeStyle = '#0077ff';
-      ctx1.beginPath();
-      ctx1.moveTo(x1,y1);
-      ctx1.lineTo(x2,y2);
-      ctx1.stroke();
+function printNotes() {
+  let system = 1;
+  for (i=0; i<voices.length; i++) {
+    for (ii=0; ii<voices[i].notes.length; i++) {
+      drawNoteHead();
     }
   }
 }
 
 window.addEventListener("keydown", function(e) {
   let kCode = e.keyCode;
-  consoleLog("keydown: " + kCode);
-  consoleLog(keyMap[kCode]);
+  consoleLog("keydown: " + kCode + ", note: " + keyMap[kCode]);
   if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
     e.preventDefault();
     if (kCode == 37) { // left
@@ -138,7 +192,7 @@ window.addEventListener("keydown", function(e) {
     colorSchemeCycle();
   } else {
     makeNote(keyMap[(e.keyCode).toString()], accidental);
-  }  
+  }
 }, false);
 
 function colorSchemeCycle() {
@@ -161,25 +215,110 @@ function colorSchemeSet() {
       parchment = color_schemes[i].parchment;
       selected = color_schemes[i].selected;
     }
-  }    
+  }
 }
 
-function makeNote(noteName, accidental_setting) {
-  if (set_key_signature == true) {
-    let key_name = noteName.slice(0,1)+accidental_setting;
-    console.log(key_name);
-    key_signature = key_signatures[key_name];
-    printSequence();
-    set_key_signature = false;
-  } else {
-    setAccidental(accidental_setting);
-    let name = noteName.slice(0, 1);
-    let octave = noteName.slice(1, 2);
-    let note = new MusicNote(name, octave, accidental);
-    notes_sequence1.push(note);
-    consoleLog(noteName + " " + note.accidental + " pushed to notes_sequence1");
-    printSequence();
+class MusicNote {
+  constructor(name, octave, accidental) {
+    this.name = name;
+    this.octave = octave;
+    this.accidental = accidental;
   }
+}
+
+function setAccidental(accidental_setting) {
+  accidental = accidental_setting;
+}
+
+function drawGrandStaffBracket(x,y,h) {
+  let depth = 1.6*staffSpacing;
+  let bo1 = 1.9*depth;
+  let bo2 = -0.8*depth;
+  let yo1 = 0.3;
+  let yo2 = 0.8;
+  let x1 = x;             //        ;|
+  let y1 = y;             //       ; |
+  let x7 = x-bo1;         //      ;  |
+  let y7 = y+yo1*h/2;     //     ;   |
+  let x6 = x-bo2          //    ;    |
+  let y6 = y+yo2*h/2;     //   ;     |
+  let x5 = x-depth;       //  ;      |
+  let y5 = y+h/2;         //  ;      |
+  let x4 = x-bo2          //   ;     |
+  let y4 = y+h-yo2*h/2    //    ;    |
+  let x3 = x-bo1          //     ;   |
+  let y3 = y+h-yo1*h/2;   //      ;  |
+  let x2 = x;             //       ; |
+  let y2 = y+h            //        ;|
+  ctx1.beginPath ();
+  ctx1.moveTo (x1, y1);
+  ctx1.lineTo(x2, y2);
+  ctx1.bezierCurveTo (x3,y3,x4,y4,x5,y5);
+  ctx1.bezierCurveTo (x6,y6,x7,y7,x1,y1);
+  ctx1.stroke ();
+}
+
+function drawStaves() {
+  for (e=0; e<3; e++) {
+    for (i=0; i<5; i++) {
+      let x1 = sideMargin;
+      let y1 = topMargin+staffSpacing*i+stavesSpacing*e;
+      let x2 = canv1.width-sideMargin;
+      let y2 = y1;
+      consoleLog("(e, i, x1, y1, x2, y2) = (" + e + ", " + i + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ")");
+      ctx1.lineWidth = 1;
+      ctx1.strokeStyle = '#0077ff';
+      ctx1.beginPath();
+      ctx1.moveTo(x1,y1);
+      ctx1.lineTo(x2,y2);
+      ctx1.stroke();
+    }
+  }
+}
+
+function drawTrebleClef(x, y) {
+  ctx1.fillStyle = ink;
+  ctx1.strokeStyle = ink;
+  let x1 = x-5;
+  let y1 = y+2*staffSpacing;
+  let x2 = x+3;
+  let y2 = y+4*staffSpacing;
+  let x3 = x+4;
+  let y3 = y+1.5*staffSpacing;
+  let x4 = x-4;
+  let y4 = y-4*staffSpacing;
+  let x5 = x+16;
+  let y5 = y-3.5*staffSpacing;
+  let x6 = x-20
+  let y6 = y-0.4*staffSpacing;
+  let x7 = x-4;
+  let y7 = y+1.4*staffSpacing;
+  let x8 = x+16;
+  let y8 = y+3.5*staffSpacing;
+  let x9 = x+10;
+  let y9 = y-4.5*staffSpacing;
+  let x10 = x-4;
+  let y10 = y+0.5*staffSpacing;
+  ctx1.beginPath ();
+  ctx1.moveTo (x1, y1);
+  ctx1.bezierCurveTo (x2,y2,x3,y3,x4,y4);
+  ctx1.bezierCurveTo (x5,y5,x6,y6,x7,y7);
+  ctx1.bezierCurveTo (x8,y8,x9,y9,x10,y10);
+  ctx1.stroke ();
+}
+
+function drawBassClef(x, y) {
+
+}
+
+function drawNoteHead(x,y,color) {
+  ctx1.strokeStyle = color;
+  ctx1.fillStyle = color;
+  ctx1.beginPath();
+  let d1 = 6/2*(0.1*staffSpacing);
+  let d2 = 8/2*(0.1*staffSpacing);
+  ctx1.ellipse(x, y, d1, d2, Math.PI / 3, 0, 2 * Math.PI);
+  ctx1.fill();
 }
 
 function consoleLog(consoleEntry) {
@@ -210,30 +349,7 @@ function consoleLog(consoleEntry) {
   console.log("hello", "my", "name", "is", "shantharuban");
 </script>
 
+<script src="build_string.js"></script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

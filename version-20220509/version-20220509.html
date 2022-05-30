@@ -33,7 +33,7 @@ div#note-console {
   height: 200px;
   width: 100%;
   background-color: #ddeeff;
-  font-family: monospace; 
+  font-family: monospace;
   border-radius: 6px;
   overflow: scroll;
   word-wrap: break-word;
@@ -63,9 +63,9 @@ p.intro {
   <p class="intro">Hit the "color scheme" button to
     make the page black and white for printing.</p>
   <table>
-    
+
     <tr>
-      
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="2"  id="double-sharp">##</button></td>
     <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'double-sharp');">C2</button></td>
     <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-sharp');">D2</button></td>
@@ -158,8 +158,8 @@ p.intro {
       <td><button class="set-key-sig" onclick="setKeySignatureEqualsTrue()">set key</button></td>
     </tr>
   <tr>
-    
-    
+
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="0"  id="natural" class="selected">natural</button></td>
       <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'natural');">C2</button></td>
       <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'natural');">D2</button></td>
@@ -205,8 +205,8 @@ p.intro {
       <td><button class="note-key white-key" id="b7button" onclick="makeNote('b7', 'natural');">B7</button></td>
     </tr>
   <tr>
-    
-    
+
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-1" id="flat">b</button></td>
     <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'flat');">C2</button></td>
     <td><button class="note-key black-key" id="d2button" onclick="makeNote('d2', 'flat');">D2</button></td>
@@ -252,8 +252,8 @@ p.intro {
     <td><button class="note-key black-key" id="b7button" onclick="makeNote('b7', 'flat');">B7</button></td>
     </tr>
     <tr>
-      
-      
+
+
       <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-2" id="double-flat">bb</button></td>
       <td><button class="note-key black-key" id="c2button" onclick="makeNote('c2', 'double-flat');">C2</button></td>
       <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-flat');">D2</button></td>
@@ -307,7 +307,7 @@ p.intro {
 <p class="intro">Last updated: 5/14/2022</p>
 
   <script>
-  	
+
 let accidentals = [
   "double-flat",
   "flat",
@@ -339,7 +339,7 @@ window.addEventListener("keydown", function(e) {
     colorSchemeCycle();
   } else {
     makeNote(keyMap[(e.keyCode).toString()], accidental);
-  }  
+  }
 }, false);
 
 class MusicNote {
@@ -349,7 +349,7 @@ class MusicNote {
     this.accidental = accidental;
   }
 }
-    
+
 let color_schemes = [
   {
     name: "printer",
@@ -370,7 +370,7 @@ let color_schemes = [
     parchment: "#272727"
   }
 ];
-    
+
 let staff_spacing = 10;
 let note_spacing = 30;
 let top_margin = 60;
@@ -423,7 +423,7 @@ let keyMap = {
 }
 
 let y_values = {
-  b7: -10.5, a7: -10.0, g7: -9.5, f7: -9.0, e7: -8.5, d7: -8.0, c7: -7.5,  
+  b7: -10.5, a7: -10.0, g7: -9.5, f7: -9.0, e7: -8.5, d7: -8.0, c7: -7.5,
   b6:  -7.0, a6:  -6.5, g6: -6.0, f6: -5.5, e6: -5.0, d6: -4.5, c6: -4.0,
   b5:  -3.5, a5:  -3.0, g5: -2.5, f5: -2.0, e5: -1.5, d5: -1.0, c5: -0.5,
   b4:   0.0, a4:   0.5, g4:  1.0, f4:  1.5, e4:  2.0, d4:  2.5, c4:  3.0,
@@ -464,7 +464,7 @@ function colorSchemeSet() {
       parchment = color_schemes[i].parchment;
       selected = color_schemes[i].selected;
     }
-  }    
+  }
 }
 
 function clearPage() {
@@ -846,10 +846,10 @@ let y5 = y+h/2;           //||     |
 
   ctx1.beginPath ();
   ctx1.moveTo (x1, y1);
-  ctx1.lineTo(x2, y2);     
+  ctx1.lineTo(x2, y2);
   ctx1.bezierCurveTo (x3,y3,x4,y4,x5,y5);
   ctx1.bezierCurveTo (x6,y6,x7,y7,x1,y1);
-  ctx1.stroke (); 
+  ctx1.stroke ();
 }
 
 
