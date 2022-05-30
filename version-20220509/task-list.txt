@@ -1,0 +1,20 @@
+1. add key binding
+
+2. musicNote.selected = true.
+
+arrow keys cycle through notes
+
+holding shift while cycling expands the selection
+
+3. redundant accidentals are responsive to key signature
+
+if note is in key then no accidental
+
+4. if note has been modified previous then display accidentl
+
+including if the modified note is in another octave
+
+5. adjust spacing of staves where notes extent into another staff
+(collision detection)
+
+
