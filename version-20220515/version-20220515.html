@@ -32,12 +32,21 @@ input#note-text-input {
   color: #eeeeee;
   background-color: #003344;
 }
+div#accidental-div {
+  border-radius: 3;
+  background-color: #23df8b;
+  color: #113399;
+  font-size: 16px;
+  height: 24px;
+  width: 122px;
+}
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
 
 <h4>musicnotes version-20220515</h4>
+<div id="accidental-div">hi</div>
 
 <canvas id="canvas1"></canvas>
 
@@ -46,19 +55,20 @@ input#note-text-input {
 </div>
 
 <script>
-let topMargin = 100;
-let staffSpacing = 10;
-let sideMargin = 30;
-let stavesSpacing = 100;
-let canv1 = document.getElementById("canvas1");
-let ctx1 = canv1.getContext("2d");
-let noteConsole = document.getElementById("note-console");
-let noteConsoleEntryNumber = 0;
-let accidental = "natural";
-let set_key_signature = false;
-let set_accidental = false;
-let key_signature = "c"
-let active_voice = 0;
+  let topMargin = 100;
+  let staffSpacing = 10;
+  let sideMargin = 30;
+  let stavesSpacing = 100;
+  let canv1 = document.getElementById("canvas1");
+  let ctx1 = canv1.getContext("2d");
+  let noteConsole = document.getElementById("note-console");
+  let noteConsoleEntryNumber = 0;
+  let accidental = "natural";
+  let set_key_signature = false;
+  let set_accidental = false;
+  let key_signature = "c"
+  let active_voice = 0;
+  accidentalLog();
 
 let color_scheme = {
   ink: "#00ffb5",
@@ -86,28 +96,38 @@ let pitches = [
   "a9", "b9", "c9", "d9", "e9", "f9", "g9"
 ];
 
-let clefs = [
-  {
-    name: "treble-clef",
-    middle_line_pitch: "b4"
-  },
-  {
-    name: "bass-clef",
-    middle_line_pitch: "d3"
+
+class Clef {
+  constructor(name, middle_line_pitch) {
+    this.name = name;
+    this.middle_line_pitch = middle_line_pitch
   }
-];
+}
+
+class MusicNote {
+  constructor(name, octave, accidental) {
+    this.name = name;
+    this.octave = octave;
+    this.accidental = accidental;
+    this.selected = false;
+  }
+}
+
+const trebleClef = new Clef("trebleClef", "b4");
+const bassClef = new Clef("bassClef", "d3");
+let clefs = [trebleClef, bassClef];
 
 let voices = [
   {
     name: 1,
-    clef: "treble-clef",
+    clef: trebleClef,
     key: key_signature,
     notes: [],
     staff: 1
   },
   {
     name: 2,
-    clef: "bass-clef",
+    clef: bassClef,
     key: key_signature,
     notes: [],
     staff: 2
@@ -129,18 +149,6 @@ let accidentals = [
   "sharp",
   "double-sharp"
 ];
-
-let keyMap = {
-  81: "octave-down", 87: "octave-up",
-  65: "-5", 83: "-4", 68: "-3", 70: "-2", 71: "-1", 72: "0",
-  74: "1", 75: "2", 76: "3", 186: "4", 222: "5",
-  56: "double-flat",
-  57: "flat",
-  48: "natural",
-  189: "sharp",
-  187: "double-sharp",
-  13: "color-scheme" // 13 = enter
-}
 
 // `1234567890-=
 // qwertyuiop[]\
@@ -181,9 +189,24 @@ function printNotes() {
   }
 }
 
+let keyMap = {
+  81: "octave-down", 87: "octave-up",
+  65: "-5", 83: "-4", 68: "-3", 70: "-2", 71: "-1", 72: "0",
+  74: "1", 75: "2", 76: "3", 186: "4", 222: "5",
+  56: "double-flat",
+  57: "flat",
+  48: "natural",
+  189: "sharp",
+  187: "double-sharp",
+  13: "color-scheme", // 13 = enter
+  219: "flatter", 221: "sharper"
+}
+
 window.addEventListener("keydown", function(e) {
   let kCode = e.keyCode;
   let kIntent = keyMap[kCode];
+  consoleLog("("+e.keyCode+", "+e.key+")");
+  console.log("("+e.keyCode+", "+e.key+")");
   if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
     e.preventDefault();
   }
@@ -201,10 +224,31 @@ window.addEventListener("keydown", function(e) {
   } else if (keyMap[kCode] == "color-scheme") {
     colorSchemeCycle();
   } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) {
-    let noteName = "g4";
+    pitches.indexOf(voices[active_voice].clef.middle_line_pitch)
+    let noteName = keyMap[kCode];
     makeNote(noteName, accidental);
+  } else if (kCode == 219 || kCode == 221) {
+    accidentalNudge(kCode);
   }
 }, false);
+
+function accidentalNudge(kCode) {
+  let current;
+  if (kCode == 219) { // (219: "flatter") ("[")
+    current = accidentals.indexOf(accidental);
+    if (current > 0) {
+      current -= 1;
+    }
+  } else if (kCode == 221) { // (221: "sharper") ("]")
+    current = accidentals.indexOf(accidental);
+    if (current < accidentals.length-1) {
+      current +=1
+    }
+  }
+  accidental = accidentals[current];
+  consoleLog(accidental);
+  accidentalLog(accidental);
+}
 
 function colorSchemeCycle() {
   console.log("cycling color scheme");
@@ -229,13 +273,6 @@ function colorSchemeSet() {
   }
 }
 
-class MusicNote {
-  constructor(name, octave, accidental) {
-    this.name = name;
-    this.octave = octave;
-    this.accidental = accidental;
-  }
-}
 
 function setAccidental(accidental_setting) {
   accidental = accidental_setting;
@@ -345,6 +382,17 @@ function consoleLog(consoleEntry) {
   noteConsole.appendChild(entry);
   noteConsole.scrollTop = noteConsole.scrollHeight;
 }
+
+function accidentalLog() {
+  let accidental_div = document.getElementById("accidental-div");
+  let entry = document.createTextNode(accidental);
+  console.log(accidental);
+  let oldContent = accidental_div.firstChild;
+  accidental_div.removeChild(oldContent);
+  accidental_div.appendChild(entry);
+}
+
+
 
 </script>
 
