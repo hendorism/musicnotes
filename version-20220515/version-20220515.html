@@ -22,7 +22,7 @@ div#note-console {
   overflow: scroll;
   word-wrap: break-word;
   text-shadow: 2px 2px 4px #9999bb;
-  font-size: 16px;
+  font-size: 12px;
 }
 input#note-text-input {
   height: 300px;
@@ -81,19 +81,19 @@ let key_signatures = {
   "g": 1, "d": 2, "a": 3, "e": 4, "b": 5, "f#": 6, "c#": 7
 }
 
-let alphabet = ["a", "b", "c", "d", "e", "f", "g"];
+let alphabet = ["c", "d", "e", "f", "g", "a", "b"];
 let octaves = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 let pitches = [
-  "a0", "b0", "c0", "d0", "e0", "f0", "g0",
-  "a1", "b1", "c1", "d1", "e1", "f1", "g1",
-  "a2", "b2", "c2", "d2", "e2", "f2", "g2",
-  "a3", "b3", "c3", "d3", "e3", "f3", "g3",
-  "a4", "b4", "c4", "d4", "e4", "f4", "g4",
-  "a5", "b5", "c5", "d5", "e5", "f5", "g5",
-  "a6", "b6", "c6", "d6", "e6", "f6", "g6",
-  "a7", "b7", "c7", "d7", "e7", "f7", "g7",
-  "a8", "b8", "c8", "d8", "e8", "f8", "g8",
-  "a9", "b9", "c9", "d9", "e9", "f9", "g9"
+  "c0", "d0", "e0", "f0", "g0", "a0", "b0",
+  "c1", "d1", "e1", "f1", "g1", "a1", "b1",
+  "c2", "d2", "e2", "f2", "g2", "a2", "b2",
+  "c3", "d3", "e3", "f3", "g3", "a3", "b3",
+  "c4", "d4", "e4", "f4", "g4", "a4", "b4",
+  "c5", "d5", "e5", "f5", "g5", "a5", "b5",
+  "c6", "d6", "e6", "f6", "g6", "a6", "b6",
+  "c7", "d7", "e7", "f7", "g7", "a7", "b7",
+  "c8", "d8", "e8", "f8", "g8", "a8", "b8",
+  "c9", "d9", "e9", "f9", "g9", "a9", "b9"
 ];
 
 
@@ -174,31 +174,44 @@ function drawStuff() {
   ctx1.strokeStyle = '#00ffb5';
   ctx1.strokeRect(0, 0, canv1.width, canv1.height);
   drawStaves();
-  printNotes();
 }
 
+let notesSpacing = 22;
+
 function printNotes() {
-  let system = 1;
+  let system = 0;
+  let xPos = 0
   for (i=0; i<voices.length; i++) {
     for (ii=0; ii<voices[i].notes.length; ii++) {
-      let x = 30+10*ii;
-      let y = 100+ii*ii;
+      let x = sideMargin+notesSpacing*xPos;
+      if (x>canv1.width-sideMargin) {
+        xPos = 0;
+        system++;
+        x = sideMargin+notesSpacing*xPos;
+      }
+      let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
+      let noteName = voices[i].notes[ii].name+voices[i].notes[ii].octave;
+      let yOffset = -(pitches.indexOf(noteName)-midPitchInd);
+      let y = topMargin+2*staffSpacing+yOffset*0.5*staffSpacing;
       let color = "#77bbee";
       drawNoteHead(x, y, color);
+      xPos++;
     }
   }
 }
 
 let keyMap = {
   81: "octave-down", 87: "octave-up",
+  
   65: "-5", 83: "-4", 68: "-3", 70: "-2", 71: "-1", 72: "0",
   74: "1", 75: "2", 76: "3", 186: "4", 222: "5",
-  56: "double-flat",
-  57: "flat",
-  48: "natural",
-  189: "sharp",
+
+  56: "double-flat", 57: "flat",
+  48: "natural", 189: "sharp",
   187: "double-sharp",
+
   13: "color-scheme", // 13 = enter
+
   219: "flatter", 221: "sharper"
 }
 
@@ -224,9 +237,11 @@ window.addEventListener("keydown", function(e) {
   } else if (keyMap[kCode] == "color-scheme") {
     colorSchemeCycle();
   } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) {
-    pitches.indexOf(voices[active_voice].clef.middle_line_pitch)
-    let noteName = keyMap[kCode];
-    makeNote(noteName, accidental);
+    let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
+    let noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    let noteName = pitches[noteIndex];
+    consoleLog("noteName: " + noteName+", midPitchInd = " + midPitchInd+", noteIndex="+noteIndex);
+    makeNote(noteName, accidental, midPitchInd, noteIndex);
   } else if (kCode == 219 || kCode == 221) {
     accidentalNudge(kCode);
   }
@@ -273,7 +288,6 @@ function colorSchemeSet() {
   }
 }
 
-
 function setAccidental(accidental_setting) {
   accidental = accidental_setting;
 }
@@ -313,7 +327,6 @@ function drawStaves() {
       let y1 = topMargin+staffSpacing*i+stavesSpacing*e;
       let x2 = canv1.width-sideMargin;
       let y2 = y1;
-      consoleLog("(e, i, x1, y1, x2, y2) = (" + e + ", " + i + ", " + x1 + ", " + y1 + ", " + x2 + ", " + y2 + ")");
       ctx1.lineWidth = 1;
       ctx1.strokeStyle = '#0077ff';
       ctx1.beginPath();
@@ -322,6 +335,7 @@ function drawStaves() {
       ctx1.stroke();
     }
   }
+  printNotes();
 }
 
 function drawTrebleClef(x, y) {
@@ -408,7 +422,9 @@ function accidentalLog() {
   console.log("hello", "my", "name", "is", "shantharuban");
 </script>
 
-<script src="build_string.js"></script>
+<!-- <script src="build_string.js"></script> -->
+<!-- <script src="build-pitches-array.js"></script> -->
+<script src="game_loop.js"></script>
 
 </body>
 </html>
