@@ -16,8 +16,8 @@ window.addEventListener("keydown", function(e) { // prevent keys from scrolling 
 	// What does that mean?
 
 $(document).keypress(function(e) {
-  notationConsoleLog( `keypress = ${e.which}` );
-  notationConsoleLog( `keyMap[e.which] = ${keyMap[e.which]}` );
+  consoleLog( `keypress = ${e.which}` );
+  consoleLog( `keyMap[e.which] = ${keyMap[e.which]}` );
   musicalInput( keyMap[e.which] );
 });
 

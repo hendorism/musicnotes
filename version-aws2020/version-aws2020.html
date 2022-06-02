@@ -1,0 +1,611 @@
+<style>
+* {
+  padding: 0;
+  margin: 0;
+  font-family: monospace;
+}
+table tr td{
+  padding: 0;
+  text-align:center;
+}
+div.controls {
+  position: fixed;
+  top: 0;
+  background-color: #d9f;
+  width: 100%;
+}
+button {
+  /* font-family: arial; */
+  width: 50px;
+  height: 50px;
+  border-radius: 3px;
+  border: 0px solid black;
+  background-color: #6688bb;
+  color: #ddeeff;
+  text-shadow: 2px 2px 4px #262626;
+}
+canvas#mnCanvas {
+  position: relative;
+  top: 320px;
+  border: 1px solid black;
+  z-index: -1;
+}
+div#notationConsole {
+  position: fixed;
+  top: 0;
+  left: 400;
+  background-color: #112240;
+  color: #33ffee;
+  border-radius: 6px;
+  height: 520px;
+  width: 500px;
+  font-family: helvetica;
+  font-size: 12px;
+  overflow: scroll;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px #9999bb;
+}
+div#notationConsole span {
+  margin: 0px 4px 0px 4px;
+  background-color: #444444;
+  border: 1px solid #000000;
+}
+div#listOfNotesDisplay {
+  position: fixed;
+  top: 530;
+  left: 400;
+  background-color: #442240;
+  color: #33ffee;
+  height: 300px;
+  width: 300px;
+  font-family: helvetica;
+  font-size: 12px;
+  word-wrap: break-word;
+  overflow: scroll;
+}
+.notationConsoleLineNumbers {
+  color:#ddddef;
+  background-color: #335599;
+  font-family: monospace;
+  font-size:16px;
+}
+a#instruction-manual-link {
+  transform: rotate(90deg);
+  letter-spacing:3px;
+  text-transform: uppercase;
+  text-decoration: none;
+  position: fixed;
+  top: 130px;
+  left: 258px;
+  z-index: 5;
+  color: #39ffb3;
+  height: 22px;
+  width: 250px;
+  background-color:#333333;
+  border-radius: 3.2px;
+  padding: 0px;
+  text-align: center;
+}
+a#instruction-manual-link:hover {
+  color: #00ff00;
+}
+</style>
+
+<!-- created by Aaron Dull 2018-2020 -->
+<!-- You are a jelly donut and I am
+pushing this comment to GitHub with
+Atom running on Linux Zorin on my
+Dell Optiples-380 on 20201126232519 -->
+<html>
+  <head>
+    <title>music notes</title>
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
+</head>
+<body>
+<div class="controls">
+  <table>
+    <tr>
+      <td><button onclick="createANote(this.id);" id="c6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="d6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="e6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="f6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="g6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="a6button"></button></td>
+      <td><button onclick="createANote(this.id);" id="b6button"></button></td>
+    </tr>
+    <tr>
+      <td><button onclick="createANote(this.id);" id="c5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="d5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="e5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="f5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="g5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="a5button"></button></td>
+      <td><button onclick="createANote(this.id);" id="b5button"></button></td>
+    </tr>
+    <tr>
+      <td><button onclick="createANote(this.id);" id="c4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="d4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="e4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="f4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="g4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="a4button"></button></td>
+      <td><button onclick="createANote(this.id);" id="b4button"></button></td>
+    </tr>
+    <tr>
+      <td><button onclick="createANote(this.id);" id="c3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="d3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="e3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="f3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="g3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="a3button"></button></td>
+      <td><button onclick="createANote(this.id);" id="b3button"></button></td>
+    </tr>
+    <tr>
+      <td><button onclick="drawNoteHead(x,y);x+=10;console.log(i);">draw note head</button></td>
+      <td><button onclick="drawStaves(quan,spac,tmar);console.log(i);i=0;console.log(i);stavesHaveBeenDrawn=true;">draw staves</button></td>
+      <td><button onclick="startOver();">new</button></td>
+      <td><button onclick="drawTrebleCleff(x,y);console.log(i);">treble clef</button></td>
+      <td><button onclick="drawSharp(x,y);console.log(i);x+=10;">sharp</button></td>
+      <td><button onclick="increaseXten()">x+=10</button></td>
+      <td><button onclick="decreaseXten()">x-=10</button></td>
+    </tr>
+    <tr>
+      <td><button onclick="increaseX_5()">x+=5</button></td>
+      <td><button onclick="decreaseX_5()">x-=5</button></td>
+      <td><button onclick="increaseY_5()">y+=5</button></td>
+      <td><button onclick="decreaseY_5()">y-=5</button></td>
+      <td><button>&#9837;</button></td>
+      <td><button>&#9838;</button></td>
+      <td><button>&#9839;</button></td>
+      <td><button onclick="createANote();">test</button></td>
+    </tr>
+  </table>
+</div>
+<a id="instruction-manual-link" href="instructions.html" target="_blank">click for instructions</a>
+<canvas id="mnCanvas"></canvas>
+<div id="notationConsole">
+  <span>notation console</span>
+</div>
+<div id="listOfNotesDisplay"></div>
+<!-- jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+class canvas {
+  constructor(systemsQuantity, systemsSpacing, topMargin) {
+    this.systemsQuantity = systemsQuantity;
+    this.systemsSpacing = systemsSpacing;
+    this.marginTop = marginTop;
+  }
+}
+class system {
+  constructor(staffQuantity, measuresQuantity) {
+    this.staffQuantity = staffQuantity;
+    this.measuresQuantity = measuresQuantity;
+  }
+}
+class staff {
+  constructor(marginTop, marginBottom) {
+    this.marginTop = marginTop;
+    this.marginBottom = marginBottom;
+  }
+}
+class musicnote {
+  constructor(name, octave, duration, accidental) {
+    this.name = name;
+    this.octave = octave;
+    this.duration = duration;
+    this.accidental = accidental;
+    this.selected = boolean;
+  }
+}
+
+console.log("music_notation_v0018.js is working.");
+console.log("music_notation_v0018.js was made by Aaron Dull in 2019.");
+
+
+var c = document.getElementById("mnCanvas");
+var ctx = c.getContext("2d");
+c.width = 400;
+c.height = 1200;
+ctx.strokeStyle = "#000000";
+ctx.strokeRect(0, 0, c.width, c.height);
+ctx.fillStyle = "#eeeecc";
+ctx.fillRect(0,0,c.width, c.height);
+const noteHeadRadius = 4;
+const lineWidth = 1;
+const thickLineWidth = 2.5;
+function drawReticle(x,y){
+    ctx.fillStyle = '#77f';
+    ctx.beginPath();
+    ctx.arc(x,y,4,0,Math.PI*2,true);
+    ctx.closePath();
+    ctx.fill();
+}
+function drawStaves(stavesQuantity,stavesSpacing,topMargin){
+    for(e=0;e<stavesQuantity;e++){
+        for(i=0;i<5;i++){
+            drawLine(10,topMargin+10*i+stavesSpacing*e, 390,topMargin+10*i+stavesSpacing*e);
+        }
+    }
+}
+function crossBeams(q, x1, y1, x2, y2) {
+  for (i=0; i<q; i++) {
+    drawThickLine(x1, y1+5*i, x2, y2+5*i);
+  }
+}
+function drawTrebleCleff(x,y){
+    drawReticle(x,y);
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000';
+    ctx.beginPath ();
+    ctx.moveTo (x-5,y+20);
+    ctx.bezierCurveTo (
+    x+3,y+40,
+    x+4,y+15,
+    x-4,y-40);
+
+    ctx.bezierCurveTo (
+    x+16,y-35,
+    x-20,y-4,
+    x-4,y+14);
+
+    ctx.bezierCurveTo (
+    x+16,y+35,
+    x+10,y-45,
+    x-4,y+5);
+    ctx.stroke ();
+}
+function drawTimeSignature(x,y,n,d){
+    //drawReticle();
+    ctx.font = "26px Arial";
+    ctx.fillText(n,x-7,y-1);
+    ctx.fillText(d,x-7,y+20);
+}
+
+function drawLine(x1,y1,x2,y2){
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo( x1, y1 );
+    ctx.lineTo( x2, y2 );
+    ctx.stroke();
+}
+function drawBezier(x1,x2,x3,x4,y1,y2,y3,y4) {
+    ctx.beginPath ();
+    ctx.moveTo (x1,y1);
+    ctx.bezierCurveTo (x2,y2,x3,y3,x4,y4);
+    ctx.stroke ();
+}
+function drawThickLine(x1,y1, x2, y2){
+    ctx.lineWidth = thickLineWidth;
+    ctx.beginPath();
+    ctx.moveTo   ( x1, y1 );
+    ctx.lineTo   ( x2, y2 );
+    ctx.stroke   ();
+}
+function drawThickBezier(x1,x2,x3,x4,y1,y2,y3,y4) {
+    ctx.lineWidth = thickLineWidth;
+    ctx.beginPath ();
+    ctx.moveTo (x1,y1);
+    ctx.bezierCurveTo (x2,y2,x3,y3,x4,y4);
+    ctx.stroke ();
+}
+function drawFlat(x,y){
+    //drawReticle (x,y);
+    ctx.beginPath();
+    ctx.moveTo(x-1,y-13);
+    ctx.lineTo(x-3,y+4);
+    ctx.bezierCurveTo( x+5,y+1, x+5,y-5, x-3,y-1   );
+    ctx.bezierCurveTo( x+5,y-5, x+5,y+1, x-3,y+4   );
+    ctx.stroke();
+}
+function drawDoubleFlat(x,y){
+    //drawReticle(x,y);
+    drawFlat(x,y);
+    drawFlat(x-5,y);
+}
+function drawSharp(x,y){
+    //drawReticle(x,y);
+    ctx.font = "18px arial"
+    ctx.fillText("#",x-4,y+7);
+}
+function drawDoubleSharp(x,y){
+    //drawReticle(x,y);
+    ctx.font = "16px arial"
+    ctx.fillText("x",x-4,y+5);
+}
+function drawNatural(x,y){
+    //drawReticle(x,y);
+    drawLine(x-2,y-8,x-2,y+5);
+    //left vertical top to bottom.
+    drawLine(x-2,y+0,x+2,y-5);
+    //top mid left to right.
+    drawLine(x-2,y+5,x+2,y-0);
+    //bottom mid left to right.
+    drawLine(x+2,y-5,x+2,y+8);
+    //right vertical top to bottom.
+}
+function drawNoteHead(x,y){
+    //ctx.beginPath();
+    //ctx.arc(x,y,noteHeadRadius,0,Math.PI*2,true);
+    //ctx.closePath();
+    //ctx.fill();
+
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
+    ctx.fill();
+}
+function drawNoteNatural(x,y){
+    drawNoteHead(x,y);
+    drawNatural(x-10,y);
+}
+function drawNoteFlat(x,y){
+    drawNoteHead(x,y);
+    drawFlat(x-9,y+0);
+}
+function drawNoteDoubleFlat(x,y){
+    drawNoteHead(x,y);
+    drawDoubleFlat(x-9,y+0);
+}
+function drawNoteSharp(x,y){
+    drawNoteHead(x,y);
+    drawSharp(x-10,y);
+}
+function drawNoteDoubleSharp(x,y){
+    drawNoteHead(x,y);
+    drawDoubleSharp(x-10,y);
+}
+function drawEighthRest(x,y){
+  let m = 1;
+  let radians = (2/3)*Math.PI;
+  ctx.fillStyle = "#000";
+  ctx.strokeStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(x,y-1,2.5*m,Math.PI*0.5,Math.PI*-2.5,true);
+  //ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(x+2.5*Math.cos(radians),y+2.5*Math.sin(radians)-1);
+  ctx.bezierCurveTo(x+4, y+2.5, x+6, y, x+8, y-2);
+  ctx.lineTo(x+4,y+17);
+  ctx.stroke();
+}
+function drawQuarterRest(x,y) {
+  let m = 10;
+  ctx.strokeStyle = "#000000";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x, y+2);
+  ctx.bezierCurveTo(x-3, y, x-8, y-2, x-4, y+9);
+  ctx.bezierCurveTo(x-10, y-3, x-6, y-5, x, y+2);
+  ctx.fill();
+  ctx.lineTo(x-7,y-9);
+  ctx.bezierCurveTo(x-3, y-13, x-3, y-15, x-6, y-19);
+  ctx.lineTo(x+1,y-10);
+  ctx.bezierCurveTo(x-5, y-9, x-3, y-3, x, y);
+  ctx.fill();
+  ctx.stroke();
+}
+/*
+function drawRest(d, x, y) {
+  if (d === 1) {
+    drawSixtyFourthRest(x, y);
+  } else if (d === 2) {
+    drawThirtySecondRest(x, y);
+  } else if (d === 3) {
+    drawSixteenthRest(x, y);
+  } else if (d === 4) {
+    drawEighthRest(x, y);
+  } else if (d === 5) {
+    drawQuarterRest(x, y);
+  } else if (d === 6) {
+    drawHalfRest(x, y);
+  } else if (d === 7) {
+    drawWholeRest(x, y);
+  }
+}
+*/
+function drawKeySignature(x,y,a){
+    let orderOfFlats  = [0,-15,5,-10,10,-5,15];
+    let orderOfSharps = [-20,-5,-25,-10,5,-15,0];
+    //drawReticle(x,y);
+    if (a<0) {
+        for(i=0;i>a;i-=1){
+            drawFlat(x+5*-i,y+orderOfFlats[-i]);
+        }
+    } else if (a>0) {
+        for(i=0;i<a;i++){
+            drawSharp(x+5*i,y+orderOfSharps[i]);
+        }
+    }
+}
+function drawTuplet(t,x1,y1,x2,y2,x3,y3,xt,yt,x4,y4,x5,y5,x6,y6) {
+    ctx.lineWidth = lineWidth;
+    drawLine(x1,y1,x2,y2);
+    drawLine(x2,y2,x3,y3);
+    ctx.font = "18px monospace";
+    ctx.fillText(t,xt,yt);
+    drawLine(x4,y4,x5,y5);
+    drawLine(x5,y5,x6,y6);
+    //ctx.beginPath();
+    //ctx.moveTo(x1, y1);
+    //ctx.lineTo(x2, y2);
+    //ctx.lineTo(x3, y3);
+    //ctx.stroke();
+
+    //ctx.moveTo(x4, y4);
+    //ctx.lineTo(x5, y5);
+    //ctx.lineTo(x6, y6);
+    //ctx.stroke();
+}
+
+
+
+
+/*
+function drawNote(a,x,y,sd,sl,sx){
+  if a=
+  drawNoteHead(x,y);
+}
+
+*/
+
+
+console.log("music_notation_v0018.js is finished working.");
+
+
+    // function redrawEverything() {
+    //   //redraw everything
+    // }
+  //key binding:
+  window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+    $(document).keypress(function(e){
+      notationConsoleDotLog("You pressed: " + e.which);
+      createANote(keyMap[e.which]);
+    });
+
+    $(document).keyup(function(e){
+      notationConsoleDotLog("You pressed: " + e.which);
+      if (e.which == 8){
+        startOver();
+      } else if (e.which == 38) { //up
+        decreaseY_5();
+      } else if (e.which == 39) { //right
+        increaseX_5();
+      } else if (e.which == 40) { //down
+        increaseY_5();
+      } else if (e.which == 37) { //left
+        decreaseX_5();
+      } else if (e.which == 32) { //spacebar
+        drawStaves(quan,spac,tmar);
+      }
+      notationConsoleDotLog("x=" + x + ", y=" + y);
+      drawReticle(x,y);
+    })
+  var keyMap = {
+    "122": "c3", "120": "d3",  "99": "e3", "118": "f3",  "98": "g3", "110": "a3", "109": "b3",
+     "97": "c4", "115": "d4", "100": "e4", "102": "f4", "103": "g4", "104": "a4", "106": "b4",
+    "113": "c5", "119": "d5", "101": "e5", "114": "f5", "116": "g5", "121": "a5", "117": "b5",
+     "49": "c6",  "50": "d6",  "51": "e6",  "52": "f6",  "53": "g6",  "54": "a6",  "55": "b6",
+
+  }
+  var stavesHaveBeenDrawn = false;
+  function increaseX_5() {x+=5;}
+  function decreaseX_5() {x-=5;}
+  function increaseY_5() {y+=5;}
+  function decreaseY_5() {y-=5;}
+  function increaseXten() {x+=10;}
+  function decreaseXten() {x-=10;}
+  var ii = 0;
+  var y = 50;
+  var x = 15;
+  let quan = 12;
+  let spac = 100;
+  let tmar = 50;
+  function clearCanvas() {
+    ctx.fillStyle = "#fefefe";
+    ctx.fillRect(0, 0, c.width, c.height);
+  }
+  function startOver() {
+    clearCanvas();
+    x = 15;
+    ii = 0;
+    listOfNotes = [];
+    notationConsoleDotLog("You just deleted everything.");
+  }
+  var ledgerLineRadius = 8;
+  var notationConsole = document.getElementById("notationConsole");
+  var listOfNotesDisplay = document.getElementById("listOfNotesDisplay");
+  var listOfNotes = [];
+  var yValueOfNoteRelativeToMiddleLine;
+  var yValuesOfNotesRelativeToMiddleLine = {
+    "b6": -70, "a6": -65, "g6": -60, "f6": -55, "e6": -50, "d6": -45, "c6": -40,
+    "b5": -35, "a5": -30, "g5": -25, "f5": -20, "e5": -15, "d5": -10, "c5":  -5,
+    "b4":   0, "a4":   5, "g4":  10, "f4":  15, "e4":  20, "d4":  25, "c4":  30,
+    "b3":  35, "a3":  40, "g3":  45, "f3":  50, "e3":  55, "d3":  60, "c3":  65
+  }
+  var notationConsoleEntryNumber = 0;
+  function notationConsoleDotLog(notationConsoleLogEntry) {
+    notationConsoleEntryNumber ++;
+    let lineBreak = document.createElement("BR");
+    let entryNumberSpan = document.createElement("SPAN");
+    let entryNumber = document.createTextNode(notationConsoleEntryNumber + ": ");
+    let entry = document.createTextNode(notationConsoleLogEntry);
+    entryNumberSpan.class = "notation-console-entry-number-span";
+    entryNumberSpan.appendChild(entryNumber);
+    notationConsole.appendChild(lineBreak);
+    notationConsole.appendChild(entryNumberSpan);
+    notationConsole.appendChild(entry);
+    notationConsole.scrollTop = notationConsole.scrollHeight;
+  }
+  function listOfNotesDisplayUpdate(listOfNotes) {
+    listOfNotesDisplay.innerHTML = ("notes are: " + listOfNotes + "<br>You have " + listOfNotes.length + " notes.");
+    if (listOfNotes.length > 50) {
+      listOfNotesDisplay.innerHTML += ("<br>You have too many notes.")
+    }
+    listOfNotesDisplay.scrollTop = listOfNotesDisplay.scrollHeight;
+  }
+  function createANote(idOfButton) {
+    clearCanvas();
+    if (idOfButton != undefined) {
+      let noteName = idOfButton.slice(0,2);
+      listOfNotes.push(noteName);
+      notationConsoleDotLog('new note: ' + noteName);
+    } else {
+      notationConsoleDotLog("idOfButton is " + idOfButton);
+    }
+    if (stavesHaveBeenDrawn == true) {
+      drawStaves(quan, spac, tmar);
+    }
+    x=15;
+    ii = 0;
+    for (iii=0; iii<listOfNotes.length; iii++) {
+      y = yValuesOfNotesRelativeToMiddleLine[listOfNotes[iii]]+tmar+20+spac*ii;
+      drawNoteHead(x,y);
+      drawLedgerLines(y);
+      resetX();
+    }
+  }
+  function drawLedgerLines(yy) {
+    let middleLineY = tmar+spac*ii+20;
+    let noteHeadY_minus_middleLineY = yy-middleLineY;
+    if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===0) {
+        for (ledgerLineNumber=0; ledgerLineNumber>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
+            drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY<=-30 && -noteHeadY_minus_middleLineY%2===1) {
+        for (ledgerLineNumber=0; ledgerLineNumber-1>(noteHeadY_minus_middleLineY+20)/10; ledgerLineNumber--) {
+            drawLine(x-ledgerLineRadius, middleLineY-30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY-30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===0) {
+        for (ledgerLineNumber=0; ledgerLineNumber<=(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
+            drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
+        }
+    } else if (noteHeadY_minus_middleLineY>=30 && noteHeadY_minus_middleLineY%2===1) {
+        for (ledgerLineNumber=0; ledgerLineNumber<(noteHeadY_minus_middleLineY-30)/10; ledgerLineNumber++) {
+            drawLine(x-ledgerLineRadius, middleLineY+30+10*ledgerLineNumber, x+ledgerLineRadius, middleLineY+30+10*ledgerLineNumber);
+        }
+    }
+  }
+  //(middleLineY - y - 20) / 10
+  function resetX() {
+    x += 10;
+    if (x>390) {
+      x = 15;
+      ii += 1;
+    }
+  }
+</script>
+</body>
+</html>
+<!--
+clicking on any clef gives a dropdown menu with other clef options.
+shift-clicking an option allows user to drag to the point where clef reverts to what it was before.
+ -->

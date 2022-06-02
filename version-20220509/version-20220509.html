@@ -2,65 +2,70 @@
   <head>
     <title>musicnotes20220509</title>
 <style>
-    * {
-        padding: 0;
-        margin: 0;
-    }
-    button.accidental {
-        width:51;
-        height:40;
-        margin: -1px;
-    }
-    button.note-key {
-        width: 22;
-        height: 60;
-        margin: -2px;
-        font-size: 11px;
-    }
-    button.white-key {
-      background-color: #ddeeff;
-      color: #1b1b1b;
-    }
-    button.black-key {
-      background-color: #1b1b1b;
-      color: #ddeeff;
-    }
-    .notation-console-entry-number-span {
-        color: #eeeeee;
-        background-color: #003344;
-    }
-    div#note-console {
-        height: 200px;
-        width: 100%;
-        background-color: #ddeeff;
-        font-family: monospace;
-      }
-      button.color-scheme {
-        background-color: #272727;
-        color: #55bbcc;
-        padding: 10px;
-      }
-      button.set-key-sig {
-        background-color: #272727;
-        color: #55bbcc;
-        padding: 10px;
-      }
-      p.intro {
-        font-family: monospace;
-      }
-      </style>
+* {
+  padding: 0;
+  margin: 0;
+}
+button.accidental {
+  width: 51;
+  height: 40;
+  margin: -1px;
+}
+button.note-key {
+  width: 22;
+  height: 60;
+  margin: -2px;
+  font-size: 11px;
+}
+button.white-key {
+  background-color: #ddeeff;
+  color: #1b1b1b;
+}
+button.black-key {
+  background-color: #1b1b1b;
+  color: #ddeeff;
+}
+.notation-console-entry-number-span {
+  color: #eeeeee;
+  background-color: #003344;
+}
+div#note-console {
+  height: 200px;
+  width: 100%;
+  background-color: #ddeeff;
+  font-family: monospace;
+  border-radius: 6px;
+  overflow: scroll;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px #9999bb;
+  font-size: 16px;
+}
+button.color-scheme {
+  background-color: #272727;
+  color: #55bbcc;
+  padding: 10px;
+}
+button.set-key-sig {
+  background-color: #272727;
+  color: #55bbcc;
+  padding: 10px;
+}
+p.intro {
+  font-family: monospace;
+}
+</style>
 </head>
 
 <body>
-  <p class="intro">Thanks for using musicnotes app.</p><br>
+  <p class="intro">musicnotes app version-20220509.</p><br>
   <p class="intro">Right-click the canvas to "save image as..."
     This will save a .png image of your song.</p><br>
   <p class="intro">Hit the "color scheme" button to
     make the page black and white for printing.</p>
   <table>
-    
+
     <tr>
-      
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="2"  id="double-sharp">##</button></td>
     <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'double-sharp');">C2</button></td>
     <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-sharp');">D2</button></td>
@@ -104,13 +109,10 @@
     <td><button class="note-key white-key" id="g7button" onclick="makeNote('g7', 'double-sharp');">G7</button></td>
     <td><button class="note-key white-key" id="a7button" onclick="makeNote('a7', 'double-sharp');">A7</button></td>
     <td><button class="note-key black-key" id="b7button" onclick="makeNote('b7', 'double-sharp');">B7</button></td>
-    
-    <td><button class="color-scheme" onclick="colorSchemeCycle()">color scheme</button></td>
+      <td><button class="color-scheme" onclick="colorSchemeCycle()">color scheme</button></td>
   </tr>
   <tr>
-    
-    
-    <td><button class="accidental" onclick="setAccidental(this.id)" data-id="1"  id="sharp">#</button></td>
+        <td><button class="accidental" onclick="setAccidental(this.id)" data-id="1"  id="sharp">#</button></td>
       <td><button class="note-key black-key" id="c2button" onclick="makeNote('c2', 'sharp');">C2</button></td>
       <td><button class="note-key black-key" id="d2button" onclick="makeNote('d2', 'sharp');">D2</button></td>
       <td><button class="note-key white-key" id="e2button" onclick="makeNote('e2', 'sharp');">E2</button></td>
@@ -156,8 +158,8 @@
       <td><button class="set-key-sig" onclick="setKeySignatureEqualsTrue()">set key</button></td>
     </tr>
   <tr>
-    
-    
+
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="0"  id="natural" class="selected">natural</button></td>
       <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'natural');">C2</button></td>
       <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'natural');">D2</button></td>
@@ -203,8 +205,8 @@
       <td><button class="note-key white-key" id="b7button" onclick="makeNote('b7', 'natural');">B7</button></td>
     </tr>
   <tr>
-    
-    
+
+
     <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-1" id="flat">b</button></td>
     <td><button class="note-key white-key" id="c2button" onclick="makeNote('c2', 'flat');">C2</button></td>
     <td><button class="note-key black-key" id="d2button" onclick="makeNote('d2', 'flat');">D2</button></td>
@@ -250,8 +252,8 @@
     <td><button class="note-key black-key" id="b7button" onclick="makeNote('b7', 'flat');">B7</button></td>
     </tr>
     <tr>
-      
-      
+
+
       <td><button class="accidental" onclick="setAccidental(this.id)" data-id="-2" id="double-flat">bb</button></td>
       <td><button class="note-key black-key" id="c2button" onclick="makeNote('c2', 'double-flat');">C2</button></td>
       <td><button class="note-key white-key" id="d2button" onclick="makeNote('d2', 'double-flat');">D2</button></td>
@@ -305,7 +307,41 @@
 <p class="intro">Last updated: 5/14/2022</p>
 
   <script>
-    
+
+let accidentals = [
+  "double-flat",
+  "flat",
+  "natural",
+  "sharp",
+  "double-sharp"
+];
+
+window.addEventListener("keydown", function(e) {
+  let kCode = e.keyCode;
+  consoleLog("keydown: " + kCode);
+  consoleLog(keyMap[kCode]);
+  if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+    e.preventDefault();
+    if (kCode == 37) { // left
+
+    } else if (kCode == 38) { // up
+      consoleLog("up");
+    } else if (kCode == 39) { // right
+      consoleLog("right");
+    } else if (kCode == 40) { // down
+      consoleLog("down");
+    }
+  }
+  let kIntent = keyMap[kCode];
+  if (accidentals.includes(kIntent)) {
+    accidental = kIntent;
+  } else if (keyMap[kCode] == "color-scheme") {
+    colorSchemeCycle();
+  } else {
+    makeNote(keyMap[(e.keyCode).toString()], accidental);
+  }
+}, false);
+
 class MusicNote {
   constructor(name, octave, accidental) {
     this.name = name;
@@ -313,25 +349,28 @@ class MusicNote {
     this.accidental = accidental;
   }
 }
-    
+
 let color_schemes = [
   {
     name: "printer",
     ink: "#000000",
+    selected: "#2323bf",
     parchment: "#ffffff"
   },
   {
     name: "parchment",
     ink: "#000000",
+    selected: "#2323bf",
     parchment: "#eeffbb"
   },
   {
     name: "dark mode",
     ink: "#55bbcc",
+    selected: "#2323bf",
     parchment: "#272727"
   }
 ];
-    
+
 let staff_spacing = 10;
 let note_spacing = 30;
 let top_margin = 60;
@@ -340,7 +379,7 @@ let note_head_radius = staff_spacing*0.5;
 let line_thickness = 1;
 let thick_line_thickness = 2.5;
 let xStart = 13*staff_spacing;
-let side_margin = 10;
+let side_margin = 30;
 let staves_quantity = 12;
 let staves_spacing = 100;
 let canv1 = document.getElementById("canvas1");
@@ -358,6 +397,7 @@ let parchment;
 let key_signature;
 let set_key_signature = false;
 let keysig_x_offset = 3*staff_spacing;
+let boffset = 0.5*staff_spacing;
 
 canv1.width = 700;
 canv1.height = 600;
@@ -366,24 +406,37 @@ colorSchemeSet();
 clearPage();
 drawStaves();
 
+let keyMap = {
+  90: "c2", 88: "d2", 67: "e2", 86: "f2", 66: "g2", 78: "a2", 77: "b2",
+  188: "c3", 190: "d3", 191: "e3", 65: "f3", 83: "g3", 68: "a3", 70: "b3",
+  71: "c4", 72: "d4", 74: "e4", 75: "f4", 76: "g4", 186: "a4", 222: "b4",
+  81: "c5", 87: "d5", 69: "e5", 82: "f5", 84: "g5", 89: "a5", 85: "b5",
+  73: "c6", 79: "d6", 80: "e6", 219: "f6", 221: "g6", 220: "a6", 49: "b6",
+  50: "c7", 51: "d7", 52: "e7", 53: "f7", 54: "g7", 55: "a7", 56: "b7",
+  57: "c8", 48: "d8", 189: "e8", 187: "f8",
+  56: "double-flat",
+  57: "flat",
+  48: "natural",
+  189: "sharp",
+  187: "double-sharp",
+  13: "color-scheme"
+}
+
 let y_values = {
-  b7: -10.5, a7: -10.0, g7: -9.5, f7: -9.0, e7: -8.5, d7: -8.0, c7: -7.5,  
+  b7: -10.5, a7: -10.0, g7: -9.5, f7: -9.0, e7: -8.5, d7: -8.0, c7: -7.5,
   b6:  -7.0, a6:  -6.5, g6: -6.0, f6: -5.5, e6: -5.0, d6: -4.5, c6: -4.0,
   b5:  -3.5, a5:  -3.0, g5: -2.5, f5: -2.0, e5: -1.5, d5: -1.0, c5: -0.5,
   b4:   0.0, a4:   0.5, g4:  1.0, f4:  1.5, e4:  2.0, d4:  2.5, c4:  3.0,
   b3:   3.5, a3:   4.0, g3:  4.5, f3:  5.0, e3:  5.5, d3:  6.0, c3:  6.5,
   b2:   7.0, a2:   7.5, g2:  8.0, f2:  8.5, e2:  9.0, d2:  9.5, c2: 10.0
 }
+
 let order_of_flats = [
-//b,    e,   a,  d, g,    c,   f
   0, -1.5, 0.5, -1, 1, -0.5, 1.5,
-//b,    e,   a,  d, g,    c,   f
   0, -1.5, 0.5, -1, 1, -0.5, 1.5,
 ];
 let order_of_sharps = [
-// f,    c,    g,  d,   a,    e, b
   -2, -0.5, -2.5, -1, 0.5, -1.5, 0,
-// f,    c,    g,  d,   a,    e, b
   -2, -0.5, -2.5, -1, 0.5, -1.5, 0,
 ];
 
@@ -409,8 +462,9 @@ function colorSchemeSet() {
     if (color_schemes[i].name == color_scheme) {
       ink = color_schemes[i].ink;
       parchment = color_schemes[i].parchment;
+      selected = color_schemes[i].selected;
     }
-  }    
+  }
 }
 
 function clearPage() {
@@ -505,7 +559,13 @@ function printSequence() {
     }
     let noteName = notes_sequence1[ii].name+notes_sequence1[ii].octave;
     let y = top_margin + 2*staff_spacing + y_values[noteName]*staff_spacing + staves_spacing*e;
-    drawNoteHead(x, y);
+    let color;
+    if (notes_sequence1[ii].selected = true) {
+      color = color_scheme.selected;
+    } else {
+      color = color_scheme.ink;
+    }
+    drawNoteHead(x, y, color);
     drawLedgerLines(x, y, e);
     drawAccidental(x, y, notes_sequence1[ii].accidental);
     x += note_spacing;
@@ -525,6 +585,12 @@ function drawStaves() {
     let y = top_margin+3*staff_spacing+e*staves_spacing;
     drawTrebleClef(x,y);
     drawKeySignature(x, y, key_signature);
+    if (e%2==0) {
+      let x = side_margin-boffset;
+      let y = top_margin+staves_spacing*e-0.5*boffset;
+      let h = staves_spacing+4*staff_spacing+boffset;
+      drawSquareBracket(x,y,h);
+    }
   }
 }
 
@@ -572,9 +638,9 @@ function drawReticle(x,y){
     ctx1.fill();
 }
 
-function drawNoteHead(x,y){
-  ctx1.strokeStyle = ink;
-  ctx1.fillStyle = ink;
+function drawNoteHead(x,y,color){
+  ctx1.strokeStyle = color;
+  ctx1.fillStyle = color;
   ctx1.beginPath();
   ctx1.ellipse(x, y, 6/2, 8/2, Math.PI / 3, 0, 2 * Math.PI);
   ctx1.fill();
@@ -722,6 +788,72 @@ function drawDoubleSharp(x,y){
     ctx1.font = "16px arial"
     ctx1.fillText("x",x1,y1);
 }
+
+function drawThickLine(xx1,yy1,xx2,yy2) {
+  ctx1.lineWidth = thick_line_thickness;
+  ctx1.beginPath();
+  ctx1.moveTo(xx1,yy1);
+  ctx1.lineTo(xx2,yy2);
+  ctx1.stroke();
+}
+
+function drawSquareBracket(x, y, h) {
+  let angle_slope = 1.2;
+  let bcl = 1;
+  let dx = bcl/angle_slope;
+  let dy = angle_slope/bcl;
+  let x1 = x+dx*staff_spacing;
+  let y1 = y-dy*staff_spacing;
+  let x2 = x;
+  let y2 = y;
+  let x3 = x;
+  let y3 = y+h;
+  let x4 = x+dx*staff_spacing;
+  let y4 = y+dy*staff_spacing+h;
+  drawThickLine(x1,y1,x2,y2);
+  drawThickLine(x2,y2,x3,y3);
+  drawThickLine(x3,y3,x4,y4);
+}
+
+function drawGrandStaffBracket(x,y,h) {
+  let depth = 1.6*staff_spacing;
+  let bo1 = 1.9*depth;
+  let bo2 = -0.8*depth;
+  let yo1 = 0.3;
+  let yo2 = 0.8;
+      let x1 = x;               // |
+      let y1 = y;               // |
+  let x7 = x-bo1;           //||   |
+  let y7 = y+yo1*h/2;       //||   |
+    let x6 = x-bo2            //|| |
+    let y6 = y+yo2*h/2;       //|| |
+let x5 = x-depth;         //||     |
+let y5 = y+h/2;           //||     |
+    let x4 = x-bo2            //|| |
+    let y4 = y+h-yo2*h/2      //|| |
+  let x3 = x-bo1            //||   |
+  let y3 = y+h-yo1*h/2;     //||   |
+      let x2 = x;               // |
+      let y2 = y+h              // |
+
+//    1
+// 7
+//   6
+//5
+//   4
+// 3
+//    2
+
+  ctx1.beginPath ();
+  ctx1.moveTo (x1, y1);
+  ctx1.lineTo(x2, y2);
+  ctx1.bezierCurveTo (x3,y3,x4,y4,x5,y5);
+  ctx1.bezierCurveTo (x6,y6,x7,y7,x1,y1);
+  ctx1.stroke ();
+}
+
+
+
 
 </script>
 </html>

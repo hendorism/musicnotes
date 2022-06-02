@@ -1,6 +1,430 @@
-class Staff {
-    constructor(clef, key) {
-      this.clef = clef;
-      this.key = key;
+<html>
+<head>
+<title>version-20220515</title>
+<style>
+* {
+  padding: 0px;
+  margin: 0px;
+}
+body {
+  background-color: #33336f;
+  color: #debf35;
+  font-family: monospace;
+  font-size: 2.8vmin;
+}
+div#note-console {
+  background-color: #ddddff;
+  color: #333333;
+  height: 400px;
+  width: 100%;
+  font-family: monospace;
+  border-radius: 6px;
+  overflow: scroll;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px #9999bb;
+  font-size: 12px;
+}
+input#note-text-input {
+  height: 300px;
+  width: 300px;
+}
+.notation-console-entry-number-span {
+  color: #eeeeee;
+  background-color: #003344;
+}
+div#accidental-div {
+  border-radius: 3;
+  background-color: #23df8b;
+  color: #113399;
+  font-size: 16px;
+  height: 24px;
+  width: 122px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+
+<h4>musicnotes version-20220515</h4>
+<div id="accidental-div">hi</div>
+
+<canvas id="canvas1"></canvas>
+
+<div id="note-console">
+  <h3>console:</h3>
+</div>
+
+<script>
+  let topMargin = 100;
+  let staffSpacing = 10;
+  let sideMargin = 30;
+  let stavesSpacing = 100;
+  let canv1 = document.getElementById("canvas1");
+  let ctx1 = canv1.getContext("2d");
+  let noteConsole = document.getElementById("note-console");
+  let noteConsoleEntryNumber = 0;
+  let accidental = "natural";
+  let set_key_signature = false;
+  let set_accidental = false;
+  let key_signature = "c"
+  let active_voice = 0;
+  accidentalLog();
+
+let color_scheme = {
+  ink: "#00ffb5",
+  parchment: "#223277",
+  selected: "#de2b6a"
+}
+
+let key_signatures = {
+  "cb": -7, "gb": -6, "db": -5, "ab": -4, "eb": -3, "bb": -2, "f": -1, "c": 0,
+  "g": 1, "d": 2, "a": 3, "e": 4, "b": 5, "f#": 6, "c#": 7
+}
+
+let alphabet = ["c", "d", "e", "f", "g", "a", "b"];
+let octaves = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+let pitches = [
+  "c0", "d0", "e0", "f0", "g0", "a0", "b0",
+  "c1", "d1", "e1", "f1", "g1", "a1", "b1",
+  "c2", "d2", "e2", "f2", "g2", "a2", "b2",
+  "c3", "d3", "e3", "f3", "g3", "a3", "b3",
+  "c4", "d4", "e4", "f4", "g4", "a4", "b4",
+  "c5", "d5", "e5", "f5", "g5", "a5", "b5",
+  "c6", "d6", "e6", "f6", "g6", "a6", "b6",
+  "c7", "d7", "e7", "f7", "g7", "a7", "b7",
+  "c8", "d8", "e8", "f8", "g8", "a8", "b8",
+  "c9", "d9", "e9", "f9", "g9", "a9", "b9"
+];
+
+
+class Clef {
+  constructor(name, middle_line_pitch) {
+    this.name = name;
+    this.middle_line_pitch = middle_line_pitch
+  }
+}
+
+class MusicNote {
+  constructor(name, octave, accidental) {
+    this.name = name;
+    this.octave = octave;
+    this.accidental = accidental;
+    this.selected = false;
+  }
+}
+
+const trebleClef = new Clef("trebleClef", "b4");
+const bassClef = new Clef("bassClef", "d3");
+let clefs = [trebleClef, bassClef];
+
+let voices = [
+  {
+    name: 1,
+    clef: trebleClef,
+    key: key_signature,
+    notes: [],
+    staff: 1
+  },
+  {
+    name: 2,
+    clef: bassClef,
+    key: key_signature,
+    notes: [],
+    staff: 2
+  }
+];
+
+function makeNote(noteName, accidental) {
+  let name = noteName.slice(0, 1);
+  let octave = noteName.slice(1, 2);
+  let note = new MusicNote(name, octave, accidental)
+  voices[active_voice].notes.push(note);
+  drawStuff();
+}
+
+let accidentals = [
+  "double-flat",
+  "flat",
+  "natural",
+  "sharp",
+  "double-sharp"
+];
+
+// `1234567890-=
+// qwertyuiop[]\
+// asdfghjkl;'
+// zxcvbnm,./
+
+consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
+
+window.addEventListener('resize', resizeCanvas, false);
+
+function resizeCanvas() {
+  canv1.width = 0.95*window.innerWidth;
+  canv1.height = 0.5*window.innerHeight;
+  consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
+  drawStuff();
+}
+
+resizeCanvas();
+
+function drawStuff() {
+  ctx1.fillStyle = '#223277';
+  ctx1.fillRect(0,0,canv1.width, canv1.height);
+  ctx1.strokeStyle = '#00ffb5';
+  ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+  drawStaves();
+}
+
+let notesSpacing = 22;
+
+function printNotes() {
+  let system = 0;
+  let xPos = 0
+  for (i=0; i<voices.length; i++) {
+    for (ii=0; ii<voices[i].notes.length; ii++) {
+      let x = sideMargin+notesSpacing*xPos;
+      if (x>canv1.width-sideMargin) {
+        xPos = 0;
+        system++;
+        x = sideMargin+notesSpacing*xPos;
+      }
+      let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
+      let noteName = voices[i].notes[ii].name+voices[i].notes[ii].octave;
+      let yOffset = -(pitches.indexOf(noteName)-midPitchInd);
+      let y = topMargin+2*staffSpacing+yOffset*0.5*staffSpacing;
+      let color = "#77bbee";
+      drawNoteHead(x, y, color);
+      xPos++;
     }
   }
+}
+
+let keyMap = {
+  81: "octave-down", 87: "octave-up",
+  
+  65: "-5", 83: "-4", 68: "-3", 70: "-2", 71: "-1", 72: "0",
+  74: "1", 75: "2", 76: "3", 186: "4", 222: "5",
+
+  56: "double-flat", 57: "flat",
+  48: "natural", 189: "sharp",
+  187: "double-sharp",
+
+  13: "color-scheme", // 13 = enter
+
+  219: "flatter", 221: "sharper"
+}
+
+window.addEventListener("keydown", function(e) {
+  let kCode = e.keyCode;
+  let kIntent = keyMap[kCode];
+  consoleLog("("+e.keyCode+", "+e.key+")");
+  console.log("("+e.keyCode+", "+e.key+")");
+  if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
+    e.preventDefault();
+  }
+  if (kCode == 37) { // left
+    consoleLog("left");
+  } else if (kCode == 38) { // up
+    consoleLog("up");
+  } else if (kCode == 39) { // right
+    consoleLog("right");
+  } else if (kCode == 40) { // down
+    consoleLog("down");
+  } else if (accidentals.includes(kIntent)) {
+    accidental = kIntent;
+    consoleLog("accidental = " + accidental);
+  } else if (keyMap[kCode] == "color-scheme") {
+    colorSchemeCycle();
+  } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) {
+    let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
+    let noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    let noteName = pitches[noteIndex];
+    consoleLog("noteName: " + noteName+", midPitchInd = " + midPitchInd+", noteIndex="+noteIndex);
+    makeNote(noteName, accidental, midPitchInd, noteIndex);
+  } else if (kCode == 219 || kCode == 221) {
+    accidentalNudge(kCode);
+  }
+}, false);
+
+function accidentalNudge(kCode) {
+  let current;
+  if (kCode == 219) { // (219: "flatter") ("[")
+    current = accidentals.indexOf(accidental);
+    if (current > 0) {
+      current -= 1;
+    }
+  } else if (kCode == 221) { // (221: "sharper") ("]")
+    current = accidentals.indexOf(accidental);
+    if (current < accidentals.length-1) {
+      current +=1
+    }
+  }
+  accidental = accidentals[current];
+  consoleLog(accidental);
+  accidentalLog(accidental);
+}
+
+function colorSchemeCycle() {
+  console.log("cycling color scheme");
+  if (color_scheme == "parchment") {
+    color_scheme = "dark mode";
+  } else if (color_scheme == "dark mode") {
+    color_scheme = "printer";
+  } else if (color_scheme == "printer") {
+    color_scheme = "parchment";
+  }
+  colorSchemeSet();
+  printSequence();
+}
+
+function colorSchemeSet() {
+  for (i=0; i<color_schemes.length; i++) {
+    if (color_schemes[i].name == color_scheme) {
+      ink = color_schemes[i].ink;
+      parchment = color_schemes[i].parchment;
+      selected = color_schemes[i].selected;
+    }
+  }
+}
+
+function setAccidental(accidental_setting) {
+  accidental = accidental_setting;
+}
+
+function drawGrandStaffBracket(x,y,h) {
+  let depth = 1.6*staffSpacing;
+  let bo1 = 1.9*depth;
+  let bo2 = -0.8*depth;
+  let yo1 = 0.3;
+  let yo2 = 0.8;
+  let x1 = x;             //        ;|
+  let y1 = y;             //       ; |
+  let x7 = x-bo1;         //      ;  |
+  let y7 = y+yo1*h/2;     //     ;   |
+  let x6 = x-bo2          //    ;    |
+  let y6 = y+yo2*h/2;     //   ;     |
+  let x5 = x-depth;       //  ;      |
+  let y5 = y+h/2;         //  ;      |
+  let x4 = x-bo2          //   ;     |
+  let y4 = y+h-yo2*h/2    //    ;    |
+  let x3 = x-bo1          //     ;   |
+  let y3 = y+h-yo1*h/2;   //      ;  |
+  let x2 = x;             //       ; |
+  let y2 = y+h            //        ;|
+  ctx1.beginPath ();
+  ctx1.moveTo (x1, y1);
+  ctx1.lineTo(x2, y2);
+  ctx1.bezierCurveTo (x3,y3,x4,y4,x5,y5);
+  ctx1.bezierCurveTo (x6,y6,x7,y7,x1,y1);
+  ctx1.stroke ();
+}
+
+function drawStaves() {
+  for (e=0; e<3; e++) {
+    for (i=0; i<5; i++) {
+      let x1 = sideMargin;
+      let y1 = topMargin+staffSpacing*i+stavesSpacing*e;
+      let x2 = canv1.width-sideMargin;
+      let y2 = y1;
+      ctx1.lineWidth = 1;
+      ctx1.strokeStyle = '#0077ff';
+      ctx1.beginPath();
+      ctx1.moveTo(x1,y1);
+      ctx1.lineTo(x2,y2);
+      ctx1.stroke();
+    }
+  }
+  printNotes();
+}
+
+function drawTrebleClef(x, y) {
+  ctx1.fillStyle = ink;
+  ctx1.strokeStyle = ink;
+  let x1 = x-5;
+  let y1 = y+2*staffSpacing;
+  let x2 = x+3;
+  let y2 = y+4*staffSpacing;
+  let x3 = x+4;
+  let y3 = y+1.5*staffSpacing;
+  let x4 = x-4;
+  let y4 = y-4*staffSpacing;
+  let x5 = x+16;
+  let y5 = y-3.5*staffSpacing;
+  let x6 = x-20
+  let y6 = y-0.4*staffSpacing;
+  let x7 = x-4;
+  let y7 = y+1.4*staffSpacing;
+  let x8 = x+16;
+  let y8 = y+3.5*staffSpacing;
+  let x9 = x+10;
+  let y9 = y-4.5*staffSpacing;
+  let x10 = x-4;
+  let y10 = y+0.5*staffSpacing;
+  ctx1.beginPath ();
+  ctx1.moveTo (x1, y1);
+  ctx1.bezierCurveTo (x2,y2,x3,y3,x4,y4);
+  ctx1.bezierCurveTo (x5,y5,x6,y6,x7,y7);
+  ctx1.bezierCurveTo (x8,y8,x9,y9,x10,y10);
+  ctx1.stroke ();
+}
+
+function drawBassClef(x, y) {
+
+}
+
+function drawNoteHead(x,y,color) {
+  ctx1.strokeStyle = color;
+  ctx1.fillStyle = color;
+  ctx1.beginPath();
+  let d1 = 6/2*(0.1*staffSpacing);
+  let d2 = 8/2*(0.1*staffSpacing);
+  ctx1.ellipse(x, y, d1, d2, Math.PI / 3, 0, 2 * Math.PI);
+  ctx1.fill();
+}
+
+function consoleLog(consoleEntry) {
+  noteConsoleEntryNumber ++;
+  let lineBreak = document.createElement("BR");
+  let entryNumberSpan = document.createElement("SPAN");
+  let entryNumber = document.createTextNode(noteConsoleEntryNumber + ": ");
+  let entry = document.createTextNode(consoleEntry);
+  entryNumberSpan.class = "notation-console-entry-number-span";
+  entryNumberSpan.appendChild(entryNumber);
+  noteConsole.appendChild(lineBreak);
+  noteConsole.appendChild(entryNumberSpan);
+  noteConsole.appendChild(entry);
+  noteConsole.scrollTop = noteConsole.scrollHeight;
+}
+
+function accidentalLog() {
+  let accidental_div = document.getElementById("accidental-div");
+  let entry = document.createTextNode(accidental);
+  console.log(accidental);
+  let oldContent = accidental_div.firstChild;
+  accidental_div.removeChild(oldContent);
+  accidental_div.appendChild(entry);
+}
+
+
+
+</script>
+
+
+<div class="output"></div>
+<script language="javascript">
+  var realConsoleLog = console.log;
+  console.log = function () {
+    var message = [].join.call(arguments, " ");
+    $(".output").text(message);
+    realConsoleLog.apply(console, arguments);
+  };
+  console.log("hello", "my", "name", "is", "shantharuban");
+</script>
+
+<!-- <script src="build_string.js"></script> -->
+<!-- <script src="build-pitches-array.js"></script> -->
+<script src="game_loop.js"></script>
+
+</body>
+</html>
