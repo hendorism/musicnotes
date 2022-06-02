@@ -15,7 +15,7 @@ body {
 div#note-console {
   background-color: #ddddff;
   color: #333333;
-  height: 400px;
+  height: 200px;
   width: 100%;
   font-family: monospace;
   border-radius: 6px;
@@ -192,7 +192,7 @@ function printNotes() {
       let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
       let noteName = voices[i].notes[ii].name+voices[i].notes[ii].octave;
       let yOffset = -(pitches.indexOf(noteName)-midPitchInd);
-      let y = topMargin+2*staffSpacing+yOffset*0.5*staffSpacing;
+      let y = topMargin+2*staffSpacing+yOffset*0.5*staffSpacing+stavesSpacing*system;
       let color = "#77bbee";
       drawNoteHead(x, y, color);
       xPos++;
@@ -424,7 +424,7 @@ function accidentalLog() {
 
 <!-- <script src="build_string.js"></script> -->
 <!-- <script src="build-pitches-array.js"></script> -->
-<script src="game_loop.js"></script>
+<!-- <script src="game_loop.js"></script> -->
 
 </body>
 </html>
