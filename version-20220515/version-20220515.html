@@ -74,6 +74,7 @@ div#accidental-div {
   let accidental_x_offset = 0.36*notesSpacing;
   let line_thickness = 1;
   let notesStartOffset = 1.5*notesSpacing
+  let canv1Height = 400;
   accidentalLog();
 
 let color_scheme = {
@@ -174,7 +175,7 @@ window.addEventListener('resize', resizeCanvas, false);
 
 function resizeCanvas() {
   canv1.width = 0.95*window.innerWidth;
-  canv1.height = 0.5*window.innerHeight;
+  canv1.height = canv1Height;
   consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
   drawStuff();
 }
@@ -365,6 +366,10 @@ function drawStaves() {
       ctx1.moveTo(x1,y1);
       ctx1.lineTo(x2,y2);
       ctx1.stroke();
+      if (y1 > canv1Height) {
+        canv1Height += 100;
+        resizeCanvas();
+      }
     }
   }
 }
