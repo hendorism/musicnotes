@@ -57,9 +57,10 @@ div#accidental-div {
 <script>
   let topMargin = 100;
   let staffSpacing = 10;
-  let sideMargin = 30;
+  let sideMargin = 15;
   let stavesSpacing = 100;
   let stavesQuan = 1;
+  let notesSpacing = 22;
   let canv1 = document.getElementById("canvas1");
   let ctx1 = canv1.getContext("2d");
   let noteConsole = document.getElementById("note-console");
@@ -69,6 +70,10 @@ div#accidental-div {
   let set_accidental = false;
   let key_signature = "c"
   let active_voice = 0;
+  let thick_line_thickness = 2;
+  let accidental_x_offset = 0.36*notesSpacing;
+  let line_thickness = 1;
+  let notesStartOffset = 1.5*notesSpacing
   accidentalLog();
 
 let color_scheme = {
@@ -184,18 +189,16 @@ function drawStuff() {
   drawStaves();
 }
 
-let notesSpacing = 22;
-
 function printNotes() {
   let system = 0;
   let xPos = 0
   for (i=0; i<voices.length; i++) {
     for (ii=0; ii<voices[i].notes.length; ii++) {
-      let x = sideMargin+notesSpacing*xPos;
+      let x = sideMargin+notesSpacing*xPos+notesStartOffset;
       if (x>canv1.width-sideMargin) {
         xPos = 0;
         system++;
-        x = sideMargin+notesSpacing*xPos;
+        x = sideMargin+notesSpacing*xPos+notesStartOffset;
         stavesQuan = system+1;
       }
       let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
@@ -206,14 +209,16 @@ function printNotes() {
       drawNoteHead(x, y, color);
       let note = voices[active_voice].notes[ii];
       if (note.accidental == "double-flat") {
-
+        drawDoubleFlat(x, y);
       } else if (note.accidental == "flat") {
-      	
+      	drawFlat(x,y);
       } else if (note.accidental == "natural") {
-      	
+      	drawNatural(x,y);
       } else if (note.accidental == "sharp") {
-      	
+      	drawSharp(x,y);
       } else if (note.accidental == "double-sharp") {
+        drawDoubleSharp(x,y);
+      }
       xPos++;
     }
   }
@@ -223,7 +228,7 @@ let keyMap = {
   81: "octave-down", 87: "octave-up",
   
   65: "-5", 83: "-4", 68: "-3", 70: "-2", 71: "-1", 72: "0",
-  74: "1", 75: "2", 76: "3", 186: "4", 192: "5",
+  74: "1", 75: "2", 76: "3", 186: "4", 222: "5",
 
   56: "double-flat", 57: "flat",
   48: "natural", 189: "sharp",
@@ -255,7 +260,7 @@ window.addEventListener("keydown", function(e) {
     consoleLog("accidental = " + accidental);
   } else if (keyMap[kCode] == "color-scheme") {
     colorSchemeCycle();
-  } else if ([65,83,68,70,71,72,74,75,76,186,192].indexOf(kCode) > -1) {
+  } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) {
     let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
     let noteIndex = midPitchInd+parseInt(keyMap[kCode]);
     let noteName = pitches[noteIndex];
@@ -527,6 +532,14 @@ function drawThickLine(xx1,yy1,xx2,yy2) {
   ctx1.beginPath();
   ctx1.moveTo(xx1,yy1);
   ctx1.lineTo(xx2,yy2);
+  ctx1.stroke();
+}
+
+function drawLine(x1,y1,x2,y2){
+  ctx1.lineWidth = line_thickness;
+  ctx1.beginPath();
+  ctx1.moveTo( x1, y1 );
+  ctx1.lineTo( x2, y2 );
   ctx1.stroke();
 }
 
