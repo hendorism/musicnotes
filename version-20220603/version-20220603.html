@@ -4,17 +4,312 @@
 * {
   margin: 0px;
   padding: 0px;
+  font-family: monospace;
+}
+
+#accidentals-table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+#accidentals-table td, #accidentals-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+#accidentals-table tr:nth-child(even){background-color: #f2f2f2;}
+#accidentals-table tr:hover {background-color: #ddd;}
+#accidentals-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+
+#console-div {
+  background-color: #99ccff;
+  color: #35129b;
+  border-radius: 3px;
+  padding: 4px;
+  height: 300px;
+  width: 100%;
+  font-family: monospace;
+  overflow: scroll;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px #9999bb;
+  font-size: 12px;
+}
+
+div#controls {
+  background-color: #6699bb;
+  color: #35129b;
+  border-radius: 3px;
+  padding: 4px;
+  height: 300px;
+  width: 100%;
+  font-family: monospace;
+  overflow: scroll;
+  word-wrap: break-word;
+  text-shadow: 2px 2px 4px #9999bb;
+  font-size: 12px;
 }
 </style>
 </head>
 
 <body>
+<table id="accidentals-table"></table>
 <canvas id="canv1"></canvas>
+<!-- table#accidentals-table -->
+<div id="console-div">console</div>
+<div id="controls">controls</div>
 <script>
-  const canv1 = document.getElementById("canv1");
-  const ctx1 = canv1.getContext("2d");
-  class Score
-	
+  
+const consoleDiv = document.getElementById("console-div");
+let consoleDivEntryNumber = 0;
+let accidentalDiv = document.getElementById("accidental-div");
+const canv1 = document.getElementById("canv1");
+const ctx1 = canv1.getContext("2d");
+let canv1Height = 400;
+
+
+let key_signatures = {
+  "cb": -7, "gb": -6, "db": -5, "ab": -4, "eb": -3, "bb": -2, "f": -1, "c": 0,
+  "g": 1, "d": 2, "a": 3, "e": 4, "b": 5, "f#": 6, "c#": 7
+}
+
+let alphabet = [
+  {name: "c", accidental: "natural"},
+  {name: "d", accidental: "natural"},
+  {name: "e", accidental: "natural"},
+  {name: "f", accidental: "natural"},
+  {name: "g", accidental: "natural"},
+  {name: "a", accidental: "natural"},
+  {name: "b", accidental: "natural"}
+];
+
+let octaves = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+let pitches = [
+  "c0", "d0", "e0", "f0", "g0", "a0", "b0",
+  "c1", "d1", "e1", "f1", "g1", "a1", "b1",
+  "c2", "d2", "e2", "f2", "g2", "a2", "b2",
+  "c3", "d3", "e3", "f3", "g3", "a3", "b3",
+  "c4", "d4", "e4", "f4", "g4", "a4", "b4",
+  "c5", "d5", "e5", "f5", "g5", "a5", "b5",
+  "c6", "d6", "e6", "f6", "g6", "a6", "b6",
+  "c7", "d7", "e7", "f7", "g7", "a7", "b7",
+  "c8", "d8", "e8", "f8", "g8", "a8", "b8",
+  "c9", "d9", "e9", "f9", "g9", "a9", "b9"
+];
+
+let flatten = ["81", "87", "69", "82", "84", "89", "85", "73", "79", "80", "219"];
+//              q     w     e     r     t     y     u     i     o     p     [
+let sharpen = ["49", "50", "51", "52", "53", "54", "55", "56", "57", "48", "189"];
+//              1     2     3     4     5     6     7     8     9     0     -
+
+class System {
+  constructor(instruments) {
+    this.instruments = instruments; // array of inst's if multiple
+    this.subGroupings = subGroupings; // array of arrays of inst's which are already belonging to this system
+  }
+}
+class Instrument {
+  constructor(staves, transposingKey) {
+    this.staves = staves; // array of staves if multiple
+    this.transposingKey = transposingKey; // +/- semitones
+    this.range = range; // if outside range, notes appear different color
+  }
+}
+class InstrumentsSubgrouping {
+  constructor(instruments, bracket) {
+    this.instruments = instruments;
+    this.bracket = bracket; // what style bracket encloses subgrouping
+  }
+}
+class Staff {
+  constructor(system, index, measures, clef) {
+    this.system = system; // index of system it belongs to
+    this.index = index; // index of staff within it's system
+    this.measures = measures; // array of or range of measures belonging to system
+    this.clef = clef; // inherited from instrument
+  }
+}
+class Measure {
+  constructor(number, timeSignature, keySignature) {
+    this.number = number;
+    this.timeSignature = timeSignature;
+    this.keySignature = keySignature;
+  }
+}
+class TimeSignature {
+  constructor(numerator, denominator) {
+    this.numerator = numerator;
+    this.denominator = denominator;
+  }
+}
+class Voice {
+  constructor() {
+    this.name = 1;
+    this.clef = clef;
+    this.key = key_signature;
+    this.notes = [];
+    this.staff = staff;
+  }
+}
+class Key {
+  constructor(fifths) {
+    this.fifths = fifths;
+  }
+}
+class Clef {
+  constructor(name, midPitch) {
+    this.name = name;
+    this.midPitch = midPitch
+    this.midPitchInd = midPitchInd; // (pitches.indexOf("whatever pitch is the middle line of the staff when reading this clef"))
+  }
+}
+class MusicNote {
+  constructor(name, octave, accidental, displayAccidental, instrument, measure, beat, duration, selected) {
+    this.name = name;
+    this.octave = octave;
+    this.accidental = accidental;
+    this.displayAccidental = displayAccidental;
+    this.instrument = instrument;
+    this.measure = measure;
+    this.beat = beat;
+    this.duration = duration;
+    this.selected = false;
+  }
+}
+
+
+window.addEventListener('resize', resizeCanvas, false);
+
+function resizeCanvas() {
+  canv1.width = window.innerWidth;
+  canv1.height = canv1Height;
+  consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
+  drawStuff();
+}
+
+resizeCanvas();
+
+function drawStuff() {
+  ctx1.fillStyle = '#223277';
+  ctx1.fillRect(0,0,canv1.width, canv1.height);
+  ctx1.strokeStyle = '#00ffb5';
+  ctx1.strokeRect(0, 0, canv1.width, canv1.height);
+  ctx1.strokeRect(10, 10, canv1.width-20, canv1.height-20);
+  printMusic();
+}
+
+function printMusic() {
+
+}
+
+window.addEventListener("keydown", function(e) {
+  let kCode = e.keyCode;
+  let kIntent = keyMap[kCode];
+  consoleLog("("+e.keyCode+", "+e.key+")");
+  let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
+  let noteIndex;
+  let noteName;
+  if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
+    e.preventDefault();
+  }
+  if (kCode == 37) { // left
+  } else if (kCode == 38) { // up
+  } else if (kCode == 39) { // right
+  } else if (kCode == 40) { // down
+  } else if (accidentals.includes(kIntent)) {
+    accidental = kIntent;
+    consoleLog("accidental = " + accidental);
+  } else if (keyMap[kCode] == "color-scheme") {
+    colorSchemeCycle();
+  } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) { // asdf
+    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    noteName = pitches[noteIndex];
+    consoleLog("noteName: " + noteName+", midPitchInd = " + midPitchInd+", noteIndex="+noteIndex);
+    makeNote(noteName, accidental, midPitchInd, noteIndex);
+  } else if (flatten.includes(kCode)) {
+    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    noteName = pitches[noteIndex];
+  } else if (sharpen.includes(kCode)) {
+    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    noteName = pitches[noteIndex];
+  } else if (kCode == 219 || kCode == 221) { // "[" and "]"
+    accidentalNudge(kCode);
+  } else if (kCode == 8) { // backspace/delete
+    deleteLastNote();
+  }
+}, false);
+
+function consoleLog(consoleEntry) {
+  consoleDivEntryNumber ++;
+  let lineBreak = document.createElement("BR");
+  let entryNumberSpan = document.createElement("SPAN");
+  let entryNumber = document.createTextNode(consoleDivEntryNumber + ": ");
+  let entry = document.createTextNode(consoleEntry);
+  entryNumberSpan.class = "notation-console-entry-number-span";
+  entryNumberSpan.appendChild(entryNumber);
+  consoleDiv.appendChild(lineBreak);
+  consoleDiv.appendChild(entryNumberSpan);
+  consoleDiv.appendChild(entry);
+  consoleDiv.scrollTop = consoleDiv.scrollHeight;
+}
+
+function accidentalLog() {
+  let table = document.createElement("table");
+  let tr = document.createElement("tr");
+  table.appendChild(tr);
+  table.appendChild(tr); 
+  for (i=0; i<alphabet.length; i++) {
+    let td = document.createElement("td");
+    let entry = document.createTextNode(accidental);
+    let oldContent = td.firstChild;
+    accidentalDiv.removeChild(oldContent);
+    accidentalDiv.appendChild(entry);
+  }
+}
+
+function populateAccidentalsTable() {
+  let table = document.getElementById("accidentals-table");
+  let tr1 = document.createElement("tr");
+  let tr2 = document.createElement("tr");
+  let trs = [tr1, tr2];
+  for (i=0; i<alphabet.length; i++) {
+    let td = document.createElement("td");
+    let node = document.createTextNode(alphabet[i].name);
+    td.appendChild(node);
+    tr1.appendChild(td);
+  }
+  for (i=0; i<alphabet.length; i++) {
+    let td = document.createElement("td");
+    let node = document.createTextNode(alphabet[i].accidental);
+    td.append(node);
+    tr2.appendChild(td);
+  }
+  for (i=0; i<trs.length; i++) {
+    table.appendChild(trs[i]);
+  }
+}
+populateAccidentalsTable();
+
+function gameLoop() {
+  setInterval(gameUpdate, 33);
+}
+function gameUpdate() {}
+function stopGame() {}
+
+// let keyMap = {
+
+// }
+
+// let builderString = "[";
+// window.addEventListener("keydown", function(e) {
+//   let kCode = e.keyCode;
+//   builderString += kCode + ': "' + ;
+//   consoleLog(builderString);
+// });
 	
 </script>
 
