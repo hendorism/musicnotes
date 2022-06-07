@@ -5,6 +5,7 @@
   margin: 0px;
   padding: 0px;
   font-family: monospace;
+  box-sizing: border-box;
 }
 
 #accidentals-table {
@@ -24,6 +25,31 @@
   text-align: left;
   background-color: #04AA6D;
   color: white;
+}
+#controls-table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+#controls-table td, #controls-table th {
+  border: 1px solid #ddd;
+  padding: 0px;
+}
+#controls-table tr:nth-child(even){background-color: #f2f2f2;}
+#controls-table tr:hover {background-color: #ddd;}
+#controls-table th {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+.controls-button {
+  background-color: #bbb;
+  display: block;
+  margin: 0px 0px;
+  padding: 0px;
+  width: 100%;
 }
 
 #console-div {
@@ -61,9 +87,19 @@ div#controls {
 <canvas id="canv1"></canvas>
 <!-- table#accidentals-table -->
 <div id="console-div">console</div>
-<div id="controls">controls</div>
+<div id="controls">controls
+<table id="controls-table"></table>
+</div>
 <script>
-  
+let scale = 0.01*window.innerWidth;
+let lineThickness = 0.1*scale;
+let thickLineThickness = 3*lineThickness;
+let staffSpacing = 10*lineThickness;
+let sideMargin = 20*lineThickness;
+let topMargin = 100*lineThickness;
+let systemVertMargin;
+let systemSpacing;
+
 const consoleDiv = document.getElementById("console-div");
 let consoleDivEntryNumber = 0;
 let accidentalDiv = document.getElementById("accidental-div");
@@ -71,11 +107,23 @@ const canv1 = document.getElementById("canv1");
 const ctx1 = canv1.getContext("2d");
 let canv1Height = 400;
 
-
-let key_signatures = {
-  "cb": -7, "gb": -6, "db": -5, "ab": -4, "eb": -3, "bb": -2, "f": -1, "c": 0,
-  "g": 1, "d": 2, "a": 3, "e": 4, "b": 5, "f#": 6, "c#": 7
-}
+let key_signatures = [
+   {name: "Cb", sharps: "-7"},
+   {name: "Gb", sharps: "-6"},
+   {name: "Db", sharps: "-5"},
+   {name: "Ab", sharps: "-4"},
+   {name: "Eb", sharps: "-3"},
+   {name: "Bb", sharps: "-2"},
+   {name: "F", sharps: "-1"},
+   {name: "C", sharps: "0"},
+   {name: "G", sharps: "1"},
+   {name: "D", sharps: "2"},
+   {name: "A", sharps: "3"},
+   {name: "E", sharps: "4"},
+   {name: "B", sharps: "5"},
+   {name: "F#", sharps: "6"},
+   {name: "C#", sharps: "7"}
+]
 
 let alphabet = [
   {name: "c", accidental: "natural"},
@@ -105,7 +153,17 @@ let flatten = ["81", "87", "69", "82", "84", "89", "85", "73", "79", "80", "219"
 //              q     w     e     r     t     y     u     i     o     p     [
 let sharpen = ["49", "50", "51", "52", "53", "54", "55", "56", "57", "48", "189"];
 //              1     2     3     4     5     6     7     8     9     0     -
+let asdfRow = ["65", "83", "68", "70", "71", "72", "74", "75", "76", "186", "222"];
+//                _________________________
+//                |     |     |     |     |
+//             a  s  d  f  g  h  j  k  l  :   ;
+//                |     |     |     |     |
 
+class Score {
+  constructor(systems) {
+    this.systems = systems
+  }
+}
 class System {
   constructor(instruments) {
     this.instruments = instruments; // array of inst's if multiple
@@ -182,16 +240,19 @@ class MusicNote {
 }
 
 
-window.addEventListener('resize', resizeCanvas, false);
+window.addEventListener('resize', refreshCanvas, false);
+refreshCanvas();
+
+function refreshCanvas() {
+  resizeCanvas();
+  drawStuff();
+}
 
 function resizeCanvas() {
   canv1.width = window.innerWidth;
   canv1.height = canv1Height;
   consoleLog("canv1 dimensions: " + canv1.width + ", " + canv1.height + ")");
-  drawStuff();
 }
-
-resizeCanvas();
 
 function drawStuff() {
   ctx1.fillStyle = '#223277';
@@ -203,41 +264,44 @@ function drawStuff() {
 }
 
 function printMusic() {
-
+  
+  ctx1.strokeStyle = "#ffffff";
+  ctx1.lineWidth = lineThickness;
+  ctx1.beginPath();
+  ctx1.moveTo( 12, 12 );
+  ctx1.lineTo( 120, 120 );
+  ctx1.stroke();
 }
+
+//function drawSystems() {}
+//function drawStaves() {}
 
 window.addEventListener("keydown", function(e) {
   let kCode = e.keyCode;
-  let kIntent = keyMap[kCode];
   consoleLog("("+e.keyCode+", "+e.key+")");
   let midPitchInd = pitches.indexOf(voices[active_voice].clef.middle_line_pitch);
   let noteIndex;
   let noteName;
-  if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
+  if ([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
     e.preventDefault();
   }
   if (kCode == 37) { // left
   } else if (kCode == 38) { // up
   } else if (kCode == 39) { // right
   } else if (kCode == 40) { // down
-  } else if (accidentals.includes(kIntent)) {
-    accidental = kIntent;
-    consoleLog("accidental = " + accidental);
-  } else if (keyMap[kCode] == "color-scheme") {
-    colorSchemeCycle();
-  } else if ([65,83,68,70,71,72,74,75,76,186,222].indexOf(kCode) > -1) { // asdf
-    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+  } else if (asdfRow.includes(kCode)) { // asdf
+    noteIndex = midPitchInd+asdfRow.indexOf(kCode)-5;
     noteName = pitches[noteIndex];
     consoleLog("noteName: " + noteName+", midPitchInd = " + midPitchInd+", noteIndex="+noteIndex);
     makeNote(noteName, accidental, midPitchInd, noteIndex);
   } else if (flatten.includes(kCode)) {
-    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    noteIndex = midPitchInd+flatten.indexOf(kCode)-5;
     noteName = pitches[noteIndex];
+    let letter = noteName.slice(0,1);
   } else if (sharpen.includes(kCode)) {
-    noteIndex = midPitchInd+parseInt(keyMap[kCode]);
+    noteIndex = midPitchInd+sharpen.indexOf(kCode)-5;
     noteName = pitches[noteIndex];
-  } else if (kCode == 219 || kCode == 221) { // "[" and "]"
-    accidentalNudge(kCode);
+    let letter = noteName.slice(0,1);
   } else if (kCode == 8) { // backspace/delete
     deleteLastNote();
   }
@@ -294,22 +358,76 @@ function populateAccidentalsTable() {
 }
 populateAccidentalsTable();
 
-function gameLoop() {
-  setInterval(gameUpdate, 33);
+let controlsArray = [
+  [
+    {name: "add piano"},
+    {name: "add flute"},
+    {name: "add clarinet"}
+  ],
+  [
+    {name: "key of Cb"},
+    {name: "key of Gb"},
+    {name: "key of Db"},
+    {name: "key of Ab"},
+    {name: "key of Eb"},
+    {name: "key of Bb"},
+    {name: "key of F"},
+    {name: "key of C"},
+    {name: "key of G"},
+    {name: "key of D"},
+    {name: "key of A"},
+    {name: "key of E"},
+    {name: "key of B"},
+    {name: "key of F#"},
+    {name: "key of C#"}
+  ]
+];
+
+function populateControlsTable() {
+  let table = document.getElementById("controls-table");
+  let tr1 = document.createElement("tr");
+  table.appendChild(tr1);
+  for (i=0; i<controlsArray[0].length; i++) {
+    let td = document.createElement("td");
+    let button = document.createElement("button");
+    button.class = "controls-button";
+    let node = document.createTextNode(controlsArray[0][i].name);
+    button.appendChild(node);
+    td.appendChild(button);
+    tr1.appendChild(td);
+  }
+  let tr2 = document.createElement("tr");
+  table.appendChild(tr2);
+  for (i=0; i<controlsArray[1].length; i++) {
+    let td = document.createElement("td");
+    let button = document.createElement("button");
+    button.class = "controls-button";
+    let node = document.createTextNode(controlsArray[1][i].name);
+    button.appendChild(node);
+    td.appendChild(button);
+    tr2.appendChild(td)
+  }
 }
-function gameUpdate() {}
-function stopGame() {}
+populateControlsTable();
 
-// let keyMap = {
+//function gameLoop() {
+//  setInterval(gameUpdate, 33);
+//}
+//function gameUpdate() {}
+//function stopGame() {}
 
+// let builderString = "";
+// for (i=0; i<key_signatures.length; i++) {
+//   builderString += '{name: "key of ' + key_signatures[i].name + '"},';
 // }
+// consoleLog(builderString);
 
-// let builderString = "[";
 // window.addEventListener("keydown", function(e) {
-//   let kCode = e.keyCode;
-//   builderString += kCode + ': "' + ;
-//   consoleLog(builderString);
+//  let kCode = e.keyCode;
+//  builderString += kCode + ': "';
+//  consoleLog(builderString);
 // });
+
 	
 </script>
 
