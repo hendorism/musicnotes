@@ -45,7 +45,7 @@
   color: white;
 }
 .controls-button {
-  background-color: #bbb;
+  background-color: #39b;
   display: block;
   margin: 0px 0px;
   padding: 0px;
@@ -98,7 +98,7 @@ let staffSpacing = 10*lineThickness;
 let sideMargin = 20*lineThickness;
 let topMargin = 100*lineThickness;
 let systemVertMargin;
-let systemSpacing;
+let systemSpacing; // space between highest and lowest element
 
 const consoleDiv = document.getElementById("console-div");
 let consoleDivEntryNumber = 0;
@@ -107,7 +107,7 @@ const canv1 = document.getElementById("canv1");
 const ctx1 = canv1.getContext("2d");
 let canv1Height = 400;
 
-let key_signatures = [
+let keySignatures = [
    {name: "Cb", sharps: "-7"},
    {name: "Gb", sharps: "-6"},
    {name: "Db", sharps: "-5"},
@@ -124,6 +124,7 @@ let key_signatures = [
    {name: "F#", sharps: "6"},
    {name: "C#", sharps: "7"}
 ]
+let keySignature = keySignatures[7];
 
 let alphabet = [
   {name: "c", accidental: "natural"},
@@ -239,7 +240,6 @@ class MusicNote {
   }
 }
 
-
 window.addEventListener('resize', refreshCanvas, false);
 refreshCanvas();
 
@@ -304,6 +304,8 @@ window.addEventListener("keydown", function(e) {
     let letter = noteName.slice(0,1);
   } else if (kCode == 8) { // backspace/delete
     deleteLastNote();
+  } else if ([90, 88].includes(kCode)) { // ["more flats/fewer sharps", "more sharps/fewer flats"];
+    keySigNudge(kCode);
   }
 }, false);
 
@@ -360,9 +362,9 @@ populateAccidentalsTable();
 
 let controlsArray = [
   [
-    {name: "add piano"},
-    {name: "add flute"},
-    {name: "add clarinet"}
+    {name: "add piano", onClick: "addInstrument('piano')"},
+    {name: "add flute", onClick: "addInstrument('flute')"},
+    {name: "add clarinet", onClick: "addInstrument('clarinet')"}
   ],
   [
     {name: "key of Cb"},
@@ -390,22 +392,23 @@ function populateControlsTable() {
   for (i=0; i<controlsArray[0].length; i++) {
     let td = document.createElement("td");
     let button = document.createElement("button");
-    button.class = "controls-button";
+    button.onclick = controlsArray[0][i].onClick;
     let node = document.createTextNode(controlsArray[0][i].name);
     button.appendChild(node);
     td.appendChild(button);
     tr1.appendChild(td);
+    button.classList.add = "controls-button";
   }
   let tr2 = document.createElement("tr");
   table.appendChild(tr2);
   for (i=0; i<controlsArray[1].length; i++) {
     let td = document.createElement("td");
     let button = document.createElement("button");
-    button.class = "controls-button";
     let node = document.createTextNode(controlsArray[1][i].name);
     button.appendChild(node);
     td.appendChild(button);
     tr2.appendChild(td)
+    button.classList.add = "controls-button";
   }
 }
 populateControlsTable();
@@ -417,8 +420,8 @@ populateControlsTable();
 //function stopGame() {}
 
 // let builderString = "";
-// for (i=0; i<key_signatures.length; i++) {
-//   builderString += '{name: "key of ' + key_signatures[i].name + '"},';
+// for (i=0; i<keySignatures.length; i++) {
+//   builderString += '{name: "key of ' + keySignatures[i].name + '"},';
 // }
 // consoleLog(builderString);
 
@@ -428,6 +431,26 @@ populateControlsTable();
 //  consoleLog(builderString);
 // });
 
+
+function keySigNudge(kCode) {
+  let ksIndex = keySignatures.indexOf(keySignature);
+  if (kCode == 90) {        // z (more flats/fewer sharps)
+    if (ksIndex <= 0) {
+      ksIndex = keySignatures.length-1;
+      keySignature = keySignatures[ksIndex];
+    } else {
+      keySignature = keySignatures[ksIndex-1];
+    }
+  } else if (kCode == 88) { // x (more sharps/less fewer flats)
+    if (ksIndex >= keySignatures.length-1) {
+      ksIndex = 0;
+      keySignature = keySignatures[ksIndex];
+    } else {
+      keySignature = keySignatures[ksIndex+1];
+    }
+  }
+  consoleLog("key signature = " + keySignature.name);
+}
 	
 </script>
 
