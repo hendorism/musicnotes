@@ -1,15 +1,78 @@
 <html>
 <head>
+	<style>
+		* {
+			padding: 0px;
+			margin: 0px;
+		}
+	</style>
 
 </head>
 <body>
 
 <canvas id="canvas1"></canvas>
-
+<a href="../index.html">BACK TO MENU</a>
 
 <script>
+let canv1 = document.getElementById("canvas1");
+let screen = {
+	contents: [],
+	background_color: "#336699",
+	noteConsole: {
+		height: 200,
+		width: window.innerWidth,
+		x: 0,
+		y: 10,
+		background_color: "#ddeeff",
+		font_color: "#223344",
+		contents: ["this", "is", "a", "test"],
+		draw: function() {
+			ctx1.fillStyle = screen.noteConsole.background_color;
+			let x1 = 0;
+			let y1 = window.innerHeight-screen.noteConsole.height;
+			let x2 = window.innerWidth;
+			let y2 = window.innerHeight-y1;
+			ctx1.fillRect(x1, y1, x2, y2);
+			for (i=0; i<screen.noteConsole.contents.length; i++) {
+				ctx1.font = "16px monospace";
+				ctx1.fillStyle = "#334488";
+				let line = (i+1) + ": " + screen.noteConsole.contents[i];
+				ctx1.fillText(line, x1+10, y1+18*(i+1));
+			}
+		},
+		log: function(entry) {
+			console.log("noteConsole.log: " + entry);
+		}
+	},
+	refresh: function() {
+		canv1.width = window.innerWidth;
+		canv1.height = window.innerHeight;
+		console.log("canv1 dimensions: " + canv1.width + ", " + canv1.height);
+		ctx1.fillStyle = screen.background_color;
+		ctx1.fillRect(0,0,canv1.width,canv1.height);
+		screen.noteConsole.draw();
+	}
+}
 
+let ctx1 = canv1.getContext("2d");
 
+window.addEventListener('resize', screen.refresh(), false);
+
+window.addEventListener("keydown", function(e) {
+	let kCode = e.keyCode;
+  let kIntent = keyMap[kCode];
+  consoleLog("("+e.keyCode+", "+e.key+")");
+  console.log("("+e.keyCode+", "+e.key+")");
+  if([32, 37, 38, 39, 40].indexOf(kCode) > -1) {
+		e.preventDefault();
+  }
+}, false);
+
+addEventListener('click', (event) => {
+	console.log("click: " + event.clientX + ", " + event.clientY);
+});
+
+screen.noteConsole.log("hello");
 
 </script>
 </body>
