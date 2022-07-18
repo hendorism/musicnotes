@@ -1,0 +1,119 @@
+<html>
+<head>
+<style>
+	* {
+		padding: 0;
+		margin: 0;
+	}
+	body {
+		overflow: hidden;
+	}
+</style>
+</head>
+<body>
+
+<canvas id="canvas1"></canvas>
+
+
+<script>
+let canvas1 = document.getElementById("canvas1");
+let ctx1 = canvas1.getContext("2d");
+
+let accidentals = {
+	a: "natural",
+	b: "natural",
+	c: "natural",
+	d: "natural",
+	e: "natural",
+	f: "natural",
+	g: "natural"
+}
+
+window.addEventListener('resize', resizeCanvas, false);
+
+function resizeCanvas() {
+  canvas1.width = window.innerWidth;
+  canvas1.height = window.innerHeight;
+  drawStuff();
+}
+
+resizeCanvas();
+
+function drawStuff() {
+	ctx1.fillStyle = "#333344";
+	ctx1.fillRect(0,0,canvas1.width,canvas1.height);
+
+  ctx1.strokeStyle = '#00ffb5';
+  ctx1.strokeRect(0, 0, canvas1.width, canvas1.height);
+
+	ctx1.fillStyle = "#88bbcc";
+	ctx1.font = "30px Arial";
+	ctx1.fillText("MusicNotes v-20220718", 20, 40);
+}
+
+class inputHandler {
+	constructor() {
+		window.addEventListener("keydown", e => {
+			console.log(e.key);
+			if (e.key === 'ArrowUp'){
+				this.game.keys.push(e.key);
+			}
+			console.log(this.game.keys);
+		});
+	}
+}
+
+class Button {
+	constructor(x, y, w, h, name, func) {
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+		this.name = name;
+		this.func = func;
+	}
+	draw(ctx) {
+		ctx.fillStyle = "#ffbbff";
+		ctx.fillRect(this.x, this.y, this.w, this.h);
+	}
+}
+
+class Game {
+	constructor(width, height) {
+		this.width = width;
+		this.height = height;
+		this.player = new Player(this);
+		this.input = new inputHandler(this);
+		this.keys = [];
+	}
+	update() {
+		this.player.update();
+	}
+	draw(ctx) {
+		this.player.draw(ctx);
+	}
+}
+
+let button = new Button(300, 300, 100, 100, "test button", console.log(this.name));
+button.draw(ctx1);
+
+class Note {
+	constructor(name, octave, accidental) {
+		this.name = name;
+		this.octave = octave;
+		this.accidental = accidental;
+	}
+}
+
+class Measure {
+	constructor(notes, timeSig, keySig) {
+		this.notes = notes;
+		this.timeSig = timeSig;
+		this.keySig = keySig;
+	}
+}
+
+</script>
+</body>
+</html>
+
