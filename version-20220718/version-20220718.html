@@ -12,7 +12,8 @@
 </head>
 <body>
 
-<canvas id="canvas1"></canvas>
+	<a href="../index.html">home</a>
+	<canvas id="canvas1"></canvas>
 
 
 <script>
@@ -75,6 +76,9 @@ class Button {
 	draw(ctx) {
 		ctx.fillStyle = "#ffbbff";
 		ctx.fillRect(this.x, this.y, this.w, this.h);
+	}
+	action() {
+		alert("hey!!!!!");
 	}
 }
 
