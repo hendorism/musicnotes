@@ -80,5 +80,13 @@ function drawStuff() {
     bassClef.draw();
     let trebleClef = new TrebleClef(22, 40);
     trebleClef.draw();
+    let bassClef2 = new BassClef(130, 20);
+    bassClef2.draw();
+
     
+    let sharp = new Sharp(200, 10);
+    sharp.draw();
+    let flat = new Flat(200, 30);
+    flat.draw();
 }
+

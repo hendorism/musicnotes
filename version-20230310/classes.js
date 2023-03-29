@@ -110,3 +110,93 @@ class TrebleClef {
         // }
     }
 }
+
+class Sharp {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    draw() {
+        let sharpHeight = 10;
+        let vertOffset = 0.7;
+        let sharpWidth = 7;
+        let horizOffset = 1;
+        let sharpInnerWidth = 2.5;
+        let sharpInnerHeight = 3;
+        let vertLineWidth = 0.7;
+        let horizLineWidth = 1.7;
+        //left vertical line
+        let x1 = this.x - sharpInnerWidth/2;
+        let y1 = this.y - sharpHeight/2 + vertOffset;
+        let x2 = this.x - sharpInnerWidth/2;
+        let y2 = this.y + sharpHeight/2 + vertOffset;
+        //right vertical line
+        let x3 = this.x + sharpInnerWidth/2;
+        let y3 = this.y - sharpHeight/2 - vertOffset;
+        let x4 = this.x + sharpInnerWidth/2;
+        let y4 = this.y + sharpHeight/2 - vertOffset;
+        //top horizontal line
+        let x5 = this.x - sharpWidth/2;
+        let y5 = this.y - sharpInnerHeight/2 + horizOffset;
+        let x6 = this.x + sharpWidth/2;
+        let y6 = this.y - sharpInnerHeight/2 - horizOffset;
+        //bottom horizontal line
+        let x7 = this.x - sharpWidth/2;
+        let y7 = this.y + sharpInnerHeight/2 + horizOffset;
+        let x8 = this.x + sharpWidth/2;
+        let y8 = this.y + sharpInnerHeight/2 - horizOffset;
+
+        ctx1.fillStyle = "#333333";
+        ctx1.strokeStyle = "#333333";
+        ctx1.lineWidth = vertLineWidth;
+        ctx1.beginPath();
+        ctx1.moveTo(x1, y1);
+        ctx1.lineTo(x2, y2);
+        ctx1.stroke();
+        ctx1.beginPath();
+        ctx1.moveTo(x3, y3);
+        ctx1.lineTo(x4, y4);
+        ctx1.stroke();
+        ctx1.lineWidth = horizLineWidth;
+        ctx1.beginPath();
+        ctx1.moveTo(x5, y5);
+        ctx1.lineTo(x6, y6);
+        ctx1.stroke();
+        ctx1.beginPath();
+        ctx1.moveTo(x7, y7);
+        ctx1.lineTo(x8, y8);
+        ctx1.stroke();
+    }
+}
+
+class Flat {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    draw() {
+        ctx1.strokeStyle = "#333333";
+        ctx1.fillStyle = "#333333";
+        ctx1.lineWidth = 1;
+        //top
+        let x1 = this.x - 2;
+        let y1 = this.y - 7;
+        //bottom
+        let x2 = this.x - 2;
+        let y2 = this.y + 4;
+        //two bezier control points
+        let x3 = this.x + 3;
+        let y3 = this.y - 2;
+        let x4 = this.x + 3;
+        let y4 = this.y - 4;
+        //rejoin initial vertical line
+        let x5 = x1;
+        let y5 = this.y - 2;
+
+        ctx1.beginPath();
+        ctx1.moveTo(x1, y1);
+        ctx1.lineTo(x2, y2);
+        ctx1.bezierCurveTo(x3, y3, x4, y4, x5, y5);
+        ctx1.stroke();
+    }
+}
