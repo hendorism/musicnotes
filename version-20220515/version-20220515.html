@@ -61,11 +61,11 @@ a {
 
 <script>
   let topMargin = 100;
-  let staffSpacing = 10;
+  let staffSpacing = 20;
   let sideMargin = 15;
-  let stavesSpacing = 100;
+  let stavesSpacing = 10 * staffSpacing;
   let stavesQuan = 1;
-  let notesSpacing = 22;
+  let notesSpacing = 2.2 * staffSpacing;
   let canv1 = document.getElementById("canvas1");
   let ctx1 = canv1.getContext("2d");
   let noteConsole = document.getElementById("note-console");
@@ -399,8 +399,8 @@ function drawStaves() {
 }
 
 function drawTrebleClef(x, y) {
-  ctx1.fillStyle = ink;
-  ctx1.strokeStyle = ink;
+  ctx1.fillStyle = color_scheme.ink;
+  ctx1.strokeStyle = color_scheme.ink;
   let x1 = x-5;
   let y1 = y+2*staffSpacing;
   let x2 = x+3;
@@ -463,7 +463,6 @@ function consoleLog(consoleEntry) {
 function accidentalLog() {
   let accidental_div = document.getElementById("accidental-div");
   let entry = document.createTextNode(accidental);
-  console.log(accidental);
   let oldContent = accidental_div.firstChild;
   accidental_div.removeChild(oldContent);
   accidental_div.appendChild(entry);
