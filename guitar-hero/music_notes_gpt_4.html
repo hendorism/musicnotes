@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Notation Game</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
         canvas {
             border: 1px solid #000;
+        }
+        body {
+            overflow: hidden;
         }
         </style>
 </head>
@@ -18,16 +25,27 @@
 const canvas = document.getElementById('musicCanvas');
 const ctx = canvas.getContext('2d');
 
+// set canvas width and height
+function setCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.onload = setCanvasSize();
+window.addEventListener('resize', setCanvasSize);
+
 // set a bunch of constants
-const staffLineSpacing = 40;
+const staffLineSpacing = canvas.height / 40;
 const staffLineCount = 5;
 const noteSpeed = 1;
-const playheadX = canvas.width / 6;
+const playheadX = 5 * staffLineSpacing;
 const playheadWidth = staffLineSpacing;
 const noteDiameter = staffLineSpacing;
 const topMargin = canvas.height / 2 - (staffLineSpacing * (staffLineCount - 1)) / 2;
 const notesInPlay = [];
+let keysDown = [];
 let score = 0;
+let notesSounding = [];
+let frame = 0;
 
 const notes = {
   'C0': { position: -28 },
@@ -92,6 +110,20 @@ const notes = {
   'F8': { position: 31 },
 };
 
+const keyboardMap = {
+    'a': 'd4',
+    's': 'e4',
+    'd': 'f4',
+    'f': 'g4',
+    'g': 'a4',
+    'h': 'b4',
+    'j': 'c5',
+    'k': 'd5',
+    'l': 'e5',
+    ';': 'f5',
+    '\'': 'g5',
+}
+
 const noteNames = Object.keys(notes);
 // console.log(`noteNames = ${noteNames}`);
 
@@ -143,6 +175,22 @@ let clefs = {
     }
 }
 
+// classes
+
+function Note(pitch, position) {
+    this.pitch = pitch;
+    this.x = canvas.width
+    this.y = calculateY(position);
+}
+
+function Staff(clef, y) {
+    this.clef = clef;
+    this.y = y;
+    this.position = clefs[clef].position;
+}
+
+// functions
+
 function showControlPoints(coords) {
     //show control points for a series of bezier curves
     coords.forEach(coord => {
@@ -167,20 +215,15 @@ function drawStaff() {
     for (let i = 0; i < staffLineCount; i++) {
         const y = topMargin + i * staffLineSpacing;
         ctx.beginPath();
-        ctx.moveTo(50, y);
-        ctx.lineTo(canvas.width - 50, y);
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
         ctx.stroke();
     }
     
     // Draw treble clef sign
-    clefs.treble.draw(50, topMargin);
-}
-
-function drawPlayerScore() {
-    // Draw score
-    ctx.font = '10px Arial';
-    ctx.fillStyle = 'black';
-    ctx.fillText(`Score: ${score} - Time: ${Math.floor(performance.now()/1000)}`, 10, 30);
+    let clefX = 1 * staffLineSpacing;
+    let clefY = topMargin;
+    clefs.treble.draw(clefX, clefY);
 }
 
 function drawPlayhead() {
@@ -194,6 +237,16 @@ function drawPlayhead() {
     ctx.lineTo(playheadX + noteDiameter, canvas.height);
     ctx.stroke();
 }
+
+function removeNotes() {
+    for (let i = 0; i < notesInPlay.length; i++) {
+        if (notesInPlay[i].x < playheadX + noteDiameter / 2) {
+            notesInPlay.splice(i, 1);
+            score -= 100;
+        }
+    }
+}
+
 function drawNotesInPlay() {
     // Draw notes in play
     notesInPlay.forEach(note => {
@@ -202,52 +255,56 @@ function drawNotesInPlay() {
         ctx.arc(note.x, note.y, noteDiameter/2, 0, Math.PI * 2);
         ctx.fillStyle = 'black';
         ctx.fill();
-        ctx.font = '50px Arial';
-        ctx.fillText(`${note.pitch}`, note.x +30, note.y+staffLineSpacing/2);
+        ctx.stroke();
+        ctx.fillStyle = '#bb3377';
+        ctx.font = `${staffLineSpacing * 1.2}px Arial`;
+        let textX = note.x + staffLineSpacing + Math.sin(frame/20) * staffLineSpacing * 0.3;
+        let textY = note.y + staffLineSpacing * 0.4 + Math.cos(frame/20) * staffLineSpacing * 0.3;
+        ctx.fillText(`${note.pitch}`, textX, textY);
         
     });
 }
 
-// game loop // game loop // game loop // game loop 
-// game loop // game loop // game loop // game loop 
+function showNotesSounding() {
+    for (i=0; i<notesSounding.length; i++) {
+        //draw a note head
+        let x = playheadX - noteDiameter/2;
+        //let y = topMargin - notes[keysDown[i]].position * (staffLineSpacing/2) + 5*staffLineSpacing;
+        let y = 100 + i*50;
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#3377bb';
+        ctx.fill();
+        ctx.fillText(`${notesSounding[i]}`, x+20, y);
+    }
+}
 
-function gameLoop() {
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    drawStaff();
-    
-    drawPlayhead();
-    
-    for (let i = 0; i < notesInPlay.length; i++) {
-        if (notesInPlay[i].x < playheadX + noteDiameter / 2) {
-            notesInPlay.splice(i, 1);
-            score -= 100;
+function drawInfo() {
+    // Draw score
+    ctx.font = `10px Arial`;
+    ctx.fillStyle = 'black';
+    let info = {
+        score: score,
+        time: Math.floor(performance.now()/1000),
+        notesSounding: notesSounding,
+        frame: frame,
+        fps: Math.floor(frame/(performance.now()/1000))
+    };
+    let x = playheadX + playheadWidth + staffLineSpacing;
+    for (i = 0; i < Object.keys(info).length; i++) {
+        let key = Object.keys(info)[i];
+        let value = info[key];
+        if (value instanceof Array) {
+            value = "";
+            for (j = 0; j < info[key].length; j++) {
+                value += `${info[key][j]}, `;
+            }
+            ctx.fillText(`${key}: ${value}`, x, 30 + i * 10);
+        } else {
+            ctx.fillText(`${key}: ${value}`, x, 30 + i * 10);
         }
     }
-    
-    
-    drawNotesInPlay();
-
-    drawPlayerScore();
-    
-    requestAnimationFrame(gameLoop);
 }
-
-// classes
-
-function Note(pitch, position) {
-    this.pitch = pitch;
-    this.x = canvas.width
-    this.y = calculateY(position);
-}
-
-function Staff(clef, y) {
-    this.clef = clef;
-    this.y = y;
-    this.position = clefs[clef].position;
-}
-
 
 function calculateY(position) {
     return topMargin - position * (staffLineSpacing/2) + 5*staffLineSpacing;
@@ -263,74 +320,49 @@ function spawnNote() {
     // notesInPlay.push({ x: canvas.width, y: randomPosition, pitch: randomNote.pitch });
 }
 
-let keysDown = [];
-
-
-    // ...
-
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
-
-    function handleKeyDown(event) {
-        keysDown.push(event.key);
-        drawNotesForKey(event.key);
-        console.log(event.key)
-    }
-
-    function handleKeyUp(event) {
-        const index = keysDown.indexOf(event.key);
-        if (index > -1) {
-            keysDown.splice(index, 1);
-        }
-    }
-
-    function drawNotesForKey(key) {
-        const noteMap = {
-            'a': 'd4',
-            's': 'e4',
-            'd': 'f4',
-            'f': 'g4',
-            'g': 'a4',
-            'h': 'b4',
-            'j': 'c5',
-            'k': 'd5',
-            'l': 'e5',
-            ';': 'f5',
-            "'": 'g5'
-        };
-
-        if (noteMap.hasOwnProperty(key)) {
-            const note = noteMap[key];
-            const x = playheadX + noteDiameter / 2;
-            const y = calculateY(notes[note].position);
-
-            ctx.beginPath();
-            ctx.arc(x, y, noteDiameter / 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'black';
-            ctx.fill();
-            ctx.font = '50px Arial';
-            ctx.fillText(`${note}`, x + 30, y + staffLineSpacing / 2);
-        }
-    }
-
-    // ...
-
-
-
-function showKeysDown() {
-    for (i=0; i<keysDown.length; i++) {
-        //draw a note head
-        let x = 100;
-        let y = 100+i*20;
-        ctx.beginPath();    
-        ctx.arc(x, y, 10, 0, Math.PI * 2);
-        ctx.fillStyle = 'black';
-        ctx.fill();
+function handleKeyDown(event) {
+    if (keysDown.indexOf(event.key) === -1) {
+        let pitch = keyboardMap[event.key];
+        notesSounding.push(notes[pitch]);
     }
 }
 
+function handleKeyUp(event) {
+    const index = notesSounding.indexOf(keyboardMap[event.key]);
+    if (index > -1) {
+        notesSounding.splice(index, 1);
+    }
+}
+
+// game loop // game loop // game loop // game loop 
+// game loop // game loop // game loop // game loop 
+
+function gameLoop() {
+    
+    ctx.fillStyle = '#ddeeff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    drawStaff();
+    
+    drawPlayhead();
+    
+    removeNotes();
+    
+    drawNotesInPlay();
+
+    showNotesSounding();
+    
+    drawInfo();
+
+    requestAnimationFrame(gameLoop);
+
+    frame++;
+
+}
+
+document.addEventListener('keydown', handleKeyDown);
+document.addEventListener('keyup', handleKeyUp);
 setInterval(spawnNote, 1000);
-        
 gameLoop(); // Start the game loop
 
 
