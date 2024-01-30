@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+        // Prevent default behavior of all keys
+        document.addEventListener("keydown", function(event) {
+            event.preventDefault();
+        });
+
+        // Get the canvas element and set its size to fill the screen
+        const canvas = document.getElementById("myCanvas");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // on window resize, update the canvas size
+        window.addEventListener("resize", function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Get the canvas context and set the line width
+        const ctx = canvas.getContext("2d");
+        ctx.lineWidth = 1;
+        let frame =0
+        let x
+        let y
+
+        // make an es6 class for a staff
+        // a staff has a y position and a draw method
+        class Staff {
+            constructor(y1, y2) {
+                this.y1 = y1;
+                this.y2 = y2;
+            }
+            draw() {
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, this.y1 + i * 10);
+                    ctx.lineTo(canvas.width, this.y2 + i * 10);
+                    ctx.stroke();
+                }
+            }
+            //
+            update() {
+                this.y1 = Math.sin(frame / 50) * 50 + canvas.height / 2;
+                this.y2 = Math.sin((frame+(frame/10)) / 50) * 50 + canvas.height / 2;
+            }
+        }
+
+        // make a class for notes
+        // a note has an x and y position and a draw method
+        class Note {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            update() {
+                this.x = Math.sin(frame / 50) * 50 + canvas.width / 2;
+                this.y += 0.1
+            }
+        }
+
+        let note = new Note(100, 100);
+        note.draw();
+
+        let staff = new Staff(100, 100);
+        staff.draw();
+
+let objectsInPlay = []
+
+objectsInPlay.push(new Staff(100, 100))
+objectsInPlay.push(new Note(200, 200))
+objectsInPlay.push(new Note(300, 300))
+
+        function updateStuff() {
+            // Your JavaScript code for updating the game state goes here
+               // draw the staff
+            for (let i = 0; i < objectsInPlay.length; i++) {
+                objectsInPlay[i].update()
+            }
+        }
+
+        function drawStuff() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+               // draw the frame number in the top left corner
+               ctx.font = "30px Arial";
+            ctx.fillText(frame, 10, 50);
+
+         
+            for (let i = 0; i < objectsInPlay.length; i++) {
+                objectsInPlay[i].draw()
+            }   
+           
+        }
+
+        // make a game loop that runs 60 times per second
+        setInterval(function() {
+            // clear the canvas
+            updateStuff();
+            drawStuff()
+         
+            frame++;
+        }, 1000 / 60);
+
+        // Your JavaScript code for drawing on the canvas goes here
+
+    </script>
+</body>
+</html>
