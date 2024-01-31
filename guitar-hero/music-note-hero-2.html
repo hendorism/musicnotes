@@ -54,6 +54,22 @@ let octaves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 //     8: 28
 // };
 
+// class Score {
+//     constructor() {
+//         this.staves = [];
+//     }
+//     update() {
+//         for (let i = 0; i < this.staves.length; i++) {
+//             this.staves[i].update();
+//         }
+//     }
+//     draw() {
+//         for (let i = 0; i < this.staves.length; i++) {
+//             this.staves[i].draw();
+//         }
+//     }
+// }
+
 class Staff {
     constructor(y1, y2, clef) {
         this.y1 = y1;
@@ -62,8 +78,8 @@ class Staff {
         this.notes = [];
     }
     update() {
-        this.y1 = Math.sin(frame / 50) * 50 + canvas.height / 2;
-        this.y2 = Math.sin((frame+(frame/10)) / 50) * 50 + canvas.height / 2;
+        this.y1 = Math.sin(frame / 50) * 50 + canvas.height * 0.25;
+        this.y2 = Math.sin((frame+(frame/10)) / 50) * 50 + canvas.height * 0.25;
         this.clef.update(this.y1, this.y2);
         for (let i = 0; i < this.notes.length; i++) {
             this.notes[i].update(this.y1, this.y2);
@@ -134,15 +150,17 @@ class Note {
         this.x -= 1;
         // calculate this.y based on y1, y2, this.x, and canvas.width
         //this.y = y1 + this.x * ((y2-y1)/canvas.width);
-        this.y = this.y = y1 + this.x * ((y2-y1)/canvas.width) - pitches.indexOf(this.pitch)*10 + 5 * 10;
+        this.y = this.y = y1 + this.x * ((y2-y1)/canvas.width) - pitches.indexOf(this.pitch)*5 + 5 * 10;
     }
     draw() {
+        ctx.fillStyle = "black";
         ctx.beginPath();
         ctx.arc(this.x, this.y, 5, 0, 2 * Math.PI);
         ctx.fill();
     }
 }
 
+// let score = new Score();
 let objectsInPlay = [];
 objectsInPlay.push(new Staff(100, 100, new Clef(50, 50, "treble")));
 
@@ -160,7 +178,8 @@ let avgFps;
 
 function drawStuff() {
     // clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ddeeff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw the frame number in the top left corner
     ctx.font = "20px Arial";
@@ -194,7 +213,7 @@ function spawnNote() {
     // constructor(x, y, pitch, octave, accidental, duration)
     let note = new Note(
         canvas.width,
-        (Math.sin(frame / 50) * 50 + canvas.height / 2) - pitches.indexOf(randomPitch)*10,
+        (Math.sin(frame / 50) * 50 + canvas.height / 2) - pitches.indexOf(randomPitch)*5,
         randomPitch,
         randomOctave,
         "natural",
@@ -223,6 +242,10 @@ setInterval(function() {
 
 setInterval(function() {
     spawnNote();
+    spawnNote();
+    spawnNote();
+
+    // calculate average fps
     if (lastTenFPS.length < 10) {
         lastTenFPS.push(fps);
     } else {
@@ -234,7 +257,7 @@ setInterval(function() {
         }
         avgFps = Math.round(sum / lastTenFPS.length);
     }
-}, 1000);
+}, 500);
 
     </script>
 </body>
