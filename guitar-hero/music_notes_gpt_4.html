@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Notation Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid #000;
+        }
+        body {
+            overflow: hidden;
+        }
+        </style>
+</head>
+<body>
+    <canvas id="musicCanvas" width=1200 height="400"></canvas>
+    <script>
+
+// grab canvas element
+const canvas = document.getElementById('musicCanvas');
+const ctx = canvas.getContext('2d');
+
+// set canvas width and height
+function setCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.onload = setCanvasSize();
+window.addEventListener('resize', setCanvasSize);
+
+// set a bunch of constants
+const staffLineSpacing = canvas.height / 40;
+const staffLineCount = 5;
+const noteSpeed = 1;
+const playheadX = 5 * staffLineSpacing;
+const playheadWidth = staffLineSpacing;
+const noteDiameter = staffLineSpacing;
+const topMargin = canvas.height / 2 - (staffLineSpacing * (staffLineCount - 1)) / 2;
+const notesInPlay = [];
+let keysDown = [];
+let score = 0;
+let notesSounding = [];
+let frame = 0;
+
+const notes = {
+  'C0': { position: -28 },
+  'D0': { position: -27 },
+  'E0': { position: -26 },
+  'F0': { position: -25 },
+  'G0': { position: -24 },
+  'A0': { position: -23 },
+  'B0': { position: -22 },
+  'C1': { position: -21 },
+  'D1': { position: -20 },
+  'E1': { position: -19 },
+  'F1': { position: -18 },
+  'G1': { position: -17 },
+  'A1': { position: -16 },
+  'B1': { position: -15 },
+  'C2': { position: -14 },
+  'D2': { position: -13 },
+  'E2': { position: -12 },
+  'F2': { position: -11 },
+  'G2': { position: -10 },
+  'A2': { position: -9 },
+  'B2': { position: -8 },
+  'C3': { position: -7 },
+  'D3': { position: -6 },
+  'E3': { position: -5 },
+  'F3': { position: -4 },
+  'G3': { position: -3 },
+  'A3': { position: -2 },
+  'B3': { position: -1 },
+  'C4': { position: 0 },
+  'D4': { position: 1 },
+  'E4': { position: 2 },
+  'F4': { position: 3 },
+  'G4': { position: 4 },
+  'A4': { position: 5 },
+  'B4': { position: 6 },
+  'C5': { position: 7 },
+  'D5': { position: 8 },
+  'E5': { position: 9 },
+  'F5': { position: 10 },
+  'G5': { position: 11 },
+  'A5': { position: 12 },
+  'B5': { position: 13 },
+  'C6': { position: 14 },
+  'D6': { position: 15 },
+  'E6': { position: 16 },
+  'F6': { position: 17 },
+  'G6': { position: 18 },
+  'A6': { position: 19 },
+  'B6': { position: 20 },
+  'C7': { position: 21 },
+  'D7': { position: 22 },
+  'E7': { position: 23 },
+  'F7': { position: 24 },
+  'G7': { position: 25 },
+  'A7': { position: 26 },
+  'B7': { position: 27 },
+  'C8': { position: 28 },
+  'D8': { position: 29 },
+  'E8': { position: 30 },
+  'F8': { position: 31 },
+};
+
+const keyboardMap = {
+    'a': 'd4',
+    's': 'e4',
+    'd': 'f4',
+    'f': 'g4',
+    'g': 'a4',
+    'h': 'b4',
+    'j': 'c5',
+    'k': 'd5',
+    'l': 'e5',
+    ';': 'f5',
+    '\'': 'g5',
+}
+
+const noteNames = Object.keys(notes);
+// console.log(`noteNames = ${noteNames}`);
+
+let clefs = {
+    //clef position is the note value of the middle line of the staff relative to middle C
+    //so for example, the bass clef has position -6 because the middle line of the bass clef is D3
+    //and in the notes array, D3 has position -6
+    treble: {
+        position: 6,
+        draw: function(x, y) {
+            ctx.beginPath();
+            let xm =20;
+            let ym = 7;
+            let yf = 1.1;
+            let s = staffLineSpacing;
+            let [x1, y1          ] =  [  x+0.0*s, y+5.0*s                      ];
+            let [x2, y2, x3, y3  ] =  [  x+1.0*s, y+7.0*s,   x+1.5*s, y+3.5*s  ]; // control points
+            let [x4, y4          ] =  [  x-0.3*s, y-1.0*s                      ];
+            let [x5, y5, x6, y6  ] =  [  x+2.0*s, y+0.3*s,   x-2.0*s, y+4.4*s  ]; // control points
+            let [x7, y7          ] =  [  x+0.8*s, y+4.0*s                      ];
+            let [x8, y8, x9, y9  ] =  [  x+2.0*s, y+4.0*s,   x+1.7*s, y+1.7*s  ]; // control points
+            let [x10, y10        ] =  [  x+0.4*s, y+2.7*s                      ];
+
+            let coords = [
+                [x1, y1], [x2, y2],
+                [x3, y3], [x4, y4],
+                [x5, y5], [x6, y6],
+                [x7, y7], [x8, y8],
+                [x9, y9], [x10, y10]
+            ];
+
+            showControlPoints(coords);
+            
+            ctx.moveTo(x1, y1);
+            ctx.bezierCurveTo(x2, y2, x3, y3, x4, y4);
+            ctx.bezierCurveTo(x5, y5, x6, y6, x7, y7);
+            ctx.bezierCurveTo(x8, y8, x9, y9, x10, y10);
+            ctx.stroke();
+        }
+    },
+    bass: {
+        position: -6
+    },
+    alto: {
+        position: 0
+    },
+    tenor: {
+        position: -12
+    }
+}
+
+// classes
+
+function Note(pitch, position) {
+    this.pitch = pitch;
+    this.x = canvas.width
+    this.y = calculateY(position);
+}
+
+function Staff(clef, y) {
+    this.clef = clef;
+    this.y = y;
+    this.position = clefs[clef].position;
+}
+
+// functions
+
+function showControlPoints(coords) {
+    //show control points for a series of bezier curves
+    coords.forEach(coord => {
+        ctx.beginPath();
+        ctx.arc(coord[0], coord[1], 2, 0, Math.PI * 2);
+        // index of coord is 0, 3, 6, 9 then fillstyle = #3388ff, else #ff00ff
+        if (coords.indexOf(coord) % 3 === 0) {
+            ctx.fillStyle = '#000000';
+        } else if (coords.indexOf(coord) < 3) {
+            ctx.fillStyle = '#226699';
+        } else if (coords.indexOf(coord) < 6) {
+            ctx.fillStyle = '#ff22ff';
+        } else {
+            ctx.fillStyle = '#ff0000';
+        }
+        ctx.fill();
+    });
+}
+
+function drawStaff() {
+    // Draw treble clef staff lines
+    for (let i = 0; i < staffLineCount; i++) {
+        const y = topMargin + i * staffLineSpacing;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    // Draw treble clef sign
+    let clefX = 1 * staffLineSpacing;
+    let clefY = topMargin;
+    clefs.treble.draw(clefX, clefY);
+}
+
+function drawPlayhead() {
+    // Draw playhead
+    ctx.beginPath();
+    ctx.moveTo(playheadX, 0);
+    ctx.lineTo(playheadX, canvas.height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(playheadX + noteDiameter, 0);
+    ctx.lineTo(playheadX + noteDiameter, canvas.height);
+    ctx.stroke();
+}
+
+function removeNotes() {
+    for (let i = 0; i < notesInPlay.length; i++) {
+        if (notesInPlay[i].x < playheadX + noteDiameter / 2) {
+            notesInPlay.splice(i, 1);
+            score -= 100;
+        }
+    }
+}
+
+function drawNotesInPlay() {
+    // Draw notes in play
+    notesInPlay.forEach(note => {
+        note.x -= noteSpeed;
+        ctx.beginPath();
+        ctx.arc(note.x, note.y, noteDiameter/2, 0, Math.PI * 2);
+        ctx.fillStyle = 'black';
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#bb3377';
+        ctx.font = `${staffLineSpacing * 1.2}px Arial`;
+        let textX = note.x + staffLineSpacing + Math.sin(frame/20) * staffLineSpacing * 0.3;
+        let textY = note.y + staffLineSpacing * 0.4 + Math.cos(frame/20) * staffLineSpacing * 0.3;
+        ctx.fillText(`${note.pitch}`, textX, textY);
+        
+    });
+}
+
+function showNotesSounding() {
+    for (i=0; i<notesSounding.length; i++) {
+        //draw a note head
+        let x = playheadX - noteDiameter/2;
+        //let y = topMargin - notes[keysDown[i]].position * (staffLineSpacing/2) + 5*staffLineSpacing;
+        let y = 100 + i*50;
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = '#3377bb';
+        ctx.fill();
+        ctx.fillText(`${notesSounding[i]}`, x+20, y);
+    }
+}
+
+function drawInfo() {
+    // Draw score
+    ctx.font = `10px Arial`;
+    ctx.fillStyle = 'black';
+    let info = {
+        score: score,
+        time: Math.floor(performance.now()/1000),
+        notesSounding: notesSounding,
+        frame: frame,
+        fps: Math.floor(frame/(performance.now()/1000))
+    };
+    let x = playheadX + playheadWidth + staffLineSpacing;
+    for (i = 0; i < Object.keys(info).length; i++) {
+        let key = Object.keys(info)[i];
+        let value = info[key];
+        if (value instanceof Array) {
+            value = "";
+            for (j = 0; j < info[key].length; j++) {
+                value += `${info[key][j]}, `;
+            }
+            ctx.fillText(`${key}: ${value}`, x, 30 + i * 10);
+        } else {
+            ctx.fillText(`${key}: ${value}`, x, 30 + i * 10);
+        }
+    }
+}
+
+function calculateY(position) {
+    return topMargin - position * (staffLineSpacing/2) + 5*staffLineSpacing;
+}
+
+function spawnNote() {
+    let i = Math.floor(Math.random() * noteNames.length/7 + noteNames.length/2);
+    let randomPitch = noteNames[i];
+    const randomNote = new Note(randomPitch, notes[randomPitch].position);
+    notesInPlay.push(randomNote);
+    // console.log(notesInPlay);
+    // const randomPosition = notePositions[Math.floor(Math.random() * notePositions.length)];
+    // notesInPlay.push({ x: canvas.width, y: randomPosition, pitch: randomNote.pitch });
+}
+
+function handleKeyDown(event) {
+    if (keysDown.indexOf(event.key) === -1) {
+        let pitch = keyboardMap[event.key];
+        notesSounding.push(notes[pitch]);
+    }
+}
+
+function handleKeyUp(event) {
+    const index = notesSounding.indexOf(keyboardMap[event.key]);
+    if (index > -1) {
+        notesSounding.splice(index, 1);
+    }
+}
+
+// game loop // game loop // game loop // game loop 
+// game loop // game loop // game loop // game loop 
+
+function gameLoop() {
+    
+    ctx.fillStyle = '#ddeeff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    drawStaff();
+    
+    drawPlayhead();
+    
+    removeNotes();
+    
+    drawNotesInPlay();
+
+    showNotesSounding();
+    
+    drawInfo();
+
+    requestAnimationFrame(gameLoop);
+
+    frame++;
+
+}
+
+document.addEventListener('keydown', handleKeyDown);
+document.addEventListener('keyup', handleKeyUp);
+setInterval(spawnNote, 1000);
+gameLoop(); // Start the game loop
+
+
+        </script>
+</body>
+</html>

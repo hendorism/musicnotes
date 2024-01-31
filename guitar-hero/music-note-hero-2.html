@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+// Prevent default behavior of all keys
+document.addEventListener("keydown", function(event) {
+    event.preventDefault();
+});
+
+// Get the canvas element and set its size to fill the screen
+const canvas = document.getElementById("myCanvas");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// on window resize, update the canvas size
+window.addEventListener("resize", function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+// Get the canvas context and set the line width
+const ctx = canvas.getContext("2d");
+ctx.lineWidth = 1;
+let frame = 0;
+let x;
+let y;
+
+let pitches = ["C", "D", "E", "F", "G", "A", "B"];
+let octaves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+
+// let octaves = {
+//     0: -28,
+//     1: -21,
+//     2: -14,
+//     3: -7,
+//     4: 0,
+//     5: 7,
+//     6: 14,
+//     7: 21,
+//     8: 28
+// };
+
+class Staff {
+    constructor(y1, y2, clef) {
+        this.y1 = y1;
+        this.y2 = y2;
+        this.clef = clef;
+        this.notes = [];
+    }
+    update() {
+        this.y1 = Math.sin(frame / 50) * 50 + canvas.height / 2;
+        this.y2 = Math.sin((frame+(frame/10)) / 50) * 50 + canvas.height / 2;
+        this.clef.update(this.y1, this.y2);
+        for (let i = 0; i < this.notes.length; i++) {
+            this.notes[i].update(this.y1, this.y2);
+        }
+    }
+    draw() {
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, this.y1 + i * 10);
+            ctx.lineTo(canvas.width, this.y2 + i * 10);
+            ctx.stroke();
+        }
+        this.clef.draw();
+        for (let i = 0; i < this.notes.length; i++) {
+            this.notes[i].draw();
+        }
+    }
+}
+
+class Clef {
+    constructor(x, y, clef) {
+        this.x = x;
+        this.y = y;
+        this.clef = clef;
+        this.s = 10;
+    }
+    update(y1, y2) {
+        this.x = 50;
+        // calculate this.y based on y1, y2, this.x, and canvas.width
+        this.y = y1 + this.x * ((y2-y1)/canvas.width);
+        [this.x1,  this.y1                    ] =  [  this.x+0.0*this.s, this.y+5.0*this.s                                          ];
+        [this.x2,  this.y2, this.x3, this.y3  ] =  [  this.x+1.0*this.s, this.y+7.0*this.s,   this.x+1.5*this.s, this.y+3.5*this.s  ]; // control points
+        [this.x4,  this.y4                    ] =  [  this.x-0.3*this.s, this.y-1.0*this.s                                          ];
+        [this.x5,  this.y5, this.x6, this.y6  ] =  [  this.x+2.0*this.s, this.y+0.3*this.s,   this.x-2.0*this.s, this.y+4.4*this.s  ]; // control points
+        [this.x7,  this.y7                    ] =  [  this.x+0.8*this.s, this.y+4.0*this.s                                          ];
+        [this.x8,  this.y8, this.x9, this.y9  ] =  [  this.x+2.0*this.s, this.y+4.0*this.s,   this.x+1.7*this.s, this.y+1.7*this.s  ]; // control points
+        [this.x10, this.y10                   ] =  [  this.x+0.4*this.s, this.y+2.7*this.s                                          ];
+        this.coords = [
+            [this.x1, this.y1], [this.x2, this.y2],
+            [this.x3, this.y3], [this.x4, this.y4],
+            [this.x5, this.y5], [this.x6, this.y6],
+            [this.x7, this.y7], [this.x8, this.y8],
+            [this.x9, this.y9], [this.x10, this.y10]
+        ];
+    }
+    draw() {
+        if (this.clef === "treble") {
+            ctx.beginPath();
+            ctx.moveTo(this.x1, this.y1);
+            ctx.bezierCurveTo(this.x2, this.y2, this.x3, this.y3, this.x4, this.y4);
+            ctx.bezierCurveTo(this.x5, this.y5, this.x6, this.y6, this.x7, this.y7);
+            ctx.bezierCurveTo(this.x8, this.y8, this.x9, this.y9, this.x10, this.y10);
+            ctx.stroke();
+        }
+    }
+}
+
+class Note {
+    constructor(x, y, pitch, octave, accidental, duration) {
+        this.x = x;
+        this.y = y;
+        this.pitch = pitch;
+        this.octave = octave;
+        this.accidental = accidental;
+        this.duration = duration;
+    }
+    update(y1, y2) {
+        this.x -= 1;
+        // calculate this.y based on y1, y2, this.x, and canvas.width
+        //this.y = y1 + this.x * ((y2-y1)/canvas.width);
+        this.y = this.y = y1 + this.x * ((y2-y1)/canvas.width) - pitches.indexOf(this.pitch)*10 + 5 * 10;
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+}
+
+let objectsInPlay = [];
+objectsInPlay.push(new Staff(100, 100, new Clef(50, 50, "treble")));
+
+
+
+function updateStuff() {
+    for (let i = 0; i < objectsInPlay.length; i++) {
+        objectsInPlay[i].update();
+    }
+}
+
+let lastTenFPS = [];
+let fps;
+let avgFps;
+
+function drawStuff() {
+    // clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw the frame number in the top left corner
+    ctx.font = "20px Arial";
+    fps = Math.round(1000 / (Date.now() - lastFrameTime));
+    let performanceStats = `fps: ${avgFps}`;
+
+    ctx.fillText(`music hero 2 - ${frame}`, 10, 50);
+    ctx.fillText(performanceStats, 10, 100);
+
+    for (let i = 0; i < objectsInPlay.length; i++) {
+        objectsInPlay[i].draw();
+    }
+
+    // make a button on the canvas in the top right corner. clicking the button navigates the browser to the file music_notes_gpt_4.html
+    // ctx.fillStyle = "red";
+    // ctx.fillRect(canvas.width - 100, 0, 100, 100);
+    // ctx.fillStyle = "black";
+    // ctx.font = "30px Arial";
+    // ctx.fillText("next", canvas.width - 100, 50);
+    // canvas.addEventListener("click", function(event) {
+    //     if (event.clientX > canvas.width - 100 && event.clientY < 100) {
+    //         window.location.href = "music_notes_gpt_4.html";
+    //     }
+    // });
+    
+}
+
+function spawnNote() {
+    let randomPitch = pitches[Math.floor(Math.random() * pitches.length)];
+    let randomOctave = octaves[4];
+    // constructor(x, y, pitch, octave, accidental, duration)
+    let note = new Note(
+        canvas.width,
+        (Math.sin(frame / 50) * 50 + canvas.height / 2) - pitches.indexOf(randomPitch)*10,
+        randomPitch,
+        randomOctave,
+        "natural",
+        1
+    );
+    objectsInPlay[0].notes.push(note);
+    // let i = Math.floor(Math.random() * noteNames.length/7 + noteNames.length/2);
+    // let randomPitch = noteNames[i];
+    // const randomNote = new Note(randomPitch, notes[randomPitch].position);
+    // notesInPlay.push(randomNote);
+    // // console.log(notesInPlay);
+    // // const randomPosition = notePositions[Math.floor(Math.random() * notePositions.length)];
+    // // notesInPlay.push({ x: canvas.width, y: randomPosition, pitch: randomNote.pitch });
+}
+
+let lastFrameTime = Date.now();
+// game loop
+setInterval(function() {
+
+    updateStuff();
+    drawStuff();
+    
+    frame++;
+    lastFrameTime = Date.now();
+}, 1000 / 60);
+
+setInterval(function() {
+    spawnNote();
+    if (lastTenFPS.length < 10) {
+        lastTenFPS.push(fps);
+    } else {
+        lastTenFPS.shift();
+        lastTenFPS.push(fps);
+        let sum = 0;
+        for (let i = 0; i < lastTenFPS.length; i++) {
+            sum += lastTenFPS[i];
+        }
+        avgFps = Math.round(sum / lastTenFPS.length);
+    }
+}, 1000);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Notation Game</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="musicCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('musicCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const notes = [
+            { pitch: 'D4', key: 'a' },
+            { pitch: 'E4', key: 's' },
+            { pitch: 'F4', key: 'd' },
+            { pitch: 'G4', key: 'f' },
+            { pitch: 'A5', key: 'g' },
+            { pitch: 'B5', key: 'h' },
+            { pitch: 'C5', key: 'j' },
+            { pitch: 'D5', key: 'k' },
+            { pitch: 'E5', key: 'l' },
+            { pitch: 'F5', key: ';' }
+        ];
+
+        const notesInPlay = [];
+
+        const playheadX = canvas.width / 8;
+        const noteSpeed = 2;
+        let score = 0;
+
+        function drawStaff() {
+            // Draw treble clef staff
+            ctx.beginPath();
+            ctx.moveTo(50, 100);
+            ctx.lineTo(50, 250);
+            ctx.moveTo(50, 100);
+            ctx.bezierCurveTo(50, 60, 100, 20, 150, 60);
+            ctx.bezierCurveTo(200, 100, 150, 170, 100, 140);
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawStaff();
+
+            // Draw playhead
+            ctx.beginPath();
+            ctx.moveTo(playheadX, 0);
+            ctx.lineTo(playheadX, canvas.height);
+            ctx.stroke();
+
+            // Draw notes in play
+            notesInPlay.forEach(note => {
+                note.x -= noteSpeed;
+                ctx.beginPath();
+                ctx.arc(note.x, note.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = 'black';
+                ctx.fill();
+            });
+
+            // Draw score
+            ctx.font = '20px Arial';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+
+            requestAnimationFrame(draw);
+        }
+
+        function spawnNote() {
+            const randomNote = notes[Math.floor(Math.random() * notes.length)];
+            notesInPlay.push({ x: canvas.width, y: Math.random() * 150 + 100, pitch: randomNote.pitch });
+        }
+
+        function handleKeyPress(event) {
+            const pressedKey = event.key.toLowerCase();
+            const hitNoteIndex = notesInPlay.findIndex(note => note.x < playheadX && pressedKey === note.pitch.toLowerCase());
+            
+            if (hitNoteIndex !== -1) {
+                notesInPlay.splice(hitNoteIndex, 1);
+                score += 100;
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyPress);
+
+        setInterval(spawnNote, 1000);
+
+        draw(); // Start the game loop
+    </script>
+</body>
+</html>

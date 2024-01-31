@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VexFlow svg Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+            <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+
+</head>
+<body>
+    <div id="svg-container"></div>
+    <script>
+        const vf = new Vex.Flow.Factory({
+            renderer: {
+                elementId: 'svg-container',
+                width: 500,
+                height: 200
+            }
+        });
+        
+        // initialize timing variables
+        let frameCount = 0;
+        let startTime = performance.now();
+        let time = startTime;
+        let elapsedTime
+        let avgFrameRate;
+        let deltaTimeProjectedFrameRate;
+
+        // game loop
+        function animate() {
+            // change timing variables and log performance
+            frameCount ++; // increment frameCount. 1st frame is #1
+            time = performance.now();
+            deltaTime = time - elapsedTime; // before elapsedTime updates, so still represents previous frame
+            elapsedTime = time - startTime; // for calculate deltaTimeProjectedFramceRate (frame rate of current frame)
+            avgFrameRate = frameCount / (elapsedTime / 1000);
+            deltaTimeProjectedFrameRate = 1000 / deltaTime;
+            // console.log(`time: ${time}, frameCount: ${frameCount}, elapsedTime: ${elapsedTime/1000}`);
+            // console.log(`avgFrameRate/deltaTimeProjectedFrameRate: ${avgFrameRate}/${deltaTimeProjectedFrameRate}`);
+            // console.log(`deltaTime: ${deltaTime}`);
+
+            const score = vf.EasyScore();
+            const system = vf.System();
+            requestAnimationFrame(animate);
+            const notes = score.notes('(C#5 D#5 b4)/8, an4, A3/q, G#4, a4', { stem: 'up' });
+            system.addStave({
+                voices: [score.voice(notes)]
+            }).addClef('treble').addTimeSignature('4/4');
+    
+            // Render to SVG
+            vf.draw();
+        }
+        animate();
+        
+
+
+        // Extract SVG and insert into the HTML
+        // const svgElement = document.querySelector('div#svg-container > svg');
+        // document.getElementById('svg-container').appendChild(svgElement.cloneNode(true));
+
+        // handle user inputs
+        let keys = [];
+        let shortCuts = {
+            //a: console.log('puppy'),
+            a: function() {
+                console.log('puppy');
+            }
+        };
+        // listen for keydown events
+        // on key down, push key to keys array
+        //on key up remove key from keys array
+        window.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+            console.log(keys);
+            shortCuts[e.key]();
+        });
+        window.addEventListener('keyup', function(e) {
+            delete keys[e.key];
+            console.log(keys);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VexFlow svg Example</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+</head>
+<body>
+
+
+      <div id="svg-container"></div>
+      <script>
+        const vf = new Vex.Flow.Factory({
+            renderer: {
+                selector: 'svg-container',
+                width: 500,
+                height: 200
+            }
+        });
+        const score = vf.EasyScore();
+    
+        // Create VexFlow notation
+        const system = vf.System();
+    
+        const notes = score.notes('C#5/q, B4, A4, G#4', { stem: 'up' });
+        system.addStave({
+          voices: [score.voice(notes)]
+        }).addClef('treble').addTimeSignature('4/4');
+    
+        // Render to SVG
+        vf.draw();
+    
+        // Extract SVG and insert into the HTML
+        const svgElement = document.querySelector('svg');
+        document.getElementById('svg-container').appendChild(svgElement);
+      </script>
+    </body>
+    </html>
+    
+
+ -->

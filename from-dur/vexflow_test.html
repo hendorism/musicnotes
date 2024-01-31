@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>VexFlow Example</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/1.2.94/vexflow-min.js"></script> -->
+        <!-- <script src="https://unpkg.com/vexflow@1.4.11/releases/vexflow-debug.js"></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/4.2.3/vexflow-min.js" integrity="sha512-6TxXkXvDGlTfA/gxa+Odoa/so4d4/bjB6c5lgyZq8OVWqUVoDm2dC2PSI4g8Shlc2RZ6FnS1jh792Fo3HRINnw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+        <script>
+            // map keys to notes
+let inputMap = {
+    '1': 'a/7','2': 'f/6','3': 'g/6',
+    '4': 'a/6',
+    '5': 'b/6',
+    '6': 'c/7',
+    '7': 'd/7',
+    '8': 'e/7',
+    '9': 'f/7',
+    '0': 'g/7',
+    '-': 'b/7',
+    '=': 'c/8',
+    '[': 'c/6',
+    '\\': 'e/6',
+    ']': 'd/6',
+    'a': 'c/3',
+    'b': 'd/2',
+    'c': 'b/1',
+    'd': 'e/3',
+    'e': 'b/4',
+    'f': 'f/3',
+    'g': 'g/3',
+    'h': 'a/3',
+    'i': 'g/5',
+    'j': 'b/3',
+    'k': 'c/4',
+    'l': 'd/4',
+    'm': 'f/2',
+    'n': 'e/2',
+    'o': 'a/5',
+    'p': 'b/5',
+    'q': 'g/4',
+    'r': 'c/5',
+    's': 'd/3',
+    't': 'd/5',
+    'u': 'f/5',
+    'v': 'c/2',
+    'w': 'a/4',
+    'x': 'a/1',
+    'y': 'e/5',
+    'z': 'g/1',
+    ',': 'g/2',
+    '.': 'a/2',
+    '/': 'b/2',
+    ';': 'e/4',
+    "'": 'c/4'
+};
+        </script>
+</head>
+<body>
+    <canvas id="musicCanvas"></canvas>
+    <script>
+                    //disable scroll bars
+                    document.body.style.overflow = 'hidden';
+        const canvas = document.getElementById('musicCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Create a VexFlow renderer
+        // Size the renderer to match the canvas element
+        var animationStartTime = performance.now();
+        var animationSpeed = 50; // Adjust the speed of animation
+
+        let gameTime = 0;
+
+        // Create some notes    
+        var notes = [
+                new Vex.Flow.StaveNote({ keys: [inputMap['g']], duration: 'q'}),
+                new Vex.Flow.StaveNote({ keys: [inputMap['f']], duration: 'q' }),
+                new Vex.Flow.StaveNote({ keys: [inputMap['e']], duration: 'q' }),
+                new Vex.Flow.StaveNote({ keys: [inputMap['d']], duration: 'q' }),
+            ];
+            let displayOutput = [];
+//prevent default behavior of all keyboard inputs
+        document.addEventListener('keydown', function(event) {
+            event.preventDefault();
+        });
+            
+        
+        // Listen for key presses
+        document.addEventListener('keydown', function(event) {
+            displayOutput.push(event.keyCode + ' - ' + event.key + ' - ' + gameTime);
+            var key = event.key.toLowerCase();
+            
+            // Check if the pressed key exists in the inputMap
+            if (inputMap.hasOwnProperty(key)) {
+                // Add a new note to the notes array
+                notes.push(new Vex.Flow.StaveNote({ keys: [inputMap[key]], duration: 'q' }));
+            }
+        });
+        
+        function animate() {
+            // Calculate elapsed time
+            var currentTime = performance.now();
+            var elapsedTime = currentTime - animationStartTime;
+            
+            // Clear the canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            var renderer = new Vex.Flow.Renderer('musicCanvas', Vex.Flow.Renderer.Backends.CANVAS);
+            renderer.resize(canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#ddeeff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#000000";
+
+            gameTime = Math.floor(elapsedTime/100)/10;
+            //always display 1 decimal place
+            if (gameTime % 1 == 0) {
+                gameTime += '.0';
+            }
+            //output the key presses
+            const rotationAngle = -Math.PI / 48; // Rotate by 45 degrees
+            ctx.translate(100, 100);
+            ctx.rotate(rotationAngle);
+            let textSize = 12;
+            ctx.font = textSize + "px Arial";
+            ctx.translate(-100, -100);
+            let yOffset = 0;
+            let displayOutputScrollThreshold = 20;
+            let lineHeight = textSize * 1.25;
+            // if displayOutput is too long, scroll it
+            if (displayOutput.length > displayOutputScrollThreshold) {
+                yOffset -= lineHeight*(displayOutput.length-displayOutputScrollThreshold);
+            }
+            // if displayOutput is too long, remove the first elements
+            if (displayOutput.length > displayOutputScrollThreshold) {
+                displayOutput = displayOutput.slice(-30);
+            }
+            //write text
+            for (i=0; i<displayOutput.length; i++) {
+                ctx.fillText(displayOutput[i], 10, 60+yOffset + i*lineHeight);
+            }
+            ctx.rotate(-rotationAngle);
+            ctx.fillText("Press any key to play a note", 100, 20);
+            ctx.fillText(gameTime, 100, 40);
+
+            // Create a VexFlow context
+            var context = renderer.getContext();
+            
+            // Create a stave
+            var stave = new Vex.Flow.Stave(10, 40, 480);
+            
+            // Add a clef and time signature
+            stave.addClef('treble').addTimeSignature('4/4');
+            
+            // Connect the stave to the VexFlow context
+            stave.setContext(context).setX(50).draw();
+            
+            
+    
+            
+            // Create a voice and add the notes to it
+            var voice = new Vex.Flow.Voice({ num_beats: notes.length, beat_value: 4 });
+            voice.addTickables(notes);
+            
+            // Format and justify the notes to fit within the stave
+            var formatter = new Vex.Flow.Formatter().joinVoices([voice]).format([voice], 400);
+            
+            voice.draw(context, stave);
+            
+            //draw the moving line
+            
+            //Redraw the notes with the updated yOffset
+            notes.forEach(function (note) {
+                note.setStave(stave);
+                note.setContext(context).draw();
+                stave.setContext(context).draw(); 
+            });
+
+            // Request the next animation frame
+            requestAnimationFrame(animate);
+        }
+        
+
+        // Start the animation loop
+        animate();
+        </script>
+</body>
+</html>
