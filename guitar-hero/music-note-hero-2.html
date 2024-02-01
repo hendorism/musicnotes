@@ -76,6 +76,7 @@ class Staff {
         this.y2 = y2;
         this.clef = clef;
         this.notes = [];
+        this.playheadX = 120;
     }
     update() {
         this.y1 = Math.sin(frame / 50) * 50 + canvas.height * 0.25;
@@ -83,6 +84,9 @@ class Staff {
         this.clef.update(this.y1, this.y2);
         for (let i = 0; i < this.notes.length; i++) {
             this.notes[i].update(this.y1, this.y2);
+            if (this.notes[i].x < this.playheadX) {
+                this.notes.splice(i, 1);
+            }
         }
     }
     draw() {
@@ -96,6 +100,10 @@ class Staff {
         for (let i = 0; i < this.notes.length; i++) {
             this.notes[i].draw();
         }
+        ctx.beginPath();
+        ctx.moveTo(this.playheadX, -40 + this.y1 + this.playheadX * ((this.y2 - this.y1) / canvas.width));
+        ctx.lineTo(this.playheadX, 40 + this.y1 + 40 + this.playheadX * ((this.y2 - this.y1) / canvas.width));
+        ctx.stroke();
     }
 }
 
@@ -145,9 +153,10 @@ class Note {
         this.octave = octave;
         this.accidental = accidental;
         this.duration = duration;
+        this.velocity = 4;
     }
     update(y1, y2) {
-        this.x -= 1;
+        this.x -= this.velocity;
         // calculate this.y based on y1, y2, this.x, and canvas.width
         //this.y = y1 + this.x * ((y2-y1)/canvas.width);
         this.y = this.y = y1 + this.x * ((y2-y1)/canvas.width) - pitches.indexOf(this.pitch)*5 + 5 * 10;
