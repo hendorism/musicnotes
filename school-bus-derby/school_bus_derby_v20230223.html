@@ -30,6 +30,7 @@ body {
   background-color: #ddee33;
   height: 26px;
   width: 90px;
+  display: flex;
 }
 
 .corolla {
@@ -48,11 +49,6 @@ body {
 <body>
 	
 <div id="game-screen"></div>
-<p>School Bus Derby</p>
-<p>school bus max accel = 2mph/second. (30 seconds 0-60mph)</p>
-<p>school bus length: 50 ft</p>
-<p>5280/50 = length in miles</p>
-<p>*(70/50) = length in miles of one pixel.</p>
 
 <script>
 
@@ -181,17 +177,28 @@ class Vehicle {
     for (i=0; i<document.getElementsByClassName(this.type + this.vehicleNumber).length; i++) {
       document.getElementsByClassName(this.type + this.vehicleNumber)[i].remove();
     }
+    // <img id="bus" src="school_bus.png" alt="School Bus">
     let bus = document.createElement("div");
     bus.classList.add("vehicle", this.type, this.type + this.vehicleNumber);
-    let windshield = document.createElement("div");
-    windshield.classList.add("windshield");
-    windshield.style.height = "20px";
-    windshield.style.width = "10px";
-    windshield.style.top = "5px";
-    windshield.style.left = "5px";
+    // let windshield = document.createElement("div");
+    // windshield.classList.add("windshield");
+    // windshield.style.height = "20px";
+    // windshield.style.width = "10px";
+    // windshield.style.top = "5px";
+    // windshield.style.left = "5px";
+    let busImage = document.createElement("img");
+    busImage.src = "school-bus-top-down-png.png";
+    busImage.style.height = "100%";
+    busImage.style.width = "100%";
+    busImage.style.position = "absolute";
+    busImage.style.top = "0px";
+    busImage.style.left = "0px";
+    // busImage.style.transform = "rotate(" + this.bearing + "deg)";
+    // busImage.style.transformOrigin = "30% center";
+    bus.appendChild(busImage);
     //let node = document.createTextNode(div.classList, this.vehicleNumber, this.type, this.x, this.y, this.bearing, this.input);
     let node = document.createTextNode(inputKeys);
-    bus.appendChild(windshield);
+    // bus.appendChild(windshield);
     bus.appendChild(node);
     gameScreen.appendChild(bus);
     bus.style.top = this.y+100;
@@ -279,6 +286,21 @@ function gameDraw() {
 function gameLoop() {
 	gameUpdate();
 	gameDraw();
+  if (frameCount > 100000) {
+    frameCount = 0;
+  }
+  // if bus goes off screen right, player wins. navigate to win screen
+  if (bus.x > window.innerWidth) {
+    alert("you win!");
+    window.location.href = "lvl2.html";
+  }
+  // if bus is off screen, reset bus
+  if (bus.x > window.innerWidth || bus.x < 0 || bus.y > window.innerHeight || bus.y < 0) {
+    bus.x = 200;
+    bus.y = 200;
+    bus.speed = 0;
+    bus.steerAngle = 0;
+  }
 }
 
 

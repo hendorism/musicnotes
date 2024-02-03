@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        </style>
+</head>
+<body>
+    
+    <canvas id="myCanvas"></canvas>
+    
+    <script>
+        // Get the canvas element
+        var canvas = document.getElementById("myCanvas");
+        
+                // get canvas context
+                var ctx = canvas.getContext("2d");
+
+        // Set the canvas size to fill the screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Prevent default behavior of all keys
+        document.addEventListener("keydown", function(event) {
+            event.preventDefault();
+        });
+
+        // Resize canvas on window resize
+        window.addEventListener("resize", function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // make es6 class for vehicle.
+        // make a bus and corolla class that extends vehicle.
+        class Vehicle {
+            constructor(x, y, width, height, color) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.color = color;
+            }
+            update() {
+                // Update game logic here
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+        }
+
+        class Bus extends Vehicle {
+            constructor(x, y, width, height, color) {
+                super(x, y, width, height, color);
+            }
+        }
+
+        class Corolla extends Vehicle {
+            constructor(x, y, width, height, color) {
+                super(x, y, width, height, color);
+            }
+        }
+
+        function update() {
+            // Update game logic here
+        }
+
+        function draw() {
+            // Clear the canvas
+            ctx.fillStyle = "#bb3399";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Render game graphics here
+        }
+
+        
+
+        // Game loop
+        function gameLoop() {
+            // Update game logic here
+
+            // Render game graphics here
+
+            // Call the game loop again
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game loop
+        gameLoop();
+
+        
+    </script>
+</body>
+</html>
