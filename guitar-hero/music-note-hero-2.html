@@ -169,6 +169,53 @@ class Note {
     }
 }
 
+
+class ClickImpact {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.diameter = 500;
+        this.duration = 1000;
+        this.rgba = [200,255, 180, 1];
+        this.color = `rgba(${this.rgba[0]}, ${this.rgba[1]}, ${this.rgba[2]}, ${this.rgba[3]})`;
+    }
+    update() {
+        this.diameter *= 0.9999;
+        this.rgba[0] *= 0.909;
+        this.rgba[1] *= 0.989;
+        this.rgba[2] *= 0.999;
+        this.rgba[3] *= 0.999;
+        this.color = `rgba(${this.rgba[0]}, ${this.rgba[1]}, ${this.rgba[2]}, ${this.rgba[3]})`;
+        if (this.diameter < 1) {
+            let index = objectsInPlay.indexOf(this);
+            if (index !== -1) {
+                objectsInPlay.splice(index, 1);
+            }
+        }
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.diameter/2, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+}
+
+class PianoKeyboard {
+    constructor() {
+        this.width = canvas.width;
+        this.height = canvas.height * 0.2;
+        this.y = canvas.height - this.height;
+        this.x = 0
+    }
+    update() {
+
+    }
+    draw() {
+        
+    }
+}
+
 // let score = new Score();
 let objectsInPlay = [];
 objectsInPlay.push(new Staff(100, 100, new Clef(50, 50, "treble")));
@@ -190,33 +237,37 @@ function drawStuff() {
     ctx.fillStyle = "#ddeeff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // draw the frame number in the top left corner
+    for (let i = 0; i < objectsInPlay.length; i++) {
+        objectsInPlay[i].draw();
+    }
+    
+    // draw stats... (HUD)... (Heads Up Display)...
+    ctx.fillStyle = "#333333";
     ctx.font = "20px Arial";
     fps = Math.round(1000 / (Date.now() - lastFrameTime));
     let performanceStats = `fps: ${avgFps}`;
 
     ctx.fillText(`music hero 2 - ${frame}`, 10, 50);
     ctx.fillText(performanceStats, 10, 100);
+    let o = objectsInPlay.length;
+    ctx.fillText(`objectsInPlay.length = ${o}`, 10, 150);
 
-    for (let i = 0; i < objectsInPlay.length; i++) {
-        objectsInPlay[i].draw();
-    }
-
-    // make a button on the canvas in the top right corner. clicking the button navigates the browser to the file music_notes_gpt_4.html
-    // ctx.fillStyle = "red";
-    // ctx.fillRect(canvas.width - 100, 0, 100, 100);
-    // ctx.fillStyle = "black";
-    // ctx.font = "30px Arial";
-    // ctx.fillText("next", canvas.width - 100, 50);
-    // canvas.addEventListener("click", function(event) {
-    //     if (event.clientX > canvas.width - 100 && event.clientY < 100) {
-    //         window.location.href = "music_notes_gpt_4.html";
-    //     }
-    // });
-    
 }
 
+canvas.addEventListener("click", function(event) {
+    if (event.clientX > canvas.width - 100 && event.clientY < 100) {
+        //window.location.href = "music_notes_gpt_4.html";
+
+    }
+    let x = event.clientX;
+    let y = event.clientY;
+    console.log(x, y);
+    let clickImpact = new ClickImpact(x, y);
+    objectsInPlay.push(clickImpact);
+});
+
 function spawnNote() {
+    //
     let randomPitch = pitches[Math.floor(Math.random() * pitches.length)];
     let randomOctave = octaves[4];
     // constructor(x, y, pitch, octave, accidental, duration)

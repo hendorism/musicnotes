@@ -82,6 +82,15 @@ window.addEventListener("keydown", function(e) {
 
 let inputKeys = [];
 
+class Tire {
+  constructor(x, y, vehicle, angle) {
+    this.x = x;
+    this.y = y; 
+    this.vehicle = vehicle;
+    this.angle = angle;
+  }
+}
+
 class Vehicle {
   constructor(x, y, bearing, vehicleNumber, type) {
 //    this.keys = [];
@@ -149,6 +158,12 @@ class Vehicle {
       }
     }
     vehicles.push(this);
+    // tire constructor(x, y, vehicle, angle)
+    this.tires = [];
+    this.tires.push(new Tire(0, 0, this, 0));
+    this.tires.push(new Tire(200, 0, this, 0));
+    this.tires.push(new Tire(0, 200, this, 0));
+    this.tires.push(new Tire(200, 200, this, 0));
   }
   update() {
     this.steerAngleTurnRate = 1 + (this.speed * 2) / (this.speed);
@@ -187,7 +202,7 @@ class Vehicle {
     // windshield.style.top = "5px";
     // windshield.style.left = "5px";
     let busImage = document.createElement("img");
-    busImage.src = "school-bus-top-down-png.png";
+    busImage.src = "longer-conv-bus.png";
     busImage.style.height = "100%";
     busImage.style.width = "100%";
     busImage.style.position = "absolute";
@@ -195,18 +210,35 @@ class Vehicle {
     busImage.style.left = "0px";
     // busImage.style.transform = "rotate(" + this.bearing + "deg)";
     // busImage.style.transformOrigin = "30% center";
-    bus.appendChild(busImage);
+    //////bus.appendChild(busImage);
     //let node = document.createTextNode(div.classList, this.vehicleNumber, this.type, this.x, this.y, this.bearing, this.input);
-    let node = document.createTextNode(inputKeys);
+    // let node = document.createTextNode(inputKeys);
     // bus.appendChild(windshield);
-    bus.appendChild(node);
+    // bus.appendChild(node);
     gameScreen.appendChild(bus);
     bus.style.top = this.y+100;
     bus.style.left = this.x+100;
     bus.style.transform = "rotate(" + this.bearing + "deg)";
     bus.style.transformOrigin = "30% center";
+    for (i=0; i<this.tires.length; i++) {
+      let tire = document.createElement("img");
+      tire.src = "tire.png";
+      tire.position = "absolute";
+      tire.height = 4;
+      tire.width = 10;
+      tire.top = this.tires[i].y;
+      tire.left = this.tires[i].x;
+      bus.appendChild(tire);
+    }
   }
 }
+
+// let testImg = document.createElement("img");
+// testImg.src = "tire.png";
+// testImg.position = "relative";
+// testImg.top = "200px";
+// testImg.left = "200px";
+// gameScreen.appendChild(testImg);
 
 //make a new square div, red, 100px by 100px, located at 100,100
 // let div = document.createElement("div");
