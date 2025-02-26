@@ -21,6 +21,7 @@
     <canvas id="musicCanvas" width=1200 height="400"></canvas>
     <script>
 
+
 // grab canvas element
 const canvas = document.getElementById('musicCanvas');
 const ctx = canvas.getContext('2d');
@@ -125,7 +126,6 @@ const keyboardMap = {
 }
 
 const noteNames = Object.keys(notes);
-// console.log(`noteNames = ${noteNames}`);
 
 let clefs = {
     //clef position is the note value of the middle line of the staff relative to middle C
@@ -315,7 +315,6 @@ function spawnNote() {
     let randomPitch = noteNames[i];
     const randomNote = new Note(randomPitch, notes[randomPitch].position);
     notesInPlay.push(randomNote);
-    // console.log(notesInPlay);
     // const randomPosition = notePositions[Math.floor(Math.random() * notePositions.length)];
     // notesInPlay.push({ x: canvas.width, y: randomPosition, pitch: randomNote.pitch });
 }
@@ -333,6 +332,48 @@ function handleKeyUp(event) {
         notesSounding.splice(index, 1);
     }
 }
+
+
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+const linkArea = {
+    x: canvas.width - 200,
+    y: canvas.height - 40,
+    width: 200,
+    height: 40,
+    textMarginLeft: 10
+}
+
+function drawLink() {
+
+    // calculate the size of the text link and draw a purple rectangle behind it
+    ctx.fillStyle = '#bb33bb';
+    ctx.fillRect(linkArea.x, linkArea.y, linkArea.width, linkArea.height);
+
+    // draw the text link
+    ctx.font = `20px Arial`;
+    ctx.fillStyle = '#dddddd';
+    ctx.fillText(`home`, linkArea.x + linkArea.textMarginLeft, linkArea.y + 30);
+}
+
+canvas.addEventListener('click', function(event) {
+    console.log("canvas.addEventListener('click', function(event) {");
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    if (x > linkArea.x && x < linkArea.x + linkArea.width && y > linkArea.y && y < linkArea.y + linkArea.height) {
+        window.open('http://127.0.0.1:5501/index.html', '_blank');
+    }
+});
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+//////////////////////////////////link to home page////////////////////////////////////
+
 
 // game loop // game loop // game loop // game loop 
 // game loop // game loop // game loop // game loop 
@@ -353,6 +394,8 @@ function gameLoop() {
     showNotesSounding();
     
     drawInfo();
+
+    drawLink();
 
     requestAnimationFrame(gameLoop);
 

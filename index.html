@@ -3,37 +3,67 @@
 <!-- https://hendorism.github.io/musicnotes/index.html -->
 <html>
 <head>
+    <title>MusicNotes</title>
 <style>
 * {
     font-family: monospace;
     font-size: 18px;
 }
+
+ul > li {
+    font-size: 0.8em;
+}
 </style></head>
 <body>
-	
+    <script>
+const baseUrl = window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1.5501' : 'https://hendorism.github.io/musicnotes';
+
+
+    </script>
+My name is Aaron Dull.<br>
 Welcome to MusicNotes!<br>
-The app that makes music fun!
+The app that makes music fun!<br>
 
 <h3>versions:</h3>
 <ul>
-    <li><a href="https://hendorism.github.io/musicnotes/guitar-hero/music_notes_gpt_4.html">guitar-hero</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/school-bus-derby/school_bus_derby_v20230223.html">school bus derby</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20230310/version-20230310.html">version-20230310</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220718/version-20220718.html">version-20220718</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220705/version-20220705.html">version-20220705</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220603/version-20220603.html">version-20220603</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220515/version-20220515.html">version-20220515</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220509/version-20220509.html">version-20220509</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20220504/version-20220504.html">version-20220504</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20210809/version-20210809.html">version-20210809</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20210709/version-20210709.html">version-20210709</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/version-20200000-aws/version-20200000-aws.html">version-20200000-aws</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/music-notes_003.html">music-notes_003.html</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/music_notes_006.html">music_notes_006.html</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/notes002-2.html">notes002-2.html</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/notesv002.html">notesv002.html</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/notesv003.html">notesv003.html</a></li>
-    <li><a href="https://hendorism.github.io/musicnotes/old_versions/piano.html">piano.html</a></li>
+    <li><a href="/guitar-hero/music_notes_gpt_4.html">guitar-hero</a></li>
+    <li><a href="/school-bus-derby/school_bus_derby_v20230223.html">school bus derby</a></li>
+    <li><a href="/version-20230310/version-20230310.html">version-20230310 (broken)</a></li>
+    <li><a href="/version-20220718/version-20220718.html">version-20220718 (broken)</a></li>
+    <li><a href="/version-20220705/version-20220705.html">version-20220705 (broken)</a></li>
+    <li><a href="/version-20220603/version-20220603.html">version-20220603 (broken)</a></li>
+    <li><a href="/version-20220515/version-20220515.html">version-20220515 (good)</a>
+        <ul>
+            <li>Version 20220515 is my favorite.</li>
+            <li>Use asdfghjkl;' keys to add notes D4-G5 to a treble staff.</li>
+            <li>Use [ and ] to select bb, b, natural, #, and ## accidentals</li>
+            <li>Use "delete" (on mac) or "backspace" to delete the last note.</li>
+            <li>Does not have arrow key Functionality or ability to select/highlight notes for editing/transposition.</li>
+        </ul>
+    </li>
+    <li><a href="/version-20220509/version-20220509.html">version-20220509 (good)</a>
+        <ul>
+            <li>Version 20220509 is almost my favorite.</li>
+            <li>It's input keyboard features five rows of keys, offering all possible options for enharmonic spelling of pitches.</li>
+            <li>In other words, it has a row for all naturals, a row for sharps, a row for double-sharps, etc.</li>
+            <li>Also, you can change the color scheme, haha. Try the "papyrus" color scheme. Now you are competing with the likes of J. S. Bach!</li>
+        </ul>
+    </li>
+    <li><a href="/version-20220504/version-20220504.html">version-20220504 (broken)</a></li>
+    <li><a href="/version-20210809/version-20210809.html">version-20210809 (broken)</a></li>
+    <li><a href="/version-20210709/version-20210709.html">version-20210709 (broken)</a></li>
+    <li><a href="http://everettmusicdojo-musicnotes.s3-website.us-east-2.amazonaws.com/">version-20200000-aws</a>
+        <ul>
+            <li>Thanks to my friend, Mark for showing me how to use Amazon Web Services to host this version of the app.</li>
+            <li>Functionality of this one is sort of ok. Remember to hit the "draw staves" button, or you will have no staves.</li>
+        </ul>
+    </li>
+    <li><a href="/old_versions/music-notes_003.html">music-notes_003.html</a></li>
+    <li><a href="/old_versions/music_notes_006.html">music_notes_006.html</a></li>
+    <li><a href="/old_versions/notes002-2.html">notes002-2.html</a></li>
+    <li><a href="/old_versions/notesv002.html">notesv002.html</a></li>
+    <li><a href="/old_versions/notesv003.html">notesv003.html</a></li>
+    <li><a href="/old_versions/piano.html">piano.html</a></li>
 </ul>
 
 <!--
