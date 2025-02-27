@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Canvas Example</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+	<div id="editableDiv" contenteditable="true" style="border: 1px solid #ccc; padding: 10px; width: 90%; font-size: 16px;">Type here...</div>
+	
+  <h1 style="text-align: center;">HTML Canvas Example</h1>
+  <canvas id="myCanvas" width="400" height="300"></canvas>
+
+  <script>
+    // Select the canvas element
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    function mLine(x1, y1, x2, y2) {
+    	//makeLine
+        //use points for slope, but extend line to edge of frawing area.
+        ctx.strokeStyle = 'black';
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2,y2);
+        ctx.stroke();
+}
+
+
+
+    // Draw a rectangle
+    ctx.fillStyle = 'skyblue';
+    ctx.fillRect(50, 50, 200, 100);
+
+    // Draw a circle
+    ctx.beginPath();
+    ctx.arc(300, 150, 50, 0, Math.PI * 2);
+    ctx.fillStyle = 'coral';
+    ctx.fill();
+
+    // Add some text
+    ctx.font = '20px Arial';
+    ctx.fillStyle = 'black';
+    ctx.fillText('Hello, Canvas!', 120, 200);
+    
+    mLine(50,50,400,400);
+    
+    
+function displayKB() {
+	//xInterval
+	let xI = canvas.width / 7;
+	
+	//yHeight
+	let yH = 100;
+	
+	//xOffset
+	let xO = 10 * xI;
+	
+	//LinesQuantity
+	let lQ = 100
+
+    //draw lines with positive slope
+    for(i=0; i<lQ; i++) {
+    	let x1 = 0 + xI * i - xO;
+        let y1 = canvas.height;
+        let x2 = canvas.width + xI * i - xO;
+        let y2 = canvas.height - yH;
+        mLine(x1, y1, x2, y2);
+    }
+    
+    //draw lines with negative slope
+    for(i=0; i<lQ; i++) {
+        let x1 = 0 + xI * i - xO;
+        let y1 = canvas.height - yH;
+        let x2 = canvas.width + xI * i - xO;
+        let y2 = canvas.height;
+        mLine(x1, y1, x2, y2);
+    }
+}
+
+displayKB();
+
+
+
+
+
+
+  </script>
+</body>
+</html>

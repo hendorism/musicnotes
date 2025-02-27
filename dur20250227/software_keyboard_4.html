@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamond Key Keyboard</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    canvas {
+      border: 1px solid red;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="keyboardCanvas"></canvas>
+  
+  <script>
+    class Key {
+      static width = 80;
+      static height = 60;
+
+      constructor(x, y, label) {
+        this.x = x;
+        this.y = y;
+        this.label = label;
+        this.isSpace = label === 'Space';
+      }
+
+      draw(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - Key.height / 2); // Top
+        ctx.lineTo(this.x + Key.width / 2, this.y); // Right
+        ctx.lineTo(this.x, this.y + Key.height / 2); // Bottom
+        ctx.lineTo(this.x - Key.width / 2, this.y); // Left
+        ctx.closePath();
+
+        ctx.fillStyle = '#ddd';
+        ctx.fill();
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+
+        ctx.fillStyle = 'black';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.label, this.x, this.y);
+      }
+
+      isClicked(x, y) {
+        const dx = Math.abs(x - this.x);
+        const dy = Math.abs(y - this.y);
+        return dx / (Key.width / 2) + dy / (Key.height / 2) <= 1;
+      }
+    }
+
+    class TextArea {
+      constructor(x, y, width, height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.text = "";
+      }
+
+      draw(ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+        ctx.fillStyle = 'black';
+        ctx.font = '18px Arial';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+
+        let lines = this.wrapText(ctx, this.text, this.width - 10);
+        lines.forEach((line, index) => {
+          ctx.fillText(line, this.x + 5, this.y + 5 + index * 22);
+        });
+      }
+
+      addCharacter(char) {
+        this.text += char;
+      }
+
+      wrapText(ctx, text, maxWidth) {
+        let words = text.split(" ");
+        let lines = [];
+        let currentLine = "";
+
+        words.forEach(word => {
+          let testLine = currentLine ? currentLine + " " + word : word;
+          let testWidth = ctx.measureText(testLine).width;
+          if (testWidth > maxWidth) {
+            lines.push(currentLine);
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        });
+
+        if (currentLine) lines.push(currentLine);
+        return lines;
+      }
+    }
+
+    const canvas = document.getElementById('keyboardCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const xOffset = 50;
+    const yOffset = 150;
+
+    const keyLayout = [
+      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+      ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+      ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Space']
+    ];
+
+    const keys = [];
+    const textArea = new TextArea(50, 50, canvas.width - 100, 80);
+
+    function createKeyboard() {
+      keyLayout.forEach((row, rowIndex) => {
+        row.forEach((key, keyIndex) => {
+          const x = xOffset + keyIndex * Key.width + (rowIndex * Key.width) / 2;
+          const y = yOffset + rowIndex * (Key.height * 0.9);
+          keys.push(new Key(x, y, key));
+        });
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw title
+      ctx.fillStyle = 'black';
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Diamond Key Keyboard', canvas.width / 2, 30);
+
+      textArea.draw(ctx);
+      keys.forEach(key => key.draw(ctx));
+    }
+
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      keys.forEach(key => {
+        if (key.isClicked(x, y)) {
+          textArea.addCharacter(key.isSpace ? ' ' : key.label);
+          draw();
+        }
+      });
+    });
+
+    createKeyboard();
+    draw();
+  </script>
+</body>
+</html>

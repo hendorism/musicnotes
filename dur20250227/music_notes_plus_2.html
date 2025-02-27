@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamond Key Keyboard</title>
+  <style>
+    * { padding: 0; margin: 0; box-sizing: border-box; }
+    body { text-align: center; font-family: Arial, sans-serif; }
+    
+    canvas { border: 0px solid black; display: block; margin: 20px auto; }
+    
+    .controls { margin: 10px; }
+    .controls label { margin-right: 10px; }
+    
+    #indicator { font-size: 18px; font-weight: bold; margin-top: 10px; }
+    .console-div { padding: 16px; background-color: red}
+  </style>
+</head>
+<body>
+
+  <h2>Diamond Key Keyboard</h2>
+
+  <div class="controls">
+    <label for="accidentals">Accidentals:</label>
+    <select id="accidentals">
+      <option>bb</option>
+      <option>b</option>
+      <option>N</option>
+      <option>#</option>
+      <option>##</option>
+    </select>
+
+    <label for="modes">Modes:</label>
+    <select id="modes">
+      <option>Ionian</option>
+      <option>Dorian</option>
+      <option>Phrygian</option>
+      <option>Lydian</option>
+      <option>Mixolydian</option>
+      <option>Aeolian</option>
+      <option>Locrian</option>
+      <option>Harmonic Minor</option>
+      <option>Melodic Minor</option>
+      <option>Indian Raga</option>
+      <option>Middle Eastern</option>
+    </select>
+  </div>
+  
+
+
+  <p id="indicator">Selected: C Ionian</p>
+
+  <canvas id="keyboardCanvas"></canvas>
+  
+  <div class="console-div"><p id="consolee">console</p>
+<p id="oso-p"></p></div>
+  
+  <script>
+  	//oscillator, oscillator period in milliseconds
+  	let oso = 1;
+      const osp = 1000;
+      const ir = 10;
+      
+  	function consoleLog(text) {
+        let p = document.getElementById("consolee");
+        let textNode = document.createTextNode(text);
+        let br = document.createElement("br");
+        p.prepend(br);
+        p.prepend(textNode);
+      }
+      
+    consoleLog("window.innerWidth: " + window.innerWidth);
+    consoleLog("window.innerHeight: " + window.innerHeight);
+    
+  	//staff spacing
+      let sss = 20
+      let ss = 2 * sss * oso;
+      
+
+    class Note {
+      constructor(x, y, pitch) {
+        this.x = x;
+        this.y = y;
+        this.pitch = pitch; 
+      }
+
+      draw(ctx, accidental = '') {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, ss / 2, 0, Math.PI * 2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.stroke();
+
+        if (accidental) {
+          // font size
+          let fs = ss * 0.9;
+          // offset
+          let of = fs * 2.0;
+          // y offset
+          let yf = ss * 0.4;
+          ctx.font = fs + "px Arial";
+          //ctx.fillText(this.pitch, this.x - of, this.y + yf);
+        }
+
+        this.drawDiamond(ctx);
+      }
+
+      drawDiamond(ctx) {
+        //diamond diameter, aspect ratio x/y
+        let dd = sss * 0.5;
+        let as = 2;
+        ctx.beginPath();
+        let x1 = this.x - ir;
+        let y1 = this.y - ir;
+        let x2 = this.x + ir;
+        let y2 = this.y - ir;
+        let x3 = this.x + ir;
+        let y3 = this.y + ir;
+        let x4 = this.x - ir;
+        let y4 = this.y + ir;
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineTo(x3, y3);
+        ctx.lineTo(x4, y4);
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      isClicked(x, y) {
+        return Math.abs(x - this.x) < ir && Math.abs(y - this.y) < ir;
+      }
+    }
+    
+    // cutters point
+    // brown sugar vanilla oatmilk latte add cinamon
+
+      
+    const canvas = document.getElementById('keyboardCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth - 2;
+    canvas.height = 400;
+
+      let noteSpacing = ss * 1;
+      const middleC_Y = canvas.height / 2;
+      const staffLines = 7;
+      const lineSpacing = ss;
+
+    function drawStaff() {
+      ctx.strokeStyle = "black";
+      for (let i = -3; i <= 3; i++) {
+        let y = middleC_Y + i * lineSpacing;
+        let x1 = 0;
+        let y1 = y;
+        let x2 = canvas.width;
+        let y2 = y;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+    }
+
+    let notes = [];
+
+    function createNotes() {
+    notes = [];
+    const pitches = ["C", "D", "E", "F", "G", "A", "B"]; // Ordered scale
+    const middleOctave = 4; // Middle C4
+    const centerX = canvas.width / 2; // Center of canvas
+
+    for (let i = -6; i <= 6; i++) {
+        // Vertical placement (-3 to +3 lines)
+        for (let j = -3; j <= 3; j++) {  // Horizontal placement (left/right for octaves)
+            const x = centerX + j * noteSpacing + i * 13;
+            const y = middleC_Y - i * lineSpacing * 0.5;
+
+            // Determine pitch by vertical position
+            let scaleIndex = (i + 7) % 7; // Maps positions to "C D E F G A B"
+            let pitch = pitches[scaleIndex];
+
+            // Octave shifts with horizontal position
+            let octave = middleOctave - j; 
+            if (i < 0) {
+                octave -=1;
+            }
+           
+
+            notes.push(new Note(x, y, pitch + octave));
+        }
+    }
+}
+    function drawNotes() {
+      const accidental = document.getElementById("accidentals").value;
+      notes.forEach(note => note.draw(ctx, accidental === "Natural" ? "J" : accidental));
+    }
+    
+    function logOso() {
+        let p = document.querySelector("#oso-p");
+        let osor = Math.round(oso * 100) / 100;
+        
+        p.textContent = "oso = " + osor;
+    }
+
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+/////////////////////////////////////
+    function gameLoop() {
+    	let currentTime = Date.now() / 1000; // Convert milliseconds to seconds
+        oso = ( Math.cos(currentTime) + 1 ) / 2;
+                 //   consoleLog(oso);
+        ss = 20 * (oso / 2 + 1 / 3);
+        noteSpacing = ss * 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawStaff();
+      drawNotes();
+      logOso();
+      requestAnimationFrame(gameLoop);
+    }
+
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      notes.forEach(note => {
+        if (note.isClicked(x, y)) {
+          consoleLog(`Clicked note: ${note.pitch}`);
+          //consoleLog("khristy is sleepy")
+        }
+      });
+    });
+    
+    
+
+    document.getElementById("accidentals").addEventListener("change", () => {
+      drawNotes();
+    });
+
+    document.getElementById("modes").addEventListener("change", () => {
+      const selectedMode = document.getElementById("modes").value;
+      document.getElementById("indicator").textContent = `Selected: C ${selectedMode}`;
+    });
+
+    createNotes();
+    gameLoop();
+  </script>
+
+</body>
+</html>

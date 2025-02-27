@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Notes Plus Scroll 3</title>
+  <style>
+    * { padding: 0; margin: 0; box-sizing: border-box; }
+    body { text-align: center; font-family: Arial, sans-serif; overflow: hidden; }
+    
+    canvas { border: 0px solid black; display: block; margin: 20px auto; touch-action: none; }
+
+    .controls { margin: 10px; }
+    .controls label { margin-right: 10px; }
+    
+    #indicator { font-size: 18px; font-weight: bold; margin-top: 10px; }
+    .console-div { padding: 16px; background-color: red}
+  </style>
+</head>
+<body>
+
+  <h2>Music Notes Plus Scroll 3</h2>
+
+  <div class="controls">
+    <label for="accidentals">Accidentals:</label>
+    <select id="accidentals">
+      <option>bb</option>
+      <option>b</option>
+      <option>N</option>
+      <option>#</option>
+      <option>##</option>
+    </select>
+
+    <label for="modes">Modes:</label>
+    <select id="modes">
+      <option>Ionian</option>
+      <option>Dorian</option>
+      <option>Phrygian</option>
+      <option>Lydian</option>
+      <option>Mixolydian</option>
+      <option>Aeolian</option>
+      <option>Locrian</option>
+      <option>Harmonic Minor</option>
+      <option>Melodic Minor</option>
+      <option>Indian Raga</option>
+      <option>Middle Eastern</option>
+    </select>
+  </div>
+
+  <p id="indicator">Selected: C Ionian</p>
+
+  <canvas id="keyboardCanvas"></canvas>
+  
+  <div class="console-div">
+    <p id="motifee">your song here</p>
+    <p id="consolee">console</p></div>
+  
+<script>
+
+
+
+
+let song = [];
+let im = 3;  // input margin
+let oso = 1;
+const ir = 20; // Increased for better visibility
+let sss = ir;
+let ss = 2 * sss + im;
+let offsetX = 0;
+let offsetY = 0
+let isDragging = false;
+let lastX = 0;
+
+function consoleLog(text) {
+  let p = document.getElementById("consolee");
+  let textNode = document.createTextNode(text);
+  let br = document.createElement("br");
+  p.prepend(br);
+  p.prepend(textNode);
+}
+    
+function updateMotif(motif) {
+  let p = document.getElementById("motifee");
+  let n = document.createTextNode(motif);
+  p.textContent = motif;
+}
+
+const canvas = document.getElementById('keyboardCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth - 2;
+canvas.height = 400;
+
+let noteSpacing = ir * 5 + ss/1.5;
+const middleC_Y = canvas.height / 2;
+const lineSpacing = ss;
+let notes = [];
+
+class Note {
+  constructor(x, y, pitch) {
+    this.x = x;
+    this.y = y;
+    this.pitch = pitch;
+  }
+  draw(ctx) {
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    let ar = 1.2  
+    let x = this.x + offsetX;
+    let y = this.y + offsetY;
+    let radiusX = ir * ar;
+    let radiusY = ir;
+    let rotation = -1 * ((Math.PI * 2)/12)
+    let startAngle = 0;
+    let endAngle = Math.PI * 2;  
+    ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
+    ctx.fillStyle = "black";
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = "white";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(this.pitch, this.x + offsetX, this.y + offsetY);
+  }
+  isClicked(x, y) {
+    return Math.abs(x - (this.x + offsetX)) < ir && Math.abs(y - (this.y + offsetY)) < ir;
+  }
+}   
+    
+class Staff {
+  constructor(x, y, lq) {
+    this.x = x;
+    this.y = y;
+    this.lineSpacing = 10;
+    this.lineQty = lq
+  }
+  draw(ctx) {
+    ctx.strokeStyle = "black";
+    for (let i = -3; i <= 3; i++) {
+      let y = this.y + i * this.lineSpacing;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+  }
+  isClicked(x, y) {
+    return Math.abs(x - (this.x + offsetX)) < ir && Math.abs(y - (this.y + offsetY)) < ir;
+  }
+}
+    
+let outputStaff = new Staff(0, canvas.height - 100, 5);
+    
+class Motif {
+  constructor(staff) {
+    this.staff = staff;
+    this.notes = [];
+  }
+  draw(ctx) {
+    // need to populate this.note with objects insted of strings.
+    let newArray = [];
+    this.notes.forEach(note => {
+      newArray.push({
+        // ??
+      });
+    });
+  }
+}
+    
+let output = new Motif(outputStaff);    
+  
+function drawStaff() {
+  ctx.strokeStyle = "black";
+  for (let i = -3; i <= 3; i++) {
+    let y = middleC_Y + i * lineSpacing + offsetY;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+}
+
+function createNotes() {
+  notes = [];
+  const pitches = ["C", "D", "E", "F", "G", "A", "B"];
+  const middleOctave = 4;
+  const centerX = canvas.width / 2;
+  for (let i = -6; i <= 6; i++) {
+    for (let j = -3; j <= 3; j++) {
+      // i = row, j = column
+      const x = centerX + j * noteSpacing + i * (ss/1);
+      const y = middleC_Y - i * lineSpacing * 0.5;
+      let scaleIndex = (i + 7) % 7;
+      let pitch = pitches[scaleIndex];
+      let octave = middleOctave - j;
+      if (i < 0) octave -= 1;
+      notes.push(new Note(x, y, pitch + octave));
+    }
+  }
+}
+
+function drawNotes() {
+  notes.forEach(note => note.draw(ctx));
+}
+
+function gameLoop() {
+  let currentTime = Date.now() / 1000;
+  oso = (Math.cos(currentTime) + 1) / 2;
+  ss = 20 * (oso / 2 + 1 / 3);
+  noteSpacing = ss * 2;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawStaff();
+  drawNotes();
+  outputStaff.draw(ctx);
+  output.draw(ctx);
+  requestAnimationFrame(gameLoop);
+}
+
+function startDrag(e) {
+  isDragging = true;
+  lastX = e.clientX || e.touches[0].clientX;
+  lastY = e.clientY || e.touches[0].clientY;
+}
+
+function drag(e) {
+  if (!isDragging) return;
+  let currentX = e.clientX || e.touches[0].clientX;
+  let currentY = e.clientY || e.touches[0].clientY;
+  offsetX += currentX - lastX;
+  offsetY += currentY - lastY;
+  lastX = currentX;
+  lastY = currentY
+}
+
+function stopDrag() {
+  isDragging = false;
+}
+
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('mousemove', drag);
+canvas.addEventListener('mouseup', stopDrag);
+canvas.addEventListener('mouseleave', stopDrag);
+
+canvas.addEventListener('touchstart', startDrag);
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  drag(e);
+});
+canvas.addEventListener('touchend', stopDrag);
+
+canvas.addEventListener('click', (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  notes.forEach(note => {
+    if (note.isClicked(x, y)) {
+      song.push(note.pitch);
+      output.notes.push(note.pitch);
+      let motif = song.join(" "); 
+      updateMotif(motif);
+      // consoleLog(`${motif}`);
+    }
+  });
+});
+
+document.getElementById("accidentals").addEventListener("change", () => drawNotes());
+document.getElementById("modes").addEventListener("change", () => {
+  const selectedMode = document.getElementById("modes").value;
+  document.getElementById("indicator").textContent = `Selected: C ${selectedMode}`;
+});
+
+createNotes();
+gameLoop();
+
+
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

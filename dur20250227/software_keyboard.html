@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>On-Screen Keyboard</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      display: block;
+      margin: 20px auto;
+    }
+    #output {
+      display: block;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 600px;
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="keyboardCanvas" width="600" height="200"></canvas>
+  <input type="text" id="output" readonly placeholder="Click keys to type here...">
+  <script>
+    const canvas = document.getElementById('keyboardCanvas');
+    const ctx = canvas.getContext('2d');
+    const output = document.getElementById('output');
+
+    const keys = [
+      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+      ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+      ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Space']
+    ];
+    const keyWidth = 50;
+    const keyHeight = 50;
+    const padding = 10;
+
+    // Draw the keyboard
+    function drawKeyboard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      keys.forEach((row, rowIndex) => {
+        row.forEach((key, keyIndex) => {
+          const x = padding + keyIndex * (keyWidth + padding);
+          const y = padding + rowIndex * (keyHeight + padding);
+
+          ctx.fillStyle = '#ddd';
+          ctx.fillRect(x, y, keyWidth, keyHeight);
+
+          ctx.fillStyle = 'black';
+          ctx.font = '18px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Center text for space key
+          if (key === 'Space') {
+            const spaceWidth = keyWidth * 4;
+            ctx.fillRect(x, y, spaceWidth, keyHeight);
+            ctx.fillStyle = 'white';
+            ctx.fillText('Space', x + spaceWidth / 2, y + keyHeight / 2);
+          } else {
+            ctx.fillText(key, x + keyWidth / 2, y + keyHeight / 2);
+          }
+        });
+      });
+    }
+
+    // Handle clicks on the keyboard
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      keys.forEach((row, rowIndex) => {
+        row.forEach((key, keyIndex) => {
+          const keyX = padding + keyIndex * (keyWidth + padding);
+          const keyY = padding + rowIndex * (keyHeight + padding);
+          const keyW = key === 'Space' ? keyWidth * 4 : keyWidth;
+
+          if (x >= keyX && x <= keyX + keyW && y >= keyY && y <= keyY + keyHeight) {
+            if (key === 'Space') {
+              output.value += ' ';
+            } else {
+              output.value += key;
+            }
+          }
+        });
+      });
+    });
+
+    drawKeyboard();
+  </script>
+</body>
+</html>

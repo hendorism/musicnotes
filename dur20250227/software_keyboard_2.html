@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diamond Key Keyboard</title>
+  <style>
+  	* {
+    padding: 0px;
+    margin: 0px;
+}
+    canvas {
+      border: 1px solid red;
+      display: block;
+      
+    }
+    #output {
+      display: block;
+      margin: 10px auto;
+      width: 90%;
+      max-width: 600px;
+      font-size: 18px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="keyboardCanvas" width="600" height="300"></canvas>
+  <input type="text" id="output" readonly placeholder="Click keys to type here...">
+  <script>
+    const canvas = document.getElementById('keyboardCanvas');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    const ctx = canvas.getContext('2d');
+    const output = document.getElementById('output');
+
+    const keys = [
+      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+      ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+      ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Space']
+    ];
+
+    const diamondWidth = 80;
+    const diamondHeight = 60;
+    const xOffset = 50; // Horizontal offset
+    const yOffset = 50; // Vertical offset
+
+    // Draw a diamond shape
+    function drawDiamond(x, y, text, isSpace) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - diamondHeight / 2); // Top point
+      ctx.lineTo(x + diamondWidth / 2, y); // Right point
+      ctx.lineTo(x, y + diamondHeight / 2); // Bottom point
+      ctx.lineTo(x - diamondWidth / 2, y); // Left point
+      ctx.closePath();
+
+      ctx.fillStyle = '#ddd';
+      ctx.fill();
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+
+      // Draw text
+      ctx.fillStyle = 'black';
+      ctx.font = '16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      if (isSpace) {
+        ctx.fillText('Space', x, y);
+      } else {
+        ctx.fillText(text, x, y);
+      }
+    }
+
+    // Draw the keyboard
+    function drawKeyboard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      keys.forEach((row, rowIndex) => {
+        row.forEach((key, keyIndex) => {
+          //const x = xOffset + keyIndex * diamondWidth + (rowIndex * diamondWidth) / 2;
+          const x = xOffset + keyIndex * diamondWidth + (rowIndex * diamondWidth) / 2;
+          const y = yOffset + rowIndex * (diamondHeight / 2);
+          const isSpace = key === 'Space';
+
+          drawDiamond(x, y, key, isSpace);
+        });
+      });
+    }
+
+    // Handle clicks on the keyboard
+    canvas.addEventListener('click', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      keys.forEach((row, rowIndex) => {
+        row.forEach((key, keyIndex) => {
+          const centerX = xOffset + keyIndex * diamondWidth + (rowIndex * diamondWidth) / 2;
+          const centerY = yOffset + rowIndex * diamondHeight;
+
+          // Check if the click is inside the diamond
+          const dx = Math.abs(x - centerX);
+          const dy = Math.abs(y - centerY);
+
+          if (dx / (diamondWidth / 2) + dy / (diamondHeight / 2) <= 1) {
+            if (key === 'Space') {
+              output.value += ' ';
+            } else {
+              output.value += key;
+            }
+          }
+        });
+      });
+    });
+
+    drawKeyboard();
+  </script>
+</body>
+</html>

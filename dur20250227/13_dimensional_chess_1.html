@@ -1,0 +1,112 @@
+13 Dimensaional CHess
+<script>
+
+// Create a 13D chessboard dynamically
+function createBoard(dimensions, size) {
+    if (dimensions === 1) return new Array(size).fill(null);
+    return new Array(size).fill(null).map(() => createBoard(dimensions - 1, size));
+}
+
+const boardSize = 8; // 8x8x... chessboard
+const board = createBoard(13, boardSize);
+
+
+
+
+const pieces = {
+    'P': 'Pawn', 'N': 'Knight', 'B': 'Bishop', 'R': 'Rook', 'Q': 'Queen', 'K': 'King'
+};
+
+// Example: 13D knight move generator (moving in 2 non-equal dimensions)
+function generateKnightMoves(position) {
+    let moves = [];
+    let shifts = [2, 1, -2, -1]; // Knight-like jumps
+    for (let i = 0; i < 13; i++) {
+        for (let j = 0; j < 13; j++) {
+            if (i !== j) { // Move in two separate dimensions
+                for (let s1 of shifts) {
+                    for (let s2 of shifts) {
+                        if (Math.abs(s1) !== Math.abs(s2)) {
+                            let newPos = [...position];
+                            newPos[i] += s1;
+                            newPos[j] += s2;
+                            moves.push(newPos);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return moves;
+}
+
+
+
+
+// move validation
+
+function isValidMove(piece, from, to) {
+    let validMoves = generateKnightMoves(from); // Example for knights
+    return validMoves.some(move => move.every((val, idx) => val === to[idx]));
+}
+
+
+
+
+
+
+function makeMove(piece, from, to) {
+    if (!isValidMove(piece, from, to)) {
+        console.log("Invalid move!");
+        return false;
+    }
+    let ref = board;
+    from.forEach((val, i) => {
+        if (i === from.length - 1) ref[val] = null;
+        else ref = ref[val];
+    });
+
+    ref = board;
+    to.forEach((val, i) => {
+        if (i === to.length - 1) ref[val] = piece;
+        else ref = ref[val];
+    });
+
+    console.log(`Moved ${piece} from ${from} to ${to}`);
+    return true;
+}
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

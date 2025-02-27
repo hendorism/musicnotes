@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitar Tab Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .tab-container {
+            display: inline-block;
+            background-color: #2b2b2b;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+
+        pre {
+            font-family: monospace;
+            font-size: 16px;
+            white-space: pre;
+            line-height: 1.5;
+            color: #0f0; /* Green text like old-school terminals */
+        }
+
+        select {
+            font-size: 16px;
+            padding: 5px;
+            margin: 10px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Guitar Tab</h2>
+    
+    <label for="scrollSpeed">Auto Scroll Speed:</label>
+<select id="scrollSpeed">
+    <option value="0">Off</option>
+    <option value="10">Slow</option>
+    <option value="5" selected>Medium</option>
+    <option value="2">Fast</option>
+</select>
+<button id="toggleScroll">Start</button>
+
+
+    <label for="lineLength">Choose line length:</label>
+    <select id="lineLength">
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20" selected>20</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="60">60</option>
+        <option value="80">80</option>
+    </select>
+    
+<br>    <label for="textSize">Choose text size:</label>
+        <select id="textSize">
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20" selected>20</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+    </select>
+<br>
+    <div class="tab-container">
+        <pre id="tab"></pre>
+    </div>
+    <br>vars:
+    
+    <br>#strings
+    <br>text size
+    <br>line length (#chars)
+    
+
+    <script>
+        let song = {
+            e: "--------------------------------------------------------------------------------",
+            B: "------------------------------------------------------------------",
+            G: "------------------------------------------------------------------",
+            D: "------------2-------2---------0-------------2------2------------------",
+            A: "------------------------0h2h4---2h4p2p0---------------------------------------",
+            E: "0-0-0-0-3h4---3p0-0---------------------3h4---3h0------------------",
+        };
+
+        // let tabElement = <pre id="tab"></pre>
+           let tabElement = document.getElementById("tab");
+
+        // let lineLengthSelector = <select id="lineLength">
+           let lineLengthSelector = document.getElementById("lineLength");
+
+        // let textSizeSelector = <select id="textSize">
+           let textSizeSelector = document.getElementById("textSize");
+
+        // let scrollSpeedSelector = <select id="scrollSpeed">
+           let scrollSpeedSelector = document.getElementById("scrollSpeed");
+
+        // let toggleScrollButton = <button id="toggleScroll">Start</button>
+           let toggleScrollButton = document.getElementById("toggleScroll");
+
+           let scrollingInterval;
+
+           let isScrolling = false;
+
+
+        function updateTabDisplay() {
+            let maxLength = parseInt(lineLengthSelector.value);
+            let textSize = parseInt(textSizeSelector.value) + "px";
+            document.querySelectorAll("pre").forEach(e => e.style.fontSize = textSize);
+
+
+            let tabText = "";
+
+            let fullLines = Object.entries(song); // Convert to array of [key, value] pairs
+            let numChunks = Math.ceil(fullLines[0][1].length / maxLength); // Calculate number of chunks
+
+            for (let i = 0; i < numChunks; i++) {
+                for (let [string, notes] of fullLines) {
+                    let start = i * maxLength;
+                    let end = start + maxLength;
+                    tabText += `${string} | ${notes.slice(start, end).padEnd(maxLength, "-")}\n`;
+                }
+                tabText += "\n"; // Space between wrapped sections
+            }
+
+            tabElement.textContent = tabText;
+        }
+
+        lineLengthSelector.addEventListener("change", updateTabDisplay);
+        textSizeSelector.addEventListener("change", updateTabDisplay);
+
+        updateTabDisplay(); // Initial display update
+    </script>
+
+</body>
+</html>
