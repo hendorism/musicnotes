@@ -22,14 +22,15 @@
             text-align: center;
         }
         form {
-            max-width: 400px;
+            max-width: 600px;
             margin: 0 auto;
-            background: #fff;
+            background: #dfefff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         input, textarea {
+            max-width: 500px;
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -54,9 +55,113 @@
             margin: 0 auto 16px; /* Adds 16px space below each paragraph */
             line-height: 1.6; /* Improves readability */
         }
+        #youtube1 {
+            display: block;
+            margin: 0 auto 16px; /* Adds 16px space below the video */
+            /* shrink to fit */
+            max-width: 100%;
+            
+        }
+        img#background-img {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 1;
+        }
+        div#background-div {
+/* background-div is blue. it is on top of background-img. it has 0.2 opacity */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #77ccff;
+            z-index: -1;
+            opacity: 0.92;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #compositions h4 {
+        margin-top: 20px;
+        color: #336699;
+    }
+
+    table {
+        width: 100%; /* Ensures tables take up the same width */
+        max-width: 800px; /* Adjust based on your layout */
+        margin: auto;
+        border-collapse: collapse;
+        table-layout: fixed; /* Ensures columns are the same width */
+        background: #f9f9f9;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+        width: 25%; /* Ensures all columns are the same width */
+    }
+
+    th {
+        background: #4477bb;
+        color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background: #eef2f7;
+    }
+
+    tr:hover {
+        background: #dce4f0;
+        transition: 0.3s;
+    }
+
+    a {
+        text-decoration: none;
+        color: #004080;
+        font-weight: bold;
+    }
+
+    a:hover {
+        color: #ff6600;
+        text-decoration: underline;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
+    <div id="background-div"></div>
+    <img id="background-img" src="https://everettmusicdojo.com/wp-content/uploads/2025/01/20250106_1608536497613424184382742-600x450.jpg">
     <header>
         <h1>Everett Music Dojo</h1>
 
@@ -64,23 +169,33 @@
     </header>
     <main>
         <h2>Welcome to Everett Music Dojo</h2>
-        <p>Learn music from the best teachers in town!</p>
+        <h4>Learn music from the best teachers in town!</h4>
         <h3>Contact Us</h3>
 <form action="https://formspree.io/f/xanqrnyv" method="POST">
   <label>
     Your email:
     <input type="email" name="email">
-  </label>
+  </label><br>
   <label>
-    Tell us about yourself, and we will get back to you as soon as possible:
-    <textarea name="message"></textarea>
+    Tell us about yourself, and we will get back to you as soon as possible:<br>
+    <textarea name="message"></textarea><br>
   </label>
   <!-- your other form fields go here -->
   <button type="submit">Send</button>
 </form>
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/7bOpG1jA31Y?si=Xdx3cZAxC7lQz_IC" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
+<iframe id="youtube1" width="560" height="315" src="https://www.youtube.com/embed/7bOpG1jA31Y?si=Xdx3cZAxC7lQz_IC" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div class="social_div">
+    <a href="https://www.facebook.com/Hendorism" target="_blank"><img src="social_media_buttons_fb.png" alt="Facebook"></a>
+    <a href="https://youtu.be/v7Zaqkzg_8Y?si=fYahAqhu0cuRQHqg" target="_blank"><img src="social_media_buttons_youtube.png" alt="YouTube"></a>
+    <a href="https://soundcloud.com/aaron-dull/flewd-conduct?si=18561583a165487a99e9a7d98278c9c3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank"><img src="social_media_buttons_soundcloud.png" alt="SoundCloud"></a>
+<!--    <a href="https://innovationsstudio.wordpress.com/about/" target="_blank"><img src="social_media_buttons_wordpress.png" alt="WordPress"></a> -->
+    <a href="https://twitter.com/Hendorism" target="_blank"><img src="social_media_buttons_twitter.png" alt="Twitter"></a>
+    <a href="https://www.fiverr.com/hendorism" target="_blank"><img src="social_media_buttons_fiverr.png" alt="Fiverr"></a>
+    <a href="https://www.linkedin.com/in/aaron-dull-57571889/" target="_blank"><img src="social_media_buttons_linkedin.png" alt="Linkedin"></a>
+    <a href="https://www.instagram.com/hendorism/?hl=en" target="_blank"><img src="social_media_buttons_insta.png" alt="Instagram"></a>
+    <a href="https://www.tiktok.com/explore" target="_blank"><img src="social_media_buttons_ticktock.png" alt="tiktok"></a>
+</div>
 
 <p>Aaron Dull's journey in music began at a tender age, growing up in a household where music education was a way of life. Surrounded by a family deeply involved in music, Aaron was exposed to various instruments such as guitar, piano, and harp from an early age. His father was a drummer, his older brother became a drummer in the 6th grade, and Aaron intended to follow in their footsteps, but the middle school band had a surplus of drummers. So Aaron chose clarinet, which he knew and loved from Sergei Prokofiev's classic musical children's story Peter and the Wolf.</p>
 
@@ -96,17 +211,97 @@
 
 
 
-        
-<div class="social_div">
-    <a href="https://www.facebook.com/Hendorism" target="_blank"><img src="social_media_buttons_fb.png" alt="Facebook"></a>
-    <a href="https://www.youtube.com/watch?v=Pz3nADyVUGc" target="_blank"><img src="social_media_buttons_youtube.png" alt="YouTube"></a>
-    <a href="https://soundcloud.com/aaron-dull/another-jam" target="_blank"><img src="social_media_buttons_soundcloud.png" alt="SoundCloud"></a>
-    <a href="https://innovationsstudio.wordpress.com/about/" target="_blank"><img src="social_media_buttons_wordpress.png" alt="WordPress"></a>
-    <a href="https://twitter.com/Hendorism" target="_blank"><img src="social_media_buttons_twitter.png" alt="Twitter"></a>
-    <a href="https://www.fiverr.com/hendorism" target="_blank"><img src="social_media_buttons_fiverr.png" alt="Fiverr"></a>
-    <a href="https://www.linkedin.com/in/aaron-dull-57571889/" target="_blank"><img src="social_media_buttons_linkedin.png" alt="Linkedin"></a>
-    <a href="https://www.instagram.com/hendorism/?hl=en" target="_blank"><img src="social_media_buttons_insta.png" alt="Instagram"></a>
+
+
+
+
+
+<div id="compositions">
+    <h1>Compositions:</h1>
+
+    <h4>Piano:</h4>
+
+    <h4>Choral:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Instrumentation</th>
+                <th>Difficulty</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <a href="http://everettmusicdojo.com/wp-content/uploads/2024/09/Yangtze-v4-20240110.pdf" target="_blank" rel="noopener">
+                        Yangtze River Boatmen (version 4)
+                    </a>
+                </td>
+                <td>Children's unison w/ piano accompaniment</td>
+                <td>Beginner</td>
+                <td>2024</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Flute:</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Instrumentation</th>
+                <th>Difficulty</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Dangerous_Daffodils_flute_solo_-_4_8_2018.pdf" target="_blank" rel="noopener">
+                        Dangerous Daffodils
+                    </a>
+                </td>
+                <td>Flute solo</td>
+                <td>Advanced</td>
+                <td>2017</td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf" target="_blank" rel="noopener">
+                        Frute of the Loom
+                    </a>
+                </td>
+                <td>Flute duet</td>
+                <td>Intermediate</td>
+                <td>2017</td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="https://everettmusicdojo.com/wp-content/uploads/2022/03/fluentsy.pdf" target="_blank" rel="noopener">
+                        Fluentsy
+                    </a>
+                </td>
+                <td>Flute duet</td>
+                <td>Advanced</td>
+                <td>2018</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
+
+
+
+
+
+
+
+
     </main>
+    <script>
+        // #youtube1 is same width as <p> elements
+        var youtube1 = document.getElementById('youtube1');
+        youtube1.style.width = 600 + 'px';
+    </script>
 </body>
 </html></html>
