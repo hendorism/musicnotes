@@ -65,7 +65,7 @@ button:hover {
 p {
     max-width: 600px; /* Matches default YouTube embed width */
     margin: 0 auto; /* Centers the text */
-    text-align: left;
+    text-align: justify;
     margin: 0 auto 16px; /* Adds 16px space below each paragraph */
     line-height: 1.6; /* Improves readability */
 }
@@ -143,12 +143,12 @@ tr:hover {
 
 a {
     text-decoration: none;
-    color: #004080;
+    color: #097000;
     font-weight: bold;
 }
 
 a:hover {
-    color: #ff6600;
+    color: #00ff66;
     text-decoration: underline;
 }
 
@@ -158,7 +158,8 @@ div.text-backdrop-div {
     /* has a 90% opaque background which is #333333. all text inside is #dddddd */
     background-color: #333333;
     color: #dddddd;
-    padding: 20px;
+    /* top padding 100px */
+    padding: 60px 20px 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
@@ -166,6 +167,25 @@ div.text-backdrop-div {
 }
 
 /* ............................................. */
+
+/* .social_div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin: 20px auto;
+} */
+
+/* .social_div a {
+    flex: 1 1 calc(25% - 10px);
+    max-width: calc(25% - 10px);
+    text-align: center;
+} */
+
+/* .social_div img {
+    width: 50%;
+    height: auto;
+} */
 </style>
 </head>
 <body>
@@ -204,8 +224,8 @@ div.text-backdrop-div {
     <a href="https://www.facebook.com/Hendorism" target="_blank"><img src="social_media_buttons_fb.png" alt="Facebook"></a>
     <a href="https://youtu.be/v7Zaqkzg_8Y?si=fYahAqhu0cuRQHqg" target="_blank"><img src="social_media_buttons_youtube.png" alt="YouTube"></a>
     <a href="https://soundcloud.com/aaron-dull/flewd-conduct?si=18561583a165487a99e9a7d98278c9c3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank"><img src="social_media_buttons_soundcloud.png" alt="SoundCloud"></a>
-<!--    <a href="https://innovationsstudio.wordpress.com/about/" target="_blank"><img src="social_media_buttons_wordpress.png" alt="WordPress"></a> -->
     <a href="https://twitter.com/Hendorism" target="_blank"><img src="social_media_buttons_twitter.png" alt="Twitter"></a>
+    <br>
     <a href="https://www.fiverr.com/hendorism" target="_blank"><img src="social_media_buttons_fiverr.png" alt="Fiverr"></a>
     <a href="https://www.linkedin.com/in/aaron-dull-57571889/" target="_blank"><img src="social_media_buttons_linkedin.png" alt="Linkedin"></a>
     <a href="https://www.instagram.com/hendorism/?hl=en" target="_blank"><img src="social_media_buttons_insta.png" alt="Instagram"></a>
@@ -698,9 +718,7 @@ function setTrColors(textColor, backgroundColor) {
         //iframe id="youtube1" top and bottom margin is 16px
         youtube1.style.margin = '120px auto';
 
-        //social div top and bottom margin is 16px
-        const socialDiv = document.querySelector('.social_div');
-        socialDiv.style.margin = '60px auto';
+
         //<form action="https://formspree.io/f/xanqrnyv" method="POST" id="contact-form"> text color is #333333 and no text shadow
         const contactForm = document.querySelector('form#contact-form');
         contactForm.style.color = '#333333';
