@@ -692,7 +692,7 @@ function setTrColors(textColor, backgroundColor) {
 document.addEventListener("DOMContentLoaded", function () {
 ////////////////////////////////////////////////////////////////////////////////
 const colorSchemes = {
-    greens1: ["#af108e", "#3e0d68", "#074784", "#0878a8", "#0878a8"],
+    greens1: ["#af108e", "#3e0d68", "#074784", "#0878a8"],
     greys: ["#333", "#666", "#999", "#ccc", "#eee"],
 };
 const header = document.querySelector('header');
@@ -714,8 +714,11 @@ if (backgroundDiv) {
         let color = `rgb(${red}, ${green}, ${blue})`;
         backgroundDiv.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
         console.log(`rgb(${red}, ${green}, ${blue})`);
-
-
+//header background color smoothly cycles between colors of colorSchemes.greens1
+let headerColor = colorSchemes.greens1[1];
+header.style.backgroundColor = headerColor;
+//header text color is the same as the background color of div#background-div
+header.style.color = color;
 
 
 
@@ -737,6 +740,15 @@ let backgroundColor = colorSchemes.greys[4];
 }
 
 
+//below header, display div to show all the colors in greens1
+for (i=0; i<colorSchemes.greens1.length; i++) {
+    let col = colorSchemes.greens1[i];
+    let div = document.createElement('div');
+    div.style.backgroundColor = col;
+    div.style.width = '100%';
+    div.style.height = '20px';
+    document.body.appendChild(div);
+}
 
 
 
