@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IM Fell English Font Demo</title>
+    
+    <!-- Method 1: Link tag in HTML head -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Method 2: CSS @import (alternative approach) */
+        /* @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap'); */
+        
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .im-fell-english {
+            font-family: 'IM Fell English', serif;
+        }
+        
+        .demo-text {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            color: #333;
+        }
+        
+        .italic {
+            font-style: italic;
+        }
+        
+        .large {
+            font-size: 24px;
+        }
+        
+        .medium {
+            font-size: 18px;
+        }
+        
+        .small {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>IM Fell English Google Font Implementation</h1>
+    
+    <h2>Implementation Methods:</h2>
+    
+    <h3>1. HTML Link Tags (Recommended)</h3>
+    <pre><code>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"&gt;</code></pre>
+    
+    <h3>2. CSS Import</h3>
+    <pre><code>@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&display=swap');</code></pre>
+    
+    <h3>3. CSS Usage</h3>
+    <pre><code>font-family: 'IM Fell English', serif;</code></pre>
+    
+    <h2>Font Demonstrations:</h2>
+    
+    <div class="demo-text im-fell-english large">
+        <strong>Large Text (24px):</strong><br>
+        The quick brown fox jumps over the lazy dog. This elegant typeface was originally cut by Peter De Walpergen in the 1670s.
+    </div>
+    
+    <div class="demo-text im-fell-english medium">
+        <strong>Medium Text (18px):</strong><br>
+        IM Fell English is based on the types used by Dr John Fell at Oxford University at the end of the 17th century.
+    </div>
+    
+    <div class="demo-text im-fell-english small">
+        <strong>Small Text (14px):</strong><br>
+        This font provides an authentic historical appearance perfect for documents requiring a classical feel.
+    </div>
+    
+    <div class="demo-text im-fell-english medium italic">
+        <strong>Italic Style:</strong><br>
+        <em>The italic variant adds graceful emphasis to your text while maintaining the historical character of the typeface.</em>
+    </div>
+    
+    <h2>JavaScript Font Loading (Optional)</h2>
+    <pre><code>// Check if font is loaded
+document.fonts.ready.then(() => {
+    console.log('IM Fell English font loaded');
+});
+
+// Or load programmatically
+const font = new FontFace('IM Fell English', 
+    'url(https://fonts.gstatic.com/s/imfellenglish/v16/Ktk6ALSWZADIskzt-H1MRIJGxBqmRcc7-g.woff2)'
+);
+font.load().then(() => {
+    document.fonts.add(font);
+});</code></pre>
+
+    <script>
+        // Example: Check when font is loaded
+        document.fonts.ready.then(() => {
+            console.log('All fonts loaded, including IM Fell English');
+        });
+        
+        // Add a visual indicator when fonts are ready
+        document.fonts.ready.then(() => {
+            const indicator = document.createElement('div');
+            indicator.textContent = '✓ Fonts loaded successfully';
+            indicator.style.cssText = 'position: fixed; top: 10px; right: 10px; background: green; color: white; padding: 10px; border-radius: 5px; font-size: 12px;';
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                indicator.style.transition = 'opacity 1s';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
