@@ -1,0 +1,403 @@
+<script>
+    a=440*(6/5);
+    b=440*(7/6);
+    c=440*2**(3/12);
+    aa = a-c;
+    bb = b-c;
+
+    // how many cents sharp is a relative to c
+    a_centsSharp = Math.round(1200 * Math.log2(a/c));
+    // how many cents sharp is b relative to c
+    b_centsSharp = Math.round(1200 * Math.log2(b/c));
+    let et_M3 = 440*2**(4/12);
+
+    let et_M6 = 440*2**(9/12);
+    let intvls = [
+        {
+            name: "12tet 0",
+            decimal: 1,
+            cents: 0,
+        },
+        {
+            name: "12tet 1",
+            cents: 100,
+            decimal: 2**(100/1200)
+        },
+        {
+            name: "12tet 2",
+            cents: 200,
+            decimal: 2**(200/1200)
+        },
+        {
+            name: "12tet 3",
+            cents: 300,
+            decimal: 2**(300/1200)
+        },
+        {
+            name: "12tet 4",
+            cents: 400,
+            decimal: 2**(400/1200)
+        },
+        {
+            name: "12tet 5",
+            cents: 500,
+            decimal: 2**(500/1200)
+        },
+        {
+            name: "12tet 6",
+            cents: 600,
+            decimal: 2**(600/1200)
+        },
+        {
+            name: "12tet 7",
+            cents: 700,
+            decimal: 2**(700/1200)
+        },
+        {
+            name: "12tet 8",
+            cents: 800,
+            decimal: 2**(800/1200)
+        },
+        {
+            name: "12tet 9",
+            cents: 900,
+            decimal: 2**(900/1200)
+        },
+        {
+            name: "12tet 10",
+            cents: 1000,
+            decimal: 2**(1000/1200)
+        },
+        {
+            name: "12tet 11",
+            cents: 1100,
+            decimal: 2**(1100/1200)
+        },
+        {
+            name: "3:2",
+            decimal: 3/2,
+            cents: Math.round(1200 * Math.log2(3/2))
+        },
+        {
+            name: "5:4",
+            decimal: 5/4,
+            cents: Math.round(1200 * Math.log2(5/4))
+        },
+        {
+            name: "6:5",
+            decimal: 6/5,
+            cents: Math.round(1200 * Math.log2(6/5))
+        },
+        {
+            name: "4:3",
+            decimal: 4/3,
+            cents: Math.round(1200 * Math.log2(4/3))
+        },
+        {
+            name: "11:8",
+            decimal: 11/8,
+            cents: Math.round(1200 * Math.log2(11/8))
+        },
+        {
+            name: "7:4",
+            decimal: 7/4,
+            cents: Math.round(1200 * Math.log2(7/4))
+        },
+        {
+            name: "9:8",
+            decimal: 9/8,
+            cents: Math.round(1200 * Math.log2(9/8))
+        },
+        {
+            name: "10:9",
+            decimal: 10/9,
+            cents: Math.round(1200 * Math.log2(10/9))
+        },
+        {
+            name: "15:8",
+            decimal: 15/8,
+            cents: Math.round(1200 * Math.log2(15/8))
+        },
+        {
+            name: "13:8",
+            decimal: 13/8,
+            cents: Math.round(1200 * Math.log2(13/8))
+        },
+        {
+            name: "14:11",
+            decimal: 14/11,
+            cents: Math.round(1200 * Math.log2(14/11))
+        },
+        {
+            name: "16:15",
+            decimal: 16/15,
+            cents: Math.round(1200 * Math.log2(16/15))
+        },
+        {
+            name: "17:16",
+            decimal: 17/16,
+            cents: Math.round(1200 * Math.log2(17/16))
+        },
+        {
+            name: "18:17",
+            decimal: 18/17,
+            cents: Math.round(1200 * Math.log2(18/17))
+        },
+        {
+            name: "19:18",
+            decimal: 19/18,
+            cents: Math.round(1200 * Math.log2(19/18))
+        },
+        {
+            name: "20:19",
+            decimal: 20/19,
+            cents: Math.round(1200 * Math.log2(20/19))
+        },
+        {
+            name: "21:20",
+            decimal: 21/20,
+            cents: Math.round(1200 * Math.log2(21/20))
+        },
+        {
+            name:"5:3", decimal: 5/3,
+            cents: Math.round(1200 * Math.log2(5/3))
+        },
+        {
+            name:"7:5", decimal: 7/5,
+            cents: Math.round(1200 * Math.log2(7/5))
+        },
+        {
+            name:"8:5", decimal: 8/5,
+            cents: Math.round(1200 * Math.log2(8/5))
+        },
+        {
+            name:"9:5", decimal: 9/5,
+            cents: Math.round(1200 * Math.log2(9/5))
+        },
+        {
+            name:"11:6", decimal: 11/6,
+            cents: Math.round(1200 * Math.log2(11/6))
+        },
+        {
+            name:"13:7", decimal: 13/7,
+            cents: Math.round(1200 * Math.log2(13/7))
+        },
+        {
+            name:"14:8", decimal: 14/8,
+            cents: Math.round(1200 * Math.log2(14/8))
+        },
+        {
+            name:"15:9", decimal: 15/9,
+            cents: Math.round(1200 * Math.log2(15/9))
+        },
+        {
+            name:"16:9", decimal: 16/9,
+            cents: Math.round(1200 * Math.log2(16/9))
+        },
+        {
+            name:"17:10", decimal: 17/10,
+            cents: Math.round(1200 * Math.log2(17/10))
+        },
+        {
+            name:"19:11", decimal: 19/11,
+            cents: Math.round(1200 * Math.log2(19/11))
+        },
+        {
+            name:"20:12", decimal: 20/12,
+            cents: Math.round(1200 * Math.log2(20/12))
+        },
+        {
+            name:"21:13", decimal: 21/13,
+            cents: Math.round(1200 * Math.log2(21/13))
+        },
+        {
+            name:"22:14", decimal: 22/14,
+            cents: Math.round(1200 * Math.log2(22/14))
+        },
+        {
+            name:"23:15", decimal: 23/15,
+            cents: Math.round(1200 * Math.log2(23/15))
+        },
+        {
+            name:"24:16", decimal: 24/16,
+            cents: Math.round(1200 * Math.log2(24/16))
+        },
+        {
+            name:"25:17", decimal: 25/17,
+            cents: Math.round(1200 * Math.log2(25/17))
+        },
+        {
+            name:"26:18", decimal: 26/18,
+            cents: Math.round(1200 * Math.log2(26/18))
+        },
+        {
+            name:"27:19", decimal: 27/19,
+            cents: Math.round(1200 * Math.log2(27/19))
+        },
+        {
+            name:"28:20", decimal: 28/20,
+            cents: Math.round(1200 * Math.log2(28/20))
+        },
+        {
+            name:"29:21", decimal: 29/21,
+            cents: Math.round(1200 * Math.log2(29/21))
+        },
+        {
+            name:"30:22", decimal: 30/22,
+            cents: Math.round(1200 * Math.log2(30/22))
+        },
+        {
+            name:"31:23", decimal: 31/23,
+            cents: Math.round(1200 * Math.log2(31/23))
+        },
+        {
+            name:"32:24", decimal: 32/24,
+            cents: Math.round(1200 * Math.log2(32/24))
+        },
+        {
+            name:"33:25", decimal: 33/25,
+            cents: Math.round(1200 * Math.log2(33/25))
+        },
+        {
+            name:"34:26", decimal: 34/26,
+            cents: Math.round(1200 * Math.log2(34/26))
+        },
+        {
+            name:"35:27", decimal: 35/27,
+            cents: Math.round(1200 * Math.log2(35/27))
+        },
+        {
+            name:"36:28", decimal: 36/28,
+            cents: Math.round(1200 * Math.log2(36/28))
+        },
+        {
+            name:"37:29", decimal: 37/29,
+            cents: Math.round(1200 * Math.log2(37/29))
+        },
+        {
+            name:"38:30", decimal: 38/30,
+            cents: Math.round(1200 * Math.log2(38/30))
+        },
+        {
+            name:"39:31", decimal: 39/31,
+            cents: Math.round(1200 * Math.log2(39/31))
+        },
+        {name:"7:6", decimal: 7/6, cents: Math.round(1200 * Math.log2(7/6))},
+        {name:"8:7", decimal: 8/7, cents: Math.round(1200 * Math.log2(8/7))},
+        {name:"9:7", decimal: 9/7, cents: Math.round(1200 * Math.log2(9/7))},
+        {name:"10:7", decimal: 10/7, cents: Math.round(1200 * Math.log2(10/7))},
+        {name:"11:7", decimal: 11/7, cents: Math.round(1200 * Math.log2(11/7))},
+        {name:"12:7", decimal: 12/7, cents: Math.round(1200 * Math.log2(12/7))},
+        {name:"13:7", decimal: 13/7, cents: Math.round(1200 * Math.log2(13/7))},
+
+    ]
+
+//rearrange intervals in order of cents
+    intvls.sort((a, b) => a.cents - b.cents);
+    //sort intervals by cents
+
+
+
+
+    //make a canvas and a 2d chart of intervals in order of cents from 0 to 1200
+    document.write(`<h1>Intervals and Frequencies</h1>`);
+    document.write(`<p>Using 440 Hz as the reference frequency, the following intervals and frequencies are calculated.</p>`);
+    document.write(`<p>Intervals are calculated in cents, which is a logarithmic scale where
+    1200 cents is one octave. The decimal value is the ratio of the frequencies.</p>`);
+    document.write(`<p>For example, a 3:2 interval (perfect fifth) has a decimal value of 1.5 and is 702 cents.</p>`);
+    document.write(`<p>Frequencies are calculated using the formula: frequency = reference frequency *
+    (2^(cents/1200)).</p>`);
+    //add canvas to page
+    document.write(`<canvas id="intervalsChart" width="800" height="400"></canvas>`);
+    //create a chart
+    let canvas = document.getElementById("intervalsChart");
+    let ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#f0f0f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
+    //draw very pale horizontal lines every 100 cents
+    for (let i = 0; i <= 1200; i += 100) {
+        ctx.beginPath();
+        ctx.moveTo(0, (canvas.height / 2) - (i / 1200) * (canvas.height / 2));
+        ctx.lineTo(canvas.width, (canvas.height / 2) - (i / 1200) * (canvas.height / 2));
+        ctx.strokeStyle = "#cceaff";
+        ctx.stroke();
+    }
+
+
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    intvls.forEach((i, index) => {
+        let x = (index / intvls.length) * canvas.width;
+        let y = canvas.height / 2 - (i.cents / 1200) * (canvas.height / 2);
+        ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = "#000";
+    ctx.font = "12px Arial";
+   
+
+    intvls.forEach((i, index) => {
+        let x = (index / intvls.length) * canvas.width;
+        let y = canvas.height / 2 - (i.cents / 1200) * (canvas.height / 2);
+        //rotate text 90 degrees
+        ctx.save();
+        ctx.translate(x, y+10);
+        ctx.rotate(Math.PI / 2.5);
+        ctx.fillText(i.name+" - "+i.cents, 0, 0);
+        ctx.restore();
+        //draw a circle at the point
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        //draw vertical line at the point
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.strokeStyle = "#ccc";
+        ctx.stroke();
+    });
+
+
+    //draw horizontal line at -600 cents
+    ctx.beginPath();
+    ctx.moveTo(0, (canvas.height / 2) + (600 / 1200) * (canvas.height / 2));
+    ctx.lineTo(canvas.width, (canvas.height / 2) + (600 / 1200) * (canvas.height / 2));
+    ctx.strokeStyle = "#f00";
+    ctx.stroke();
+
+
+    let intervals = intvls.map((i) => {
+        return `<li>${i.name} - ${i.cents} cents - ${i.decimal.toFixed(4)}</li>`;
+    }).join("");
+    document.write(`<h2>Intervals</h2><ul>${intervals}</ul>`);
+    document.write(`<h2>440 Hz</h2>`);
+    document.write(`<ul>
+        <li>A4: ${a.toFixed(2)} Hz</li>
+        <li>B4: ${b.toFixed(2)} Hz</li>
+        <li>C5: ${c.toFixed(2)} Hz</li>
+        <li>A4 is ${a_centsSharp} cents sharp relative to C5</li>
+        <li>B4 is ${b_centsSharp} cents sharp relative to C5</li>
+        <li>ET M3: ${et_M3.toFixed(2)} Hz</li>
+        <li>ET M6: ${et_M6.toFixed(2)} Hz</li>
+    </ul>`);
+
+    let circleOfFifth = [
+        { name: 0, ratio: "1:1"},
+        { name: 1, ratio: "3:2" },
+        { name: 2, ratio: "9:8" },
+        { name: 3, ratio: "4:3" },
+        { name: 4, ratio: "5:4" },
+        { name: 5, ratio: "2:1" },
+        { name: 6, ratio: "15:8" },
+        { name: 7, ratio: "16:15" },
+        { name: 8, ratio: "17:16" },
+        { name: 9, ratio: "18:17" },
+        { name: 10, ratio: "19:18" },
+        { name: 11, ratio: "20:19" },
+        { name: 12, ratio: "21:20" },
+    ]
+</Script>
