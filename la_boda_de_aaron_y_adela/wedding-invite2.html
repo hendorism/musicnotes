@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Cormorant Garamond', serif;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Full-screen background using a gorgeous floral/nature image from Unsplash */
+  .bg {
+    position: fixed;
+    inset: 0;
+    /* background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80'); */
+        background-image: url('https://hendorism.github.io/musicnotes/la_boda_de_aaron_y_adela/boda-bg-1.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    z-index: 0;
+  }
+
+  /* Soft dark vignette overlay */
+  .bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%),
+      linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.5) 100%);
+  }
+
+  /* Decorative grain overlay for depth */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+    max-width: 680px;
+    width: 100%;
+    animation: fadeUp 1.6s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Top ornamental rule */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    animation: fadeUp 1.6s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  .ornament-line {
+    flex: 1;
+    max-width: 80px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.7), transparent);
+  }
+
+  .ornament-diamond {
+    width: 6px; height: 6px;
+    background: rgba(255,255,255,0.85);
+    transform: rotate(45deg);
+  }
+
+  .small-caps {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    animation: fadeUp 1.6s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    margin-bottom: 1.2rem;
+  }
+
+  .names {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: #fff;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+    animation: fadeUp 1.6s 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    margin-bottom: 0.4rem;
+  }
+
+  .ampersand {
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.7);
+    display: block;
+    line-height: 1.1;
+  }
+
+  .date-line {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.8);
+    margin: 1.6rem 0;
+    animation: fadeUp 1.6s 0.55s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  .location {
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.05em;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 1.6s 0.65s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  /* QR code card */
+  .qr-wrapper {
+    display: inline-block;
+    position: relative;
+    animation: fadeUp 1.6s 0.8s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  .qr-card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  /* Decorative corner accents */
+  .qr-card::before, .qr-card::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border-color: rgba(255,255,255,0.6);
+    border-style: solid;
+  }
+  .qr-card::before {
+    top: -1px; left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+  .qr-card::after {
+    bottom: -1px; right: -1px;
+    border-width: 0 2px 2px 0;
+  }
+
+  /* Corner accents for all four */
+  .corner { position: absolute; width: 14px; height: 14px; border-color: rgba(255,255,255,0.6); border-style: solid; }
+  .corner.tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+
+  /* Placeholder QR — replace src with your real QR code image */
+  .qr-img {
+    width: 160px; height: 160px;
+    background: #fff;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .qr-img svg {
+    width: 140px; height: 140px;
+  }
+
+  .qr-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .rsvp-note {
+    font-size: 0.95rem;
+    font-style: italic;
+    color: rgba(255,255,255,0.65);
+    margin-top: 2rem;
+    animation: fadeUp 1.6s 1s cubic-bezier(0.16,1,0.3,1) both;
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="grain"></div>
+
+<div class="content">
+
+  <div class="ornament" style="animation-delay:0.1s">
+    <div class="ornament-line"></div>
+    <div class="ornament-diamond"></div>
+    <div class="ornament-line"></div>
+  </div>
+
+
+<p class="small-caps">Together with their families &nbsp;✦&nbsp; Juntos con sus familias</p>
+
+
+  <div class="names">
+    Adela<br>
+    <span class="ampersand">&amp;</span>
+    Aaron
+  </div>
+
+  <p class="date-line">Saturday, the Twenty-first of March<br>Two Thousand Twenty-Six</p>
+  <p class="date-line">Sábado, el Veinti-uno del Marzo<br>Dos Mil Veinti-Seis</p>
+
+  <p class="location">St. Aidan's Episcopal Church &nbsp;·&nbsp; Camano Island, Washington, United States of America</p>
+  <p class="location">La Iglesia Episcopal de St. Aidan &nbsp;·&nbsp; Isla Camano, Washington, Los Estados Unidos</p>
+
+<p class="date-line">Saturday, the Twenty-First of March &nbsp;✦&nbsp; Sábado, el Veintiuno de Marzo<br>Two Thousand Twenty-Six &nbsp;·&nbsp; Dos Mil Veintiséis</p>
+
+<p class="location">St. Aidan's Episcopal Church &nbsp;·&nbsp; La Iglesia Episcopal de St. Aidan<br>Camano Island, Washington &nbsp;·&nbsp; Isla Camano, Washington</p>
+
+
+  <p class="rsvp-note">Kindly reply by the fifteenth of March</p>
+  <p class="rsvp-note">Por favor, responda antes del 15 de marzo</p>
+
+  
+
+</div>
+
+</body>
+</html>

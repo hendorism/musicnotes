@@ -8,10 +8,7 @@
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
-    width: 100%; height: 100%;
-    overflow: hidden;
-  }
+  html, body { width: 100%; overflow-x: hidden; }
 
   body {
     font-family: 'Cormorant Garamond', serif;
@@ -23,28 +20,24 @@
     position: relative;
   }
 
-  /* Full-screen background using a gorgeous floral/nature image from Unsplash */
   .bg {
     position: fixed;
     inset: 0;
-    /* background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80'); */
-        background-image: url('https://hendorism.github.io/musicnotes/la_boda_de_aaron_y_adela/608961719_10229414733104313_9141839287186188737_n.jpg ');
+    background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=1920&q=80');
     background-size: cover;
     background-position: center 30%;
     z-index: 0;
   }
 
-  /* Soft dark vignette overlay */
   .bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
+    background:
       radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%),
       linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.5) 100%);
   }
 
-  /* Decorative grain overlay for depth */
   .grain {
     position: fixed;
     inset: 0;
@@ -55,22 +48,68 @@
     background-size: 200px;
   }
 
+  /* Language pill switcher */
+  .lang-switcher {
+    position: fixed;
+    top: 1.4rem;
+    right: left: 50%; transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 100px;
+    padding: 3px;
+    gap: 2px;
+    animation: fadeDown 1s 0.5s cubic-bezier(0.16,1,0.3,1) both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+.lang-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  background: transparent;
+  border: none;
+  border-radius: 100px;
+  padding: 0.65rem 1.6rem;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+
+  .lang-btn.active {
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+  }
+
+  .lang-btn:hover:not(.active) { color: rgba(255,255,255,0.85); }
+
+  /* Content */
   .content {
     position: relative;
     z-index: 2;
     text-align: center;
-    padding: 2rem;
+padding: 5rem 2rem 2rem;
     max-width: 680px;
     width: 100%;
     animation: fadeUp 1.6s cubic-bezier(0.16,1,0.3,1) both;
+    transition: opacity 0.25s ease;
   }
+
+  .content.switching { opacity: 0; }
 
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Top ornamental rule */
   .ornament {
     display: flex;
     align-items: center;
@@ -130,6 +169,7 @@
     color: rgba(255,255,255,0.8);
     margin: 1.6rem 0;
     animation: fadeUp 1.6s 0.55s cubic-bezier(0.16,1,0.3,1) both;
+    line-height: 1.9;
   }
 
   .location {
@@ -140,72 +180,141 @@
     letter-spacing: 0.05em;
     margin-bottom: 2.5rem;
     animation: fadeUp 1.6s 0.65s cubic-bezier(0.16,1,0.3,1) both;
+    line-height: 1.9;
   }
 
-  /* QR code card */
-  .qr-wrapper {
+  /* Form */
+  .form-wrapper {
     display: inline-block;
     position: relative;
+    width: 100%;
+    max-width: 420px;
     animation: fadeUp 1.6s 0.8s cubic-bezier(0.16,1,0.3,1) both;
   }
 
-  .qr-card {
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(18px) saturate(1.4);
-    -webkit-backdrop-filter: blur(18px) saturate(1.4);
-    border: 1px solid rgba(255,255,255,0.25);
+  .form-card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.22);
     border-radius: 4px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    box-shadow: 0 8px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+    padding: 2rem 2rem 1.8rem;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18);
+    position: relative;
   }
 
-  /* Decorative corner accents */
-  .qr-card::before, .qr-card::after {
+  .form-card::before, .form-card::after {
     content: '';
     position: absolute;
     width: 14px; height: 14px;
     border-color: rgba(255,255,255,0.6);
     border-style: solid;
   }
-  .qr-card::before {
-    top: -1px; left: -1px;
-    border-width: 2px 0 0 2px;
-  }
-  .qr-card::after {
-    bottom: -1px; right: -1px;
-    border-width: 0 2px 2px 0;
-  }
+  .form-card::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .form-card::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 
-  /* Corner accents for all four */
   .corner { position: absolute; width: 14px; height: 14px; border-color: rgba(255,255,255,0.6); border-style: solid; }
   .corner.tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
   .corner.bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
 
-  /* Placeholder QR — replace src with your real QR code image */
-  .qr-img {
-    width: 160px; height: 160px;
-    background: #fff;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  .form-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 1.6rem;
+    text-align: center;
   }
 
-  .qr-img svg {
-    width: 140px; height: 140px;
-  }
+  .field-group { margin-bottom: 1.2rem; text-align: left; }
 
-  .qr-label {
+  .field-group label {
+    display: block;
     font-family: 'Cinzel', serif;
     font-size: 0.55rem;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: rgba(255,255,255,0.6);
+    margin-bottom: 0.45rem;
+  }
+
+  .field-group input[type="text"],
+  .field-group input[type="number"],
+  .field-group textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    padding: 0.6rem 0.75rem;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    resize: none;
+  }
+
+  .field-group input::placeholder,
+  .field-group textarea::placeholder {
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+  }
+
+  .field-group input:focus,
+  .field-group textarea:focus {
+    border-color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.12);
+  }
+
+  .radio-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+
+  .radio-label {
+    display: flex !important;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.03em !important;
+    text-transform: none !important;
+    color: rgba(255,255,255,0.85) !important;
+    cursor: pointer;
+    font-style: italic;
+  }
+
+  .radio-label input[type="radio"] {
+    accent-color: rgba(255,255,255,0.9);
+    width: 14px; height: 14px;
+    cursor: pointer;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    margin-top: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 2px;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  button[type="submit"]:hover { background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.7); }
+  button[type="submit"]:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .success-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    padding: 1rem 0;
+    line-height: 1.6;
   }
 
   .rsvp-note {
@@ -213,6 +322,7 @@
     font-style: italic;
     color: rgba(255,255,255,0.65);
     margin-top: 2rem;
+    padding-bottom: 2rem;
     animation: fadeUp 1.6s 1s cubic-bezier(0.16,1,0.3,1) both;
     letter-spacing: 0.03em;
   }
@@ -223,70 +333,194 @@
 <div class="bg"></div>
 <div class="grain"></div>
 
-<div class="content">
+<div class="lang-switcher" onclick="setLang(currentLang === 'en' ? 'es' : 'en')" style="cursor:pointer">
+  <button class="lang-btn active" data-lang="en">English</button>
+  <button class="lang-btn" data-lang="es">Español</button>
+</div>
 
-  <div class="ornament" style="animation-delay:0.1s">
+<div class="content" id="main-content">
+
+  <div class="ornament">
     <div class="ornament-line"></div>
     <div class="ornament-diamond"></div>
     <div class="ornament-line"></div>
   </div>
 
-  <p class="small-caps">Together with their families</p>
+  <p class="small-caps"
+    data-en="Together with their families"
+    data-es="Juntos con sus familias">Together with their families</p>
 
   <div class="names">
-    Eleanor<br>
-    <span class="ampersand">&amp;</span><br>
-    James
+    Adela<br>
+    <span class="ampersand">&amp;</span>
+    Aaron
   </div>
 
-  <p class="date-line">Saturday, the Fourteenth of June &nbsp;·&nbsp; Two Thousand Twenty-Five</p>
+  <p class="date-line">
+    <span data-en="Saturday, the Twenty-First of March" data-es="Sábado, el Veintiuno de Marzo">Saturday, the Twenty-First of March</span><br>
+    <span data-en="Two Thousand Twenty-Six" data-es="Dos Mil Veintiséis">Two Thousand Twenty-Six</span>
+  </p>
 
-  <p class="location">The Rosewood Estate &nbsp;·&nbsp; Napa Valley, California</p>
+  <p class="location">
+    <span data-en="St. Aidan's Episcopal Church" data-es="La Iglesia Episcopal de St. Aidan">St. Aidan's Episcopal Church</span><br>
+    <span data-en="Camano Island, Washington" data-es="Isla Camano, Washington">Camano Island, Washington</span>
+  </p>
 
-  <div class="qr-wrapper">
-    <div class="qr-card">
+  <div class="form-wrapper">
+    <div class="form-card">
       <div class="corner tr"></div>
       <div class="corner bl"></div>
 
-      <!-- Replace this SVG with your actual QR code image: <img src="your-qr.png" class="qr-img" /> -->
-      <div class="qr-img">
-        <svg viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Sample QR pattern — replace with real QR image -->
-          <rect width="37" height="37" fill="white"/>
-          <g fill="#111">
-            <!-- Finder top-left -->
-            <rect x="1" y="1" width="7" height="7"/><rect x="2" y="2" width="5" height="5" fill="white"/><rect x="3" y="3" width="3" height="3"/>
-            <!-- Finder top-right -->
-            <rect x="29" y="1" width="7" height="7"/><rect x="30" y="2" width="5" height="5" fill="white"/><rect x="31" y="3" width="3" height="3"/>
-            <!-- Finder bottom-left -->
-            <rect x="1" y="29" width="7" height="7"/><rect x="2" y="30" width="5" height="5" fill="white"/><rect x="3" y="31" width="3" height="3"/>
-            <!-- Timing patterns -->
-            <rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/><rect x="12" y="6" width="1" height="1"/>
-            <rect x="6" y="8" width="1" height="1"/><rect x="6" y="10" width="1" height="1"/><rect x="6" y="12" width="1" height="1"/>
-            <!-- Data modules (decorative) -->
-            <rect x="9" y="9" width="2" height="2"/><rect x="12" y="9" width="3" height="1"/><rect x="16" y="9" width="2" height="2"/>
-            <rect x="20" y="9" width="2" height="1"/><rect x="24" y="9" width="3" height="2"/>
-            <rect x="9" y="12" width="1" height="3"/><rect x="11" y="13" width="3" height="1"/><rect x="15" y="12" width="2" height="2"/>
-            <rect x="19" y="12" width="4" height="1"/><rect x="24" y="12" width="1" height="3"/>
-            <rect x="9" y="16" width="3" height="2"/><rect x="13" y="17" width="2" height="1"/><rect x="16" y="16" width="1" height="3"/>
-            <rect x="18" y="16" width="3" height="1"/><rect x="22" y="16" width="2" height="2"/>
-            <rect x="9" y="20" width="2" height="3"/><rect x="12" y="21" width="4" height="1"/><rect x="17" y="20" width="2" height="2"/>
-            <rect x="20" y="21" width="1" height="2"/><rect x="22" y="20" width="3" height="1"/>
-            <rect x="9" y="24" width="4" height="2"/><rect x="14" y="25" width="1" height="2"/><rect x="16" y="24" width="3" height="1"/>
-            <rect x="20" y="24" width="2" height="3"/><rect x="23" y="25" width="3" height="1"/>
-            <!-- Alignment pattern -->
-            <rect x="28" y="28" width="5" height="5"/><rect x="29" y="29" width="3" height="3" fill="white"/><rect x="30" y="30" width="1" height="1"/>
-          </g>
-        </svg>
-      </div>
+      <p class="form-title" data-en="RSVP" data-es="Confirmar Asistencia">RSVP</p>
 
-      <p class="qr-label">Scan to RSVP</p>
+      <form id="rsvp-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="field-group">
+          <label data-en="Will you attend?" data-es="¿Asistirás?">Will you attend?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="attending" value="Joyfully accepts" required>
+              <span data-en="Joyfully accepts" data-es="Con gusto asisto">Joyfully accepts</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="attending" value="Regretfully declines">
+              <span data-en="Regretfully declines" data-es="Con pesar no puedo">Regretfully declines</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="name" data-en="Full Name" data-es="Nombre Completo">Full Name</label>
+          <input type="text" id="name" name="name"
+            data-placeholder-en="Your full name"
+            data-placeholder-es="Tu nombre completo"
+            placeholder="Your full name" required>
+        </div>
+
+        <div class="field-group">
+          <label for="guests" data-en="Number of Guests" data-es="Número de Invitados">Number of Guests</label>
+          <input type="number" id="guests" name="guests" min="1" max="10"
+            data-placeholder-en="Including yourself"
+            data-placeholder-es="Incluyéndote a ti"
+            placeholder="Including yourself">
+        </div>
+
+        <div class="field-group">
+          <label for="message"
+            data-en="A note to the couple"
+            data-es="Un mensaje para los novios">A note to the couple</label>
+          <textarea id="message" name="message" rows="3"
+            data-placeholder-en="Share your wishes…"
+            data-placeholder-es="Comparte tus buenos deseos…"
+            placeholder="Share your wishes…"></textarea>
+        </div>
+
+        <button type="submit"
+          data-en="Send RSVP"
+          data-es="Enviar Confirmación">Send RSVP</button>
+      </form>
+
+      <div id="success-msg" style="display:none">
+        <p class="success-text"
+          data-en="✦ Thank you — we can't wait to celebrate with you ✦"
+          data-es="✦ Gracias — no podemos esperar para celebrar contigo ✦">
+          ✦ Thank you — we can't wait to celebrate with you ✦
+        </p>
+      </div>
     </div>
   </div>
 
-  <p class="rsvp-note">Kindly reply by the first of May</p>
+  <p class="rsvp-note"
+    data-en="Kindly reply by the first of May"
+    data-es="Por favor confirma antes del primero de mayo">
+    Kindly reply by the first of May
+  </p>
 
 </div>
 
+<script>
+  let currentLang = 'en';
+
+//   document.querySelectorAll('.lang-btn').forEach(btn => {
+//   btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+// });
+
+function setLang(lang) {
+  if (lang === currentLang) return;
+  currentLang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+
+  const content = document.getElementById('main-content');
+  content.classList.add('switching');
+
+  setTimeout(() => {
+    document.querySelectorAll('[data-en]').forEach(el => {
+      el.textContent = el.getAttribute('data-' + lang);
+    });
+    document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+      el.placeholder = el.getAttribute('data-placeholder-' + lang);
+    });
+    content.classList.remove('switching');
+  }, 250);
+}
+
+  // function setLang(lang) {
+  //   if (lang === currentLang) return;
+  //   currentLang = lang;
+
+  //   document.querySelectorAll('.lang-btn').forEach(btn => {
+  //     btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+  //   });
+
+  //   const content = document.getElementById('main-content');
+  //   content.classList.add('switching');
+
+  //   setTimeout(() => {
+  //     document.querySelectorAll('[data-en]').forEach(el => {
+  //       el.textContent = el.getAttribute('data-' + lang);
+  //     });
+  //     document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+  //       el.placeholder = el.getAttribute('data-placeholder-' + lang);
+  //     });
+  //     content.classList.remove('switching');
+  //   }, 250);
+  // }
+
+  // Formspree submission
+  const form = document.getElementById('rsvp-form');
+  const successMsg = document.getElementById('success-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = currentLang === 'en' ? 'Sending…' : 'Enviando…';
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        form.style.display = 'none';
+        const st = successMsg.querySelector('.success-text');
+        st.textContent = st.getAttribute('data-' + currentLang);
+        successMsg.style.display = 'block';
+      } else {
+        btn.disabled = false;
+        btn.textContent = btn.getAttribute('data-' + currentLang);
+        alert(currentLang === 'en' ? 'Something went wrong. Please try again.' : 'Algo salió mal. Inténtalo de nuevo.');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = btn.getAttribute('data-' + currentLang);
+      alert(currentLang === 'en' ? 'Network error. Please try again.' : 'Error de red. Inténtalo de nuevo.');
+    }
+  });
+</script>
 </body>
 </html>
