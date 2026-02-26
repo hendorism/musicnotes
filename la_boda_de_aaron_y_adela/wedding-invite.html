@@ -6,19 +6,28 @@
 <title>You're Invited</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
+  /* * { outline: 1px solid red; } */
+
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body { width: 100%; overflow-x: hidden; }
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
 
-  body {
-    font-family: 'Cormorant Garamond', serif;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    position: relative;
-  }
+html {
+  scroll-padding-top: 0;
+}
+
+body {
+  font-family: 'Cormorant Garamond', serif;
+  color: #fff;
+  display: block;
+  min-height: 100vh;
+  position: relative;
+}
+
 
   .bg {
     position: fixed;
@@ -42,6 +51,14 @@
       linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.5) 100%);
   }
 
+  .bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,2.45) 0%, rgba(0,0,0,0) 70%);
+  z-index: 1;
+}
+
   .grain {
     position: fixed;
     inset: 0;
@@ -53,21 +70,24 @@
   }
 
   /* Language pill switcher */
-  .lang-switcher {
-    position: fixed;
-    top: 1.4rem;
-    right: left: 50%; transform: translateX(-50%);
-    z-index: 10;
-    display: flex;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgba(255,255,255,0.22);
-    border-radius: 100px;
-    padding: 3px;
-    gap: 2px;
-    animation: fadeDown 1s 0.5s cubic-bezier(0.16,1,0.3,1) both;
-  }
+.lang-switcher {
+  position: fixed;
+  top: 1.4rem;
+left: 0;
+right: 0;
+margin: 0 auto;
+width: fit-content;
+  z-index: 10;
+  display: flex;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 100px;
+  padding: 3px;
+  gap: 2px;
+  animation: fadeDown 1s 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
 
   @keyframes fadeDown {
     from { opacity: 0; transform: translateY(-10px); }
@@ -96,21 +116,22 @@
   .lang-btn:hover:not(.active) { color: rgba(255,255,255,0.85); }
 
   /* Content */
-  .content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-padding: 5rem 2rem 2rem;
-    max-width: 680px;
-    width: 100%;
-    animation: fadeUp 1.6s cubic-bezier(0.16,1,0.3,1) both;
-    transition: opacity 0.25s ease;
-  }
+.content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 5rem 2rem 2rem;
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  animation: fadeUp 1.6s cubic-bezier(0.16,1,0.3,1) both;
+  transition: opacity 0.25s ease;
+}
 
   .content.switching { opacity: 0; }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(28px); }
+    from { opacity: 0; transform: translateY(-30px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -197,7 +218,7 @@ padding: 5rem 2rem 2rem;
   }
 
   .form-card {
-    background: rgba(255,255,255,0.1);
+    background: rgba(240,240,240,0.3);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     border: 1px solid rgba(255,255,255,0.22);
@@ -206,6 +227,7 @@ padding: 5rem 2rem 2rem;
     box-shadow: 0 8px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.18);
     position: relative;
   }
+
 
   .form-card::before, .form-card::after {
     content: '';
@@ -330,6 +352,54 @@ padding: 5rem 2rem 2rem;
     animation: fadeUp 1.6s 1s cubic-bezier(0.16,1,0.3,1) both;
     letter-spacing: 0.03em;
   }
+
+  .schedule {
+  margin-bottom: 2.5rem;
+  animation: fadeUp 1.6s 0.65s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.venue-block {
+  margin: 0.5rem 0;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  transition: background 0.2s;
+}
+
+.venue-block:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.venue-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 0.2rem;
+}
+
+.venue-address {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
+}
+
+.venue-event {
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+}
+
+.venue-divider {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+  margin: 1rem 0;
+}
 </style>
 </head>
 <body>
@@ -365,10 +435,24 @@ padding: 5rem 2rem 2rem;
     <span data-en="Two Thousand Twenty-Six" data-es="Dos Mil Veintiséis">Two Thousand Twenty-Six</span>
   </p>
 
-  <p class="location">
-    <span data-en="St. Aidan's Episcopal Church" data-es="La Iglesia Episcopal de St. Aidan">St. Aidan's Episcopal Church</span><br>
-    <span data-en="Camano Island, Washington" data-es="Isla Camano, Washington">Camano Island, Washington</span>
-  </p>
+
+<div class="schedule">
+    <div class="venue-block" onclick="window.open('https://maps.app.goo.gl/Fy9oXa1fqSWy8np79', '_blank')">
+    <p class="venue-name" data-en="St. Aidan's Episcopal Church" data-es="St. Aidan's Episcopal Church">St. Aidan's Episcopal Church</p>
+    <p class="venue-address">1318 WA-532, Camano, WA 98282</p>
+    <p class="venue-event"><span data-en="12:00 PM · Ceremony" data-es="12:00 PM · Ceremonia">12:00 PM · Ceremony</span></p>
+    <p class="venue-event"><span data-en="1:00 – 4:00 PM · Reception" data-es="1:00 – 4:00 PM · Recepción">1:00 – 4:00 PM · Reception</span></p>
+  </div>
+
+  <div class="venue-divider">✦</div>
+
+    <div class="venue-block" onclick="window.open('https://maps.app.goo.gl/eEJutbvxTVbZbi5f8', '_blank')">
+    <p class="venue-name" data-en="The Grape &amp; Grain" data-es="The Grape &amp; Grain">The Grape &amp; Grain</p>
+    <p class="venue-address">6502 Evergreen Way Suite A, Everett, WA</p>
+    <p class="venue-event"><span data-en="5:00 – 11:00 PM · After-Party" data-es="5:00 – 11:00 PM · Pachanga">5:00 – 11:00 PM · After-Party</span></p>
+  </div>
+</div>
+
 
   <div class="form-wrapper">
     <div class="form-card">
@@ -435,9 +519,9 @@ padding: 5rem 2rem 2rem;
 
 
   <p class="rsvp-note"
-    data-en="Kindly reply by the first of May"
-    data-es="Por favor confirma antes del primero de mayo">
-    Kindly reply by the first of May
+    data-en="Kindly reply by the tenth of March"
+    data-es="Por favor, responda antes del diez de marzo">
+    Kindly reply by the tenth of March
   </p>
 
 </div>
@@ -526,6 +610,9 @@ function setLang(lang) {
       alert(currentLang === 'en' ? 'Network error. Please try again.' : 'Error de red. Inténtalo de nuevo.');
     }
   });
+
+    window.addEventListener('load', () => window.scrollTo(0, 0));
+
 </script>
 </body>
 </html>
