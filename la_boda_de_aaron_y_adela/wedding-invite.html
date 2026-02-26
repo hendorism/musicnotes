@@ -494,7 +494,8 @@ width: fit-content;
 
 
 <div class="registry-block">
-  <a class="registry-link" href="https://www.amazon.com/wedding/registry/YOUR_REGISTRY_ID" target="_blank">
+  <a class="registry-link" href="https://www.amazon.com/wedding/guest-view/20B67KNBHYP5P
+" target="_blank">
     <span data-en="Amazon Gift Registry" data-es="Registro de Regalos en Amazon">Amazon Gift Registry</span>
     <span class="registry-arrow">→</span>
   </a>
@@ -573,7 +574,9 @@ width: fit-content;
 </div>
 
 <script>
-  let currentLang = 'en';
+  
+
+let currentLang = 'en';
 
 const userLang = navigator.language || navigator.userLanguage;
 if (userLang.startsWith('es')) {
@@ -587,15 +590,6 @@ if (userLang.startsWith('es')) {
   document.querySelectorAll('[data-placeholder-en]').forEach(el => {
     el.placeholder = el.getAttribute('data-placeholder-es');
   });
-}
-
-//   document.querySelectorAll('.lang-btn').forEach(btn => {
-//   btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-// });
-
-const userLang = navigator.language || navigator.userLanguage;
-if (userLang.startsWith('es')) {
-  setLang('es');
 }
 
 function setLang(lang) {
