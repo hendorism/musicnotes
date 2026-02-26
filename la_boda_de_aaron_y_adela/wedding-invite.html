@@ -400,6 +400,40 @@ width: fit-content;
   font-size: 0.7rem;
   margin: 1rem 0;
 }
+
+.registry-block {
+  margin-bottom: 2rem;
+  animation: fadeUp 1.6s 0.75s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.registry-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 0.2rem;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.registry-link:hover {
+  color: rgba(255,255,255,0.95);
+  border-color: rgba(255,255,255,0.6);
+}
+
+.registry-arrow {
+  font-style: normal;
+  transition: transform 0.2s;
+}
+
+.registry-link:hover .registry-arrow {
+  transform: translateX(4px);
+}
 </style>
 </head>
 <body>
@@ -430,6 +464,11 @@ width: fit-content;
     Aaron
   </div>
 
+    <p class="small-caps"
+    data-en="invite you to celebrate their wedding day on"
+    data-es="le invitan a celebrar el día de su boda el">invite you to celebrate their wedding day on</p>
+
+
   <p class="date-line">
     <span data-en="Saturday, the Twenty-First of March" data-es="Sábado, el Veintiuno de Marzo">Saturday, the Twenty-First of March</span><br>
     <span data-en="Two Thousand Twenty-Six" data-es="Dos Mil Veintiséis">Two Thousand Twenty-Six</span>
@@ -453,6 +492,13 @@ width: fit-content;
   </div>
 </div>
 
+
+<div class="registry-block">
+  <a class="registry-link" href="https://www.amazon.com/wedding/registry/YOUR_REGISTRY_ID" target="_blank">
+    <span data-en="Amazon Gift Registry" data-es="Registro de Regalos en Amazon">Amazon Gift Registry</span>
+    <span class="registry-arrow">→</span>
+  </a>
+</div>
 
   <div class="form-wrapper">
     <div class="form-card">
@@ -529,9 +575,28 @@ width: fit-content;
 <script>
   let currentLang = 'en';
 
+const userLang = navigator.language || navigator.userLanguage;
+if (userLang.startsWith('es')) {
+  currentLang = 'es';
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === 'es');
+  });
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = el.getAttribute('data-es');
+  });
+  document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+    el.placeholder = el.getAttribute('data-placeholder-es');
+  });
+}
+
 //   document.querySelectorAll('.lang-btn').forEach(btn => {
 //   btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
 // });
+
+const userLang = navigator.language || navigator.userLanguage;
+if (userLang.startsWith('es')) {
+  setLang('es');
+}
 
 function setLang(lang) {
   if (lang === currentLang) return;
