@@ -163,35 +163,18 @@
     border: 1px solid;
   }
 
-  /* Soprano — pink */
-  .voice-S1 { color: #d980b0; border-color: rgba(217,128,176,0.35); background: rgba(217,128,176,0.07); }
-  .voice-S1:hover { background: rgba(217,128,176,0.18); }
-  .voice-S2 { color: #e8a0c8; border-color: rgba(232,160,200,0.35); background: rgba(232,160,200,0.07); }
-  .voice-S2:hover { background: rgba(232,160,200,0.18); }
-
-  /* Alto — gold */
-  .voice-A1 { color: #d4a84a; border-color: rgba(212,168,74,0.35); background: rgba(212,168,74,0.07); }
-  .voice-A1:hover { background: rgba(212,168,74,0.18); }
-  .voice-A2 { color: #c49030; border-color: rgba(196,144,48,0.35); background: rgba(196,144,48,0.07); }
-  .voice-A2:hover { background: rgba(196,144,48,0.18); }
-
-  /* Tenor — green */
-  .voice-T  { color: #90c88a; border-color: rgba(144,200,138,0.35); background: rgba(144,200,138,0.07); }
-  .voice-T:hover  { background: rgba(144,200,138,0.18); }
-
-  /* Bass — blue */
-  .voice-B1 { color: #7ab0e0; border-color: rgba(122,176,224,0.35); background: rgba(122,176,224,0.07); }
-  .voice-B1:hover { background: rgba(122,176,224,0.18); }
-  .voice-B2 { color: #a0c8f0; border-color: rgba(160,200,240,0.35); background: rgba(160,200,240,0.07); }
-  .voice-B2:hover { background: rgba(160,200,240,0.18); }
-
-  /* Single-part aliases (Beati has just "Alto", "Soprano I/II", "Bass I/II") */
-  .voice-S  { color: #d980b0; border-color: rgba(217,128,176,0.35); background: rgba(217,128,176,0.07); }
-  .voice-S:hover  { background: rgba(217,128,176,0.18); }
-  .voice-A  { color: #d4a84a; border-color: rgba(212,168,74,0.35); background: rgba(212,168,74,0.07); }
-  .voice-A:hover  { background: rgba(212,168,74,0.18); }
   .voice-B  { color: #7ab0e0; border-color: rgba(122,176,224,0.35); background: rgba(122,176,224,0.07); }
   .voice-B:hover  { background: rgba(122,176,224,0.18); }
+  .voice-B2 { color: #a0c8f0; border-color: rgba(160,200,240,0.35); background: rgba(160,200,240,0.07); }
+  .voice-B2:hover { background: rgba(160,200,240,0.18); }
+  .voice-T  { color: #90c88a; border-color: rgba(144,200,138,0.35); background: rgba(144,200,138,0.07); }
+  .voice-T:hover  { background: rgba(144,200,138,0.18); }
+  .voice-A  { color: #d4a84a; border-color: rgba(212,168,74,0.35); background: rgba(212,168,74,0.07); }
+  .voice-A:hover  { background: rgba(212,168,74,0.18); }
+  .voice-S  { color: #d980b0; border-color: rgba(217,128,176,0.35); background: rgba(217,128,176,0.07); }
+  .voice-S:hover  { background: rgba(217,128,176,0.18); }
+  .voice-S2 { color: #e8a0c8; border-color: rgba(232,160,200,0.35); background: rgba(232,160,200,0.07); }
+  .voice-S2:hover { background: rgba(232,160,200,0.18); }
 
   .sheet-music-link {
     display: block;
@@ -288,7 +271,6 @@
     </thead>
     <tbody>
 
-      <!-- Set Me as a Seal — SSAATBB -->
       <tr>
         <td class="title-cell" data-label="Title">
           <a href="#" target="_blank" rel="noopener">Set Me as a Seal Upon Your Heart</a>
@@ -296,18 +278,17 @@
         <td class="composer-cell" data-label="Composer">René Clausen</td>
         <td data-label="Practice Tracks">
           <ul class="voice-parts">
-            <li><a class="voice-btn voice-S1" href="https://youtu.be/OZGewqUWlBs?si=lUXT-jlCrwNdjoJ-" target="_blank">Soprano 1</a></li>
-            <li><a class="voice-btn voice-S2" href="https://youtu.be/MmNQ54K1ZZY?si=NVtJ-ldyj14Eh5cm" target="_blank">Soprano 2</a></li>
-            <li><a class="voice-btn voice-A1" href="https://youtu.be/iS2RwrnaSdk?si=qK7N77NSjsSNtaT6" target="_blank">Alto 1</a></li>
-            <li><a class="voice-btn voice-A2" href="https://youtu.be/aG1nWomqtO8?si=VL-tC87P8MHSZfbG" target="_blank">Alto 2</a></li>
+            <li><a class="voice-btn voice-S1"  href="https://youtu.be/OZGewqUWlBs?si=lUXT-jlCrwNdjoJ-" target="_blank">Soprano 1</a></li>
+            <li><a class="voice-btn voice-S2"  href="https://youtu.be/MmNQ54K1ZZY?si=NVtJ-ldyj14Eh5cm" target="_blank">Soprano2</a></li>
+            <li><a class="voice-btn voice-A1"  href="https://youtu.be/iS2RwrnaSdk?si=qK7N77NSjsSNtaT6" target="_blank">Alto 1</a></li>
+            <li><a class="voice-btn voice-A2"  href="https://youtu.be/aG1nWomqtO8?si=VL-tC87P8MHSZfbG" target="_blank">Alto 2</a></li>
             <li><a class="voice-btn voice-T"  href="https://youtu.be/r784AcMh5zM?si=6_oAC2avJl5UAEaJ" target="_blank">Tenor</a></li>
-            <li><a class="voice-btn voice-B1" href="https://youtu.be/MWCzw5sZhg4?si=3renDQWa6nSOWYBk" target="_blank">Bass 1</a></li>
+            <li><a class="voice-btn voice-B"  href="https://youtu.be/MWCzw5sZhg4?si=3renDQWa6nSOWYBk" target="_blank">Bass 1</a></li>
             <li><a class="voice-btn voice-B2" href="https://youtu.be/PC0d4gNJ2UE?si=qnZhKg52jH17fXnn" target="_blank">Bass 2</a></li>
           </ul>
         </td>
       </tr>
 
-      <!-- Beati Quorum Via — SSATBB -->
       <tr>
         <td class="title-cell" data-label="Title">
           <a href="https://youtu.be/L9zgq5qrNGw?si=poIH-uzfOkRDJI6u" target="_blank" rel="noopener">Beati Quorum Via</a>
@@ -315,17 +296,16 @@
         <td class="composer-cell" data-label="Composer">C. V. Stanford</td>
         <td data-label="Practice Tracks">
           <ul class="voice-parts">
-            <li><a class="voice-btn voice-S1" href="https://youtu.be/Rcc6Xk8SfSI?si=SMbMCGf5Cl1o0VRB" target="_blank">Soprano I</a></li>
+            <li><a class="voice-btn voice-S"  href="https://youtu.be/Rcc6Xk8SfSI?si=SMbMCGf5Cl1o0VRB" target="_blank">Soprano I</a></li>
             <li><a class="voice-btn voice-S2" href="https://youtu.be/51Dhu682XCc?si=6byZq6D6iAQ1BuON"  target="_blank">Soprano II</a></li>
             <li><a class="voice-btn voice-A"  href="https://youtu.be/eP-ZP9wkjVc?si=8itsDDuwjRhUE008" target="_blank">Alto</a></li>
             <li><a class="voice-btn voice-T"  href="https://youtu.be/cYQ98A908y4?si=Th_ETKybtyQ1v_le" target="_blank">Tenor</a></li>
-            <li><a class="voice-btn voice-B1" href="https://youtu.be/8UyFcirse2U?si=tnUh9Tg5P7lQDQmK" target="_blank">Bass I</a></li>
+            <li><a class="voice-btn voice-B"  href="https://youtu.be/8UyFcirse2U?si=tnUh9Tg5P7lQDQmK" target="_blank">Bass I</a></li>
             <li><a class="voice-btn voice-B2" href="https://youtu.be/xP3mqmDsbaA?si=E53RAwHZ_mgfyAU7" target="_blank">Bass II</a></li>
           </ul>
         </td>
       </tr>
 
-      <!-- A Gaelic Blessing — SSATBB -->
       <tr>
         <td class="title-cell" data-label="Title">
           <a href="#" target="_blank" rel="noopener">A Gaelic Blessing</a>
@@ -335,8 +315,9 @@
           <ul class="voice-parts">
             <li><a class="voice-btn voice-S1" href="https://youtu.be/XOAKbyQecIY?si=RHobyQkAnHB1chCM" target="_blank">Soprano 1</a></li>
             <li><a class="voice-btn voice-S2" href="https://youtu.be/fJHPcDGcsjU?si=YoHNcuCWEnnYs5MJ" target="_blank">Soprano 2</a></li>
-            <li><a class="voice-btn voice-A"  href="https://youtu.be/DARf7-5760g?si=Kv-umcLlVzrr8If4" target="_blank">Alto</a></li>
-            <li><a class="voice-btn voice-T"  href="https://youtu.be/Gmis3Pbi2RM?si=B6ByUGNkn0EsPDCN" target="_blank">Tenor</a></li>
+            <li><a class="voice-btn voice-A" href="https://youtu.be/DARf7-5760g?si=Kv-umcLlVzrr8If4" target="_blank">Alto</a></li>
+            <li><a class="voice-btn voice-T" href="https://youtu.be/Gmis3Pbi2RM?si=B6ByUGNkn0EsPDCN" target="_blank">Tenor</a></li>
+         
             <li><a class="voice-btn voice-B1" href="https://youtu.be/wxhSos7nhHU?si=NrRuFFbV7rLYBueC" target="_blank">Bass 1</a></li>
             <li><a class="voice-btn voice-B2" href="https://youtu.be/UMLSkes0L8s?si=wdMy_fywkOOHrtqw" target="_blank">Bass 2</a></li>
           </ul>

@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choral Repertoire</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Pro:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f0e0c;
+    background-image: 
+      radial-gradient(ellipse at 20% 20%, rgba(180,140,80,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(120,100,160,0.06) 0%, transparent 50%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 24px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: #e8e0d0;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 860px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 300;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #b89a52;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    color: #f0e8d8;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(90deg, transparent, #b89a52);
+  }
+  .divider::after {
+    background: linear-gradient(90deg, #b89a52, transparent);
+  }
+  .divider-diamond {
+    color: #b89a52;
+    font-size: 0.6rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(184,154,82,0.2);
+    border-radius: 2px;
+  }
+
+  thead tr {
+    background: rgba(184,154,82,0.12);
+  }
+
+  th {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 500;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #b89a52;
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid rgba(184,154,82,0.3);
+  }
+
+  tbody tr {
+    transition: background 0.2s;
+  }
+  tbody tr:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  tbody tr:not(:last-child) td {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  td {
+    padding: 20px 20px;
+    vertical-align: middle;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .title-cell a {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: #f0e8d8;
+    font-style: italic;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(184,154,82,0.4);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .title-cell a:hover {
+    color: #b89a52;
+    border-color: #b89a52;
+  }
+
+  .composer-cell {
+    color: #c8bfaf;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+
+  .voice-parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .voice-btn {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 1px;
+    font-size: 0.78rem;
+    font-family: 'Crimson Pro', serif;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+
+  .voice-B  { color: #7ab0e0; border-color: rgba(122,176,224,0.35); background: rgba(122,176,224,0.07); }
+  .voice-B:hover  { background: rgba(122,176,224,0.18); }
+  .voice-B2 { color: #a0c8f0; border-color: rgba(160,200,240,0.35); background: rgba(160,200,240,0.07); }
+  .voice-B2:hover { background: rgba(160,200,240,0.18); }
+  .voice-T  { color: #90c88a; border-color: rgba(144,200,138,0.35); background: rgba(144,200,138,0.07); }
+  .voice-T:hover  { background: rgba(144,200,138,0.18); }
+  .voice-A  { color: #d4a84a; border-color: rgba(212,168,74,0.35); background: rgba(212,168,74,0.07); }
+  .voice-A:hover  { background: rgba(212,168,74,0.18); }
+  .voice-S  { color: #d980b0; border-color: rgba(217,128,176,0.35); background: rgba(217,128,176,0.07); }
+  .voice-S:hover  { background: rgba(217,128,176,0.18); }
+  .voice-S2 { color: #e8a0c8; border-color: rgba(232,160,200,0.35); background: rgba(232,160,200,0.07); }
+  .voice-S2:hover { background: rgba(232,160,200,0.18); }
+
+  @media (max-width: 620px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tbody tr {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 2px;
+    }
+    td { padding: 4px 0; border: none !important; }
+    td::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #b89a52;
+      margin-bottom: 4px;
+      margin-top: 10px;
+    }
+    td:first-child::before { margin-top: 0; }
+  }
+  .sheet-music-link {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 5px;
+    font-size: 1.78rem;
+    font-family: 'Crimson Pro', serif;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #b89a52;
+    border: 1px solid rgba(184,154,82,0.35);
+    background: rgba(184,154,82,0.07);
+    transition: all 0.2s;
+    /* link is centered */
+    margin: 24px auto 0;
+    display: block;
+    /* text within the link is centered */
+    text-align: center;
+    /* prevent the link from being too wide on larger screens */
+    max-width: 300px;
+    
+  }
+
+    .sheet-music-link:hover {
+      background: rgba(184,154,82,0.18);
+    }
+
+    .back-to-wedding-invite-link {
+      display: inline-block;
+      margin-bottom: 16px;
+      font-size: 0.78rem;
+      font-family: 'Crimson Pro', serif;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #b89a52;
+      border: 1px solid rgba(184,154,82,0.35);
+      background: rgba(184,154,82,0.07);
+      padding: 4px 12px;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+    .explanation-text {
+      margin: 16px 0;
+      font-size: 1.5rem;
+      color: #c8bfaf;
+      text-align: center;
+    }
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <a href="https://hendorism.github.io/musicnotes/la_boda_de_aaron_y_adela/wedding-invite.html" target="_blank" class="back-to-wedding-invite-link">Back to Wedding Invitation page</a>
+    <p class="eyebrow">Choral Ensemble</p>
+    <h1>Repertoire</h1>
+
+    <div class="divider"><span class="divider-diamond">◆</span></div>
+        
+  </header>
+
+    <a href="https://everettmusicdojo.com/wp-content/uploads/2026/03/wedding-music-3-21-2026.pdf" target="_blank" class="sheet-music-link">Click here to download sheet music</a>
+    <p class="explanation-text">
+Click the song title to view YouTube performance examples. Click the voice part buttons to access practice tracks for each part.
+    </p>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Composer</th>
+        <th>Practice Tracks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="title-cell" data-label="Title">
+          <a href="#" target="_blank" rel="noopener">Set Me as a Seal Upon Your Heart</a>
+        </td>
+        <td class="composer-cell" data-label="Composer">René Clausen</td>
+        <td data-label="Practice Tracks">
+          <div class="voice-parts">
+            <ul>
+<li>
+  <a class="voice-btn voice-B" href="https://youtu.be/PC0d4gNJ2UE?si=qnZhKg52jH17fXnn" target="_blank">Bass 2</a>
+
+</li><li>
+
+  <a class="voice-btn voice-B" href="https://youtu.be/MWCzw5sZhg4?si=3renDQWa6nSOWYBk" target="_blank">Bass 1</a>
+</li><li>
+  <a class="voice-btn voice-T" href="https://youtu.be/r784AcMh5zM?si=6_oAC2avJl5UAEaJ" target="_blank">Tenor</a>
+
+</li>
+              <a class="voice-btn voice-A" href="https://youtu.be/aG1nWomqtO8?si=VL-tC87P8MHSZfbG" target="_blank">Alto 2</a>
+              <a class="voice-btn voice-A" href="https://youtu.be/iS2RwrnaSdk?si=qK7N77NSjsSNtaT6" target="_blank">Alto 1</a>
+              <a class="voice-btn voice-S" href="#" target="_blank">Soprano</a>
+
+            </ul>
+          </div>
+        </td>
+      </tr>
+      
+      <tr>
+        <td class="title-cell" data-label="Title">
+          <a href="https://youtu.be/L9zgq5qrNGw?si=poIH-uzfOkRDJI6u" target="_blank" rel="noopener">Beati Quorum Via</a>
+        </td>
+        <td class="composer-cell" data-label="Composer">C. V. Stanford</td>
+        <td data-label="Practice Tracks">
+          <div class="voice-parts">
+            <a class="voice-btn voice-B2" href="https://youtu.be/xP3mqmDsbaA?si=E53RAwHZ_mgfyAU7" target="_blank">Bass II</a>
+            <a class="voice-btn voice-B" href="https://youtu.be/8UyFcirse2U?si=tnUh9Tg5P7lQDQmK" target="_blank">Bass I</a>
+            <a class="voice-btn voice-T" href="https://youtu.be/cYQ98A908y4?si=Th_ETKybtyQ1v_le" target="_blank">Tenor</a>
+            <a class="voice-btn voice-A" href="https://youtu.be/eP-ZP9wkjVc?si=8itsDDuwjRhUE008" target="_blank">Alto</a>
+            <a class="voice-btn voice-S2" href="https://youtu.be/51Dhu682XCc?si=6byZq6D6iAQ1BuON" target="_blank">Soprano II</a>
+            <a class="voice-btn voice-S" href="https://youtu.be/Rcc6Xk8SfSI?si=SMbMCGf5Cl1o0VRB" target="_blank">Soprano I</a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="title-cell" data-label="Title">
+          <a href="#" target="_blank" rel="noopener">A Gaelic Blessing</a>
+        </td>
+        <td class="composer-cell" data-label="Composer">John Rutter</td>
+        <td data-label="Practice Tracks">
+          <div class="voice-parts">
+            <a class="voice-btn voice-B" href="#" target="_blank">Bass</a>
+            <a class="voice-btn voice-T" href="#" target="_blank">Tenor</a>
+            <a class="voice-btn voice-A" href="#" target="_blank">Alto</a>
+            <a class="voice-btn voice-S" href="#" target="_blank">Soprano</a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+</body>
+</html>
