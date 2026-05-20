@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Interactive Music Staff</title>
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: sans-serif;
+    background: white;
+  }
+
+  canvas {
+    display: block;
+    touch-action: none;
+    background: white;
+  }
+
+  #deleteButton {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    padding: 10px 14px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  #menu {
+    position: fixed;
+    display: none;
+    background: white;
+    border: 1px solid black;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+    z-index: 100;
+    min-width: 170px;
+  }
+
+  #menu h4 {
+    margin: 8px;
+    font-size: 14px;
+  }
+
+  #menu button {
+    width: 100%;
+    border: none;
+    background: white;
+    padding: 8px 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  #menu button:hover {
+    background: #eee;
+  }
+
+  #analysis {
+    padding: 20px;
+    line-height: 1.5;
+    max-width: 900px;
+  }
+
+  #analysis h2 {
+    margin-top: 0;
+  }
+
+  code {
+    background: #f3f3f3;
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+
+<body>
+
+<button id="deleteButton">Delete Last Note</button>
+
+<div id="menu">
+  <h4>Note Value</h4>
+
+  <button data-value="1/32">1/32</button>
+  <button data-value="1/16">1/16</button>
+  <button data-value="1/8">1/8</button>
+  <button data-value="1/4">1/4</button>
+  <button data-value="1/2">1/2</button>
+  <button data-value="1">1</button>
+
+  <hr>
+
+  <button id="makeRest">Make Rest</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div id="analysis">
+  <h2>Prompt Evaluation</h2>
+
+  <p>
+    This prompt is already highly effective because it:
+  </p>
+
+  <ul>
+    <li>Specifies geometry precisely</li>
+    <li>Separates interaction behaviors from visual appearance</li>
+    <li>Defines snapping behavior clearly</li>
+    <li>Defines gesture distinctions (tap vs long press)</li>
+    <li>Provides measurable constraints like stem length = 2.4 × staff spacing</li>
+  </ul>
+
+  <p>
+    The biggest improvement would be organizing the prompt into labeled sections:
+  </p>
+
+<pre>
+LAYOUT
+STAFF
+INPUT REGIONS
+GESTURES
+NOTE APPEARANCE
+CONTEXT MENU
+DATA MODEL
+</pre>
+
+  <p>
+    This improves:
+  </p>
+
+  <ul>
+    <li>Code architecture</li>
+    <li>Parsing reliability</li>
+    <li>Extensibility</li>
+    <li>Reduced ambiguity</li>
+  </ul>
+
+  <h2>Prompt Size Limits</h2>
+
+  <p>
+    You are nowhere near prompt-size limits yet.
+  </p>
+
+  <p>
+    Modern large-context models can often handle:
+  </p>
+
+  <ul>
+    <li>tens of thousands of words comfortably</li>
+    <li>large codebases</li>
+    <li>multi-file specifications</li>
+  </ul>
+
+  <p>
+    But practical degradation begins when:
+  </p>
+
+  <ul>
+    <li>requirements become contradictory</li>
+    <li>requirements are repeated inconsistently</li>
+    <li>too many implementation details constrain architecture</li>
+    <li>many unrelated concerns are mixed together</li>
+  </ul>
+
+  <p>
+    The real limitation is usually not token count — it is specification entropy.
+  </p>
+
+  <p>
+    Long prompts remain effective if they are:
+  </p>
+
+  <ul>
+    <li>hierarchical</li>
+    <li>modular</li>
+    <li>internally consistent</li>
+    <li>grouped by concern</li>
+  </ul>
+
+  <p>
+    Your prompting style is already approaching professional software-specification style rather than casual prompting, which is generally ideal for structured code generation.
+  </p>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const menu = document.getElementById("menu");
+const deleteButton = document.getElementById("deleteButton");
+
+let notes = [];
+let selectedNote = null;
+
+const staff = {
+  top: 90,
+  spacing: 30,
+  lines: 5
+};
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = 320;
+  draw();
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+function lineY(index) {
+  return staff.top + index * staff.spacing;
+}
+
+function getInputCenters() {
+  const centers = [];
+
+  const bottomLine = lineY(4);
+
+  for (let i = -4; i <= 12; i++) {
+    centers.push(bottomLine - i * (staff.spacing / 2));
+  }
+
+  return centers;
+}
+
+function snapY(y) {
+  const centers = getInputCenters();
+
+  let best = centers[0];
+  let bestDist = Infinity;
+
+  for (const c of centers) {
+    const d = Math.abs(c - y);
+
+    if (d < bestDist) {
+      bestDist = d;
+      best = c;
+    }
+  }
+
+  return best;
+}
+
+function drawStaff() {
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  for (let i = 0; i < staff.lines; i++) {
+    const y = lineY(i);
+
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "black";
+  ctx.font = "16px sans-serif";
+
+  // line labels bottom-to-top
+  for (let i = 0; i < 5; i++) {
+    const y = lineY(4 - i);
+
+    ctx.fillText(
+      `${i + 1}`,
+      10,
+      y + 5
+    );
+  }
+
+  // space labels bottom-to-top
+  for (let i = 0; i < 4; i++) {
+    const y =
+      lineY(4 - i) - staff.spacing / 2;
+
+    ctx.fillText(
+      `${i + 1}`,
+      34,
+      y + 5
+    );
+  }
+}
+
+function drawRest(note) {
+  ctx.beginPath();
+  ctx.rect(-7, -6, 14, 12);
+  ctx.fill();
+}
+
+function drawNote(note) {
+  ctx.save();
+
+  ctx.translate(note.x, note.y);
+
+  // slight counterclockwise rotation
+  ctx.rotate(-0.25);
+
+  ctx.fillStyle = "black";
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  if (note.isRest) {
+    drawRest(note);
+  } else {
+    // note head
+    ctx.beginPath();
+
+    ctx.ellipse(
+      0,
+      0,
+      16,
+      11,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    // stem
+    const stemLength = staff.spacing * 2.4;
+
+    ctx.beginPath();
+    ctx.moveTo(12, 0);
+    ctx.lineTo(12, -stemLength);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  if (note.value) {
+    ctx.fillStyle = "blue";
+    ctx.font = "14px sans-serif";
+
+    ctx.fillText(
+      note.value,
+      note.x + 18,
+      note.y - 8
+    );
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawStaff();
+
+  for (const note of notes) {
+    drawNote(note);
+  }
+}
+
+function addNote(x, y) {
+  notes.push({
+    x,
+    y: snapY(y),
+    value: null,
+    isRest: false
+  });
+
+  draw();
+}
+
+function pointerPosition(e) {
+  const rect = canvas.getBoundingClientRect();
+
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+
+function hitTest(x, y) {
+  for (let i = notes.length - 1; i >= 0; i--) {
+    const n = notes[i];
+
+    const dx = x - n.x;
+    const dy = y - n.y;
+
+    const inside =
+      ((dx * dx) / (18 * 18)) +
+      ((dy * dy) / (14 * 14)) <= 1;
+
+    if (inside) {
+      return n;
+    }
+  }
+
+  return null;
+}
+
+let longPressTimer = null;
+let startX = 0;
+let startY = 0;
+let didLongPress = false;
+
+canvas.addEventListener("pointerdown", e => {
+  const pos = pointerPosition(e);
+
+  startX = pos.x;
+  startY = pos.y;
+
+  didLongPress = false;
+
+  longPressTimer = setTimeout(() => {
+    const hit = hitTest(pos.x, pos.y);
+
+    if (hit) {
+      didLongPress = true;
+
+      selectedNote = hit;
+
+      menu.style.left = `${e.clientX}px`;
+      menu.style.top = `${e.clientY}px`;
+      menu.style.display = "block";
+    }
+  }, 600);
+});
+
+canvas.addEventListener("pointermove", e => {
+  const pos = pointerPosition(e);
+
+  const dx = pos.x - startX;
+  const dy = pos.y - startY;
+
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  // tolerate small involuntary movement
+  if (dist > 10) {
+    clearTimeout(longPressTimer);
+  }
+});
+
+canvas.addEventListener("pointerup", e => {
+  clearTimeout(longPressTimer);
+
+  if (didLongPress) {
+    return;
+  }
+
+  const pos = pointerPosition(e);
+
+  const hit = hitTest(pos.x, pos.y);
+
+  if (!hit) {
+    addNote(pos.x, pos.y);
+  }
+});
+
+canvas.addEventListener("contextmenu", e => {
+  e.preventDefault();
+});
+
+document.addEventListener("click", e => {
+  if (!menu.contains(e.target)) {
+    menu.style.display = "none";
+  }
+});
+
+document.querySelectorAll("[data-value]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    if (selectedNote) {
+      selectedNote.value = btn.dataset.value;
+      draw();
+    }
+
+    menu.style.display = "none";
+  });
+});
+
+document.getElementById("makeRest")
+.addEventListener("click", () => {
+  if (selectedNote) {
+    selectedNote.isRest = true;
+
+    if (!selectedNote.value) {
+      selectedNote.value = "1/4";
+    }
+
+    draw();
+  }
+
+  menu.style.display = "none";
+});
+
+deleteButton.addEventListener("click", () => {
+  notes.pop();
+  draw();
+});
+
+resizeCanvas();
+</script>
+
+</body>
+</html>
