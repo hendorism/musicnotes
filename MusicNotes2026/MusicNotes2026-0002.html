@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0"/>
+
+<title>Refactored Interactive Staff</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: white;
+  font-family: sans-serif;
+}
+
+canvas {
+  display: block;
+  touch-action: none;
+}
+
+#ui {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  padding: 10px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#menu {
+  position: fixed;
+  display: none;
+  background: white;
+  border: 1px solid black;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 200;
+  min-width: 170px;
+}
+
+#menu h4 {
+  margin: 8px;
+  font-size: 14px;
+}
+
+#menu button {
+  width: 100%;
+  border: none;
+  background: white;
+  text-align: left;
+}
+
+#menu button:hover {
+  background: #eee;
+}
+
+#noteList {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 220px;
+  overflow: auto;
+  background: #fafafa;
+  border-top: 1px solid #ccc;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 6px;
+  text-align: left;
+}
+
+.cursorRow {
+  background: rgba(255, 0, 0, 0.12);
+  transition: background 0.08s linear;
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+  <button id="deleteButton">Delete</button>
+  <button id="leftButton">←</button>
+  <button id="rightButton">→</button>
+</div>
+
+<div id="menu">
+  <h4>Note Value</h4>
+
+  <button data-value="1/32">1/32</button>
+  <button data-value="1/16">1/16</button>
+  <button data-value="1/8">1/8</button>
+  <button data-value="1/4">1/4</button>
+  <button data-value="1/2">1/2</button>
+  <button data-value="1">1</button>
+
+  <hr>
+
+  <button id="makeRest">Make Rest</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div id="noteList">
+  <h3>Notes</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>X</th>
+        <th>Pitch</th>
+      </tr>
+    </thead>
+
+    <tbody id="noteTableBody"></tbody>
+  </table>
+</div>
+
+<script>
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+  document.getElementById("canvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+const noteTableBody =
+  document.getElementById("noteTableBody");
+
+const menu =
+  document.getElementById("menu");
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const S = 18;
+
+const NOTE_WIDTH = 18;
+const MIN_SPACING = 44;
+
+const STAFF = {
+  top: 200,
+  lines: 5,
+  spacing: S
+};
+
+const CLEF_X = 52;
+const FOG_WIDTH = 110;
+
+const CURSOR_HEIGHT = S * 1.4;
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let notes = [];
+
+let nextId = 1;
+
+let selectedNote = null;
+
+let cursorIndex = 0;
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const camera = {
+  x: 0,
+
+  startX: 0,
+  targetX: 0,
+
+  animating: false,
+  startTime: 0,
+  duration: 200
+};
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+const input = {
+  down: false,
+
+  startX: 0,
+  startY: 0,
+
+  screenX: 0,
+  screenY: 0,
+
+  dragging: false,
+  dragThreshold: 12,
+
+  longPressTimer: null,
+  didLongPress: false
+};
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+function easeInOut(t) {
+  return t < 0.5
+    ? 2 * t * t
+    : -1 + (4 - 2 * t) * t;
+}
+
+function lineY(i) {
+  return STAFF.top + i * STAFF.spacing;
+}
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height =
+    window.innerHeight - 220;
+}
+
+window.addEventListener(
+  "resize",
+  resizeCanvas
+);
+
+resizeCanvas();
+
+/* =========================================================
+   NOTE PITCH SYSTEM
+========================================================= */
+
+function getInputCenters() {
+
+  const centers = [];
+
+  const bottom =
+    lineY(4);
+
+  for (let i = -8; i <= 16; i++) {
+
+    centers.push(
+      bottom - i * (S / 2)
+    );
+  }
+
+  return centers;
+}
+
+function snapY(y) {
+
+  const centers =
+    getInputCenters();
+
+  let best =
+    centers[0];
+
+  let bestDist =
+    Infinity;
+
+  for (const c of centers) {
+
+    const d =
+      Math.abs(y - c);
+
+    if (d < bestDist) {
+
+      bestDist = d;
+      best = c;
+    }
+  }
+
+  return best;
+}
+
+function getNoteName(y) {
+
+  const bottom =
+    lineY(4);
+
+  const steps =
+    Math.round(
+      (bottom - y) / (S / 2)
+    );
+
+  const letters =
+    ["C","D","E","F","G","A","B"];
+
+  let index = 2;
+  let octave = 4;
+
+  for (let i = 0; i < Math.abs(steps); i++) {
+
+    if (steps > 0) {
+
+      index++;
+
+      if (index > 6) {
+        index = 0;
+        octave++;
+      }
+    }
+    else {
+
+      index--;
+
+      if (index < 0) {
+        index = 6;
+        octave--;
+      }
+    }
+  }
+
+  return letters[index] + octave;
+}
+
+/* =========================================================
+   NOTE MODEL
+========================================================= */
+
+function createNote(x, y) {
+
+  return {
+    id: nextId++,
+
+    x,
+    y: snapY(y),
+
+    value: null,
+    isRest: false,
+
+    drawX: x
+  };
+}
+
+/* =========================================================
+   LAYOUT ENGINE
+========================================================= */
+
+function getOrderedNotes() {
+
+  return [...notes]
+    .sort((a,b)=>a.x-b.x);
+}
+
+function layoutNotes() {
+
+  const ordered =
+    getOrderedNotes();
+
+  if (ordered.length === 0) {
+    return;
+  }
+
+  ordered[0].layoutX =
+    ordered[0].x;
+
+  for (let i = 1; i < ordered.length; i++) {
+
+    const left =
+      ordered[i - 1];
+
+    const right =
+      ordered[i];
+
+    right.layoutX =
+      Math.max(
+        right.x,
+        left.layoutX + MIN_SPACING
+      );
+  }
+}
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+function animateCamera(timestamp) {
+
+  if (!camera.animating) {
+    return;
+  }
+
+  let t =
+    (timestamp - camera.startTime)
+    / camera.duration;
+
+  if (t >= 1) {
+
+    t = 1;
+    camera.animating = false;
+  }
+
+  const eased =
+    easeInOut(t);
+
+  camera.x =
+    camera.startX +
+    (camera.targetX - camera.startX)
+    * eased;
+}
+
+function updateAnimations() {
+
+  for (const note of notes) {
+
+    const dx =
+      note.layoutX - note.drawX;
+
+    note.drawX += dx * 0.18;
+  }
+}
+
+/* =========================================================
+   AUTO SCROLL
+========================================================= */
+
+function smoothScrollBy(dx) {
+
+  camera.startX =
+    camera.x;
+
+  camera.targetX =
+    camera.x + dx;
+
+  camera.startTime =
+    performance.now();
+
+  camera.animating = true;
+}
+
+function autoScrollForNote(note) {
+
+  const screenX =
+    note.layoutX - camera.x;
+
+  const threshold =
+    canvas.width * 0.82;
+
+  if (screenX > threshold) {
+
+    smoothScrollBy(
+      canvas.width * 0.33
+    );
+  }
+}
+
+/* =========================================================
+   NOTE OPERATIONS
+========================================================= */
+function findInsertionIndex(screenX) {
+
+  const ordered =
+    getOrderedNotes();
+
+  if (ordered.length === 0) {
+    return 0;
+  }
+
+  for (let i = 0; i < ordered.length; i++) {
+
+    const note =
+      ordered[i];
+
+    const visualX =
+      note.layoutX;
+
+    if (screenX < visualX) {
+      return i;
+    }
+  }
+
+  return ordered.length;
+}
+
+function addNote(x, y) {
+
+  const note =
+    createNote(x, y);
+
+  const ordered =
+    getOrderedNotes();
+
+  const insertionIndex =
+    findInsertionIndex(x);
+
+  // determine musical x position
+  let newX;
+
+  if (ordered.length === 0) {
+
+    newX = x;
+  }
+
+  else if (insertionIndex <= 0) {
+
+    newX =
+      ordered[0].x - MIN_SPACING;
+  }
+
+  else if (
+    insertionIndex >= ordered.length
+  ) {
+
+    newX =
+      ordered[
+        ordered.length - 1
+      ].x + MIN_SPACING;
+  }
+
+  else {
+
+    const left =
+      ordered[insertionIndex - 1];
+
+    const right =
+      ordered[insertionIndex];
+
+    newX =
+      (left.x + right.x) * 0.5;
+  }
+
+  note.x = newX;
+
+  notes.push(note);
+
+  layoutNotes();
+
+  cursorIndex =
+    insertionIndex + 1;
+
+  autoScrollForNote(note);
+
+  updateTable();
+}
+
+function deleteBehindCursor() {
+
+  const ordered =
+    getOrderedNotes();
+
+  const targetIndex =
+    cursorIndex - 1;
+
+  if (targetIndex < 0) {
+    return;
+  }
+
+  const target =
+    ordered[targetIndex];
+
+  notes =
+    notes.filter(
+      n => n.id !== target.id
+    );
+
+  cursorIndex--;
+
+  if (cursorIndex < 0) {
+    cursorIndex = 0;
+  }
+
+  layoutNotes();
+
+  updateTable();
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+function updateTable() {
+
+  const ordered =
+    [...notes].sort(
+      (a, b) => a.drawX - b.drawX
+    );
+
+  noteTableBody.innerHTML = "";
+
+  // note immediately LEFT of cursor
+  const activeIndex =
+    cursorIndex - 1;
+
+  // sync with cursor blink timing
+  const blinkVisible =
+    Math.floor(
+      performance.now() / 400
+    ) % 2 === 1;
+
+  ordered.forEach((note, index) => {
+
+    note.sequenceNumber = index + 1;
+
+    const tr =
+      document.createElement("tr");
+
+    // blinking highlighted row
+    if (
+      index === activeIndex &&
+      blinkVisible
+    ) {
+      tr.classList.add("cursorRow");
+    }
+
+    tr.innerHTML = `
+      <td>${note.sequenceNumber}</td>
+      <td>${Math.round(note.x)}</td>
+      <td>${getNoteName(note.y)}</td>
+    `;
+
+    noteTableBody.appendChild(tr);
+  });
+}
+/* =========================================================
+   POINTER
+========================================================= */
+
+function getPointerPosition(e) {
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  return {
+    x:
+      e.clientX
+      - rect.left
+      + camera.x,
+
+    y:
+      e.clientY
+      - rect.top
+  };
+}
+
+function hitTest(x, y) {
+
+  const ordered =
+    [...notes]
+    .sort((a,b)=>b.drawX-a.drawX);
+
+  for (const n of ordered) {
+
+    const dx =
+      x - n.drawX;
+
+    const dy =
+      y - n.y;
+
+    const inside =
+      ((dx*dx)/(18*18))
+      +
+      ((dy*dy)/(14*14))
+      <= 1;
+
+    if (inside) {
+      return n;
+    }
+  }
+
+  return null;
+}
+
+/* =========================================================
+   INPUT EVENTS
+========================================================= */
+
+canvas.addEventListener(
+  "pointerdown",
+  e => {
+
+    canvas.setPointerCapture(
+      e.pointerId
+    );
+
+    input.down = true;
+
+    input.dragging = false;
+    input.didLongPress = false;
+
+    input.screenX = e.clientX;
+    input.screenY = e.clientY;
+
+    const pos =
+      getPointerPosition(e);
+
+    input.startX = pos.x;
+    input.startY = pos.y;
+
+    input.longPressTimer =
+      setTimeout(() => {
+
+        if (input.dragging) {
+          return;
+        }
+
+        const hit =
+          hitTest(pos.x, pos.y);
+
+        if (!hit) {
+          return;
+        }
+
+        input.didLongPress = true;
+
+        selectedNote = hit;
+
+        menu.style.left =
+          `${e.clientX}px`;
+
+        menu.style.top =
+          `${e.clientY}px`;
+
+        menu.style.display =
+          "block";
+
+      }, 600);
+  }
+);
+
+canvas.addEventListener(
+  "pointermove",
+  e => {
+
+    if (!input.down) {
+      return;
+    }
+
+    const dx =
+      e.clientX - input.screenX;
+
+    const dy =
+      e.clientY - input.screenY;
+
+    const dist =
+      Math.sqrt(dx*dx + dy*dy);
+
+    if (
+      dist > input.dragThreshold
+    ) {
+
+      input.dragging = true;
+
+      clearTimeout(
+        input.longPressTimer
+      );
+
+      camera.x -= dx;
+
+      if (camera.x < 0) {
+        camera.x = 0;
+      }
+
+      input.screenX =
+        e.clientX;
+
+      input.screenY =
+        e.clientY;
+    }
+  }
+);
+
+canvas.addEventListener(
+  "pointerup",
+  e => {
+
+    input.down = false;
+
+    clearTimeout(
+      input.longPressTimer
+    );
+
+    if (
+      input.dragging
+      ||
+      input.didLongPress
+    ) {
+      return;
+    }
+
+    const pos =
+      getPointerPosition(e);
+
+    const hit =
+      hitTest(pos.x, pos.y);
+
+    if (!hit) {
+
+      addNote(
+        pos.x,
+        pos.y
+      );
+    }
+  }
+);
+
+canvas.addEventListener(
+  "wheel",
+  e => {
+
+    e.preventDefault();
+
+    camera.x += e.deltaY;
+
+    if (camera.x < 0) {
+      camera.x = 0;
+    }
+  },
+  { passive:false }
+);
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+document
+.getElementById("deleteButton")
+.addEventListener(
+  "click",
+  deleteBehindCursor
+);
+
+document
+.getElementById("leftButton")
+.addEventListener(
+  "click",
+  () => {
+
+    cursorIndex--;
+
+    if (cursorIndex < 0) {
+      cursorIndex = 0;
+    }
+  }
+);
+
+document
+.getElementById("rightButton")
+.addEventListener(
+  "click",
+  () => {
+
+    cursorIndex++;
+
+    if (
+      cursorIndex > notes.length
+    ) {
+      cursorIndex =
+        notes.length;
+    }
+  }
+);
+
+/* =========================================================
+   CONTEXT MENU
+========================================================= */
+
+document
+.addEventListener(
+  "click",
+  e => {
+
+    if (
+      !menu.contains(e.target)
+    ) {
+
+      menu.style.display =
+        "none";
+    }
+  }
+);
+
+document
+.querySelectorAll("[data-value]")
+.forEach(btn => {
+
+  btn.addEventListener(
+    "click",
+    () => {
+
+      if (selectedNote) {
+
+        selectedNote.value =
+          btn.dataset.value;
+      }
+
+      menu.style.display =
+        "none";
+    }
+  );
+});
+
+document
+.getElementById("makeRest")
+.addEventListener(
+  "click",
+  () => {
+
+    if (selectedNote) {
+
+      selectedNote.isRest =
+        true;
+
+      if (
+        !selectedNote.value
+      ) {
+
+        selectedNote.value =
+          "1/4";
+      }
+    }
+
+    menu.style.display =
+      "none";
+  }
+);
+
+/* =========================================================
+   RENDERING
+========================================================= */
+
+function drawStaticStaff() {
+
+  ctx.strokeStyle =
+    "black";
+
+  ctx.lineWidth = 2;
+
+  for (let i = 0; i < 5; i++) {
+
+    const y =
+      lineY(i);
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+
+    ctx.stroke();
+  }
+
+  ctx.fillStyle =
+    "black";
+
+  ctx.font =
+    "16px sans-serif";
+
+  for (let i = 0; i < 5; i++) {
+
+    ctx.fillText(
+      `${i+1}`,
+      10,
+      lineY(4-i) + 5
+    );
+  }
+
+  for (let i = 0; i < 4; i++) {
+
+    ctx.fillText(
+      `${i+1}`,
+      35,
+      lineY(4-i)
+      - S/2 + 5
+    );
+  }
+}
+
+function drawTrebleClef() {
+
+  ctx.save();
+
+  ctx.font =
+    "120px serif";
+
+  ctx.fillStyle =
+    "black";
+
+  ctx.fillText(
+    "𝄞",
+    CLEF_X,
+    lineY(4) + 35
+  );
+
+  ctx.restore();
+}
+
+function drawFog() {
+
+  const gradient =
+    ctx.createLinearGradient(
+      0,
+      0,
+      FOG_WIDTH,
+      0
+    );
+
+  gradient.addColorStop(
+    0,
+    "rgba(255,255,255,0.98)"
+  );
+
+  gradient.addColorStop(
+    1,
+    "rgba(255,255,255,0)"
+  );
+
+  ctx.fillStyle =
+    gradient;
+
+  ctx.fillRect(
+    0,
+    0,
+    FOG_WIDTH,
+    canvas.height
+  );
+}
+
+function drawLedgerLines(note) {
+
+  const top =
+    lineY(0);
+
+  const bottom =
+    lineY(4);
+
+  const relative =
+    (bottom - note.y)
+    / (S / 2);
+
+  const width = 44;
+
+  ctx.strokeStyle =
+    "black";
+
+  ctx.lineWidth = 2;
+
+  if (note.y < top) {
+
+    for (
+      let pos = 10;
+      pos <= relative;
+      pos += 2
+    ) {
+
+      const y =
+        bottom - pos * (S/2);
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        note.drawX - camera.x
+        - width/2,
+        y
+      );
+
+      ctx.lineTo(
+        note.drawX - camera.x
+        + width/2,
+        y
+      );
+
+      ctx.stroke();
+    }
+  }
+
+  else if (note.y > bottom) {
+
+    for (
+      let pos = -2;
+      pos >= relative;
+      pos -= 2
+    ) {
+
+      const y =
+        bottom - pos * (S/2);
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        note.drawX - camera.x
+        - width/2,
+        y
+      );
+
+      ctx.lineTo(
+        note.drawX - camera.x
+        + width/2,
+        y
+      );
+
+      ctx.stroke();
+    }
+  }
+}
+
+function drawRestGlyph() {
+
+  ctx.beginPath();
+
+  ctx.rect(
+    -7,
+    -6,
+    14,
+    12
+  );
+
+  ctx.fill();
+}
+
+function drawNote(note) {
+
+  const screenX =
+    note.drawX - camera.x;
+
+  if (
+    screenX < -120
+    ||
+    screenX > canvas.width + 120
+  ) {
+    return;
+  }
+
+  drawLedgerLines(note);
+
+  ctx.save();
+
+  ctx.translate(
+    screenX,
+    note.y
+  );
+
+  ctx.rotate(-0.25);
+
+  ctx.fillStyle =
+    "black";
+
+  ctx.strokeStyle =
+    "black";
+
+  ctx.lineWidth = 2;
+
+  if (note.isRest) {
+
+    drawRestGlyph();
+  }
+  else {
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+      0,
+      0,
+      18,
+      12,
+      0,
+      0,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+
+    ctx.beginPath();
+
+    ctx.moveTo(12, 0);
+
+    ctx.lineTo(
+      12,
+      -S * 2.4
+    );
+
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  if (note.value) {
+
+    ctx.fillStyle =
+      "blue";
+
+    ctx.font =
+      "14px sans-serif";
+
+    ctx.fillText(
+      note.value,
+      screenX + 20,
+      note.y - 8
+    );
+  }
+}
+
+function drawCursor() {
+
+  const ordered =
+    getOrderedNotes();
+
+  let x = 160;
+
+  if (ordered.length > 0) {
+
+    if (cursorIndex <= 0) {
+
+      x =
+        ordered[0].layoutX
+        - MIN_SPACING;
+    }
+
+    else if (
+      cursorIndex >= ordered.length
+    ) {
+
+      x =
+        ordered[
+          ordered.length - 1
+        ].layoutX
+        + MIN_SPACING;
+    }
+
+    else {
+
+      const left =
+        ordered[cursorIndex - 1];
+
+      const right =
+        ordered[cursorIndex];
+
+      x =
+        (
+          left.layoutX
+          +
+          right.layoutX
+        ) / 2;
+    }
+  }
+
+  const screenX =
+    x - camera.x;
+
+  const blink =
+    Math.floor(
+      performance.now() / 400
+    ) % 2;
+
+  if (!blink) {
+    return;
+  }
+
+  ctx.save();
+
+  ctx.strokeStyle =
+    "red";
+
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    screenX,
+    lineY(0)
+    - CURSOR_HEIGHT
+  );
+
+  ctx.lineTo(
+    screenX,
+    lineY(4)
+    + CURSOR_HEIGHT
+  );
+
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function render() {
+
+  ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  /* STATIC STAFF */
+
+  drawStaticStaff();
+
+  /* WORLD OBJECTS */
+
+  for (const note of notes) {
+    drawNote(note);
+  }
+
+  drawCursor();
+
+  /* FOG */
+
+  drawFog();
+
+  /* FOREGROUND CLEF */
+
+  drawTrebleClef();
+}
+
+/* =========================================================
+   MAIN LOOP
+========================================================= */
+
+function animate(timestamp) {
+
+  animateCamera(timestamp);
+
+  layoutNotes();
+
+  updateAnimations();
+
+  render();
+
+  requestAnimationFrame(
+    animate
+  );
+}
+
+requestAnimationFrame(
+  animate
+);
+</script>
+
+</body>
+</html>
