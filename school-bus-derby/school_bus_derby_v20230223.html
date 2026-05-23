@@ -154,7 +154,9 @@ class Vehicle {
       this.speed += 0.01;
     }
     this.turnLeft = function() {
-      this.steerAngle -= 0.01 * this.steerAngleTurnRate;
+      //if speed > 0 (
+        this.steerAngle -= 0.01 * this.steerAngleTurnRate;
+      // )
     }
     this.turnRight = function() {
       this.steerAngle += 0.01 * this.steerAngleTurnRate;
@@ -180,8 +182,8 @@ class Vehicle {
     this.tires.push(new Tire(200, 200, this, 0));
   }
   update() {
-    this.steerAngleTurnRate = 1 + (this.speed * 2) / (this.speed);
-    this.speed *= 0.995;
+    this.steerAngleTurnRate = 2 + (this.speed * 2) / (this.speed);
+    this.speed *= 0.999;
     if (inputKeys.indexOf(38) > -1) {
       this.accelerate();
     }
@@ -200,6 +202,9 @@ class Vehicle {
     this.x += Math.cos(degreesToRadians(this.bearing)) * this.speed;
     this.y += Math.sin(degreesToRadians(this.bearing)) * this.speed;
     this.bearing += this.steerAngle * this.speed;
+    // if player not pressing left/right(
+      this.steerAngle *= 0.98
+    // )
     this.draw();
   }
   draw() {
