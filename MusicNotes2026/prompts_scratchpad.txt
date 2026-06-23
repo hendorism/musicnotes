@@ -1,0 +1,22 @@
+
+file:///C:/Users/hendo/github/musicnotes/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
+http://127.0.0.1:5501/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
+
+https://hendorism.github.io/musicnotes/index.html
+
+https://hendorism.github.io/musicnotes/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
+
+Let's say I have a long string of notes in the key of C, and then I toss a five-sharp key signature in the middle of that string. I want to preserve the pitches as they originally were, but anything after the key signature to the end of the bar needs to have an explicit natural on it. So, you know, whenever I add or remove a key signature, we need to handle and say, does this note need an explicit accidental to show that it deviates from the key signature?
+////////////////////////////////////////////////////////
+
+the selected note should appear blue and slightly larger. make a 200ms transition effect when selecting/unselecting
+
+when i mouse over a note it should animate. the animation is this:notehead will grow to %150 of its original size. by the time it reaches that size, it will have faded to nothing. When animation starts, a new notehead appears behind it with diameter 0. by the time the previous notehead reaches its final size, the new one will have grown to original size. this animation should be smooth and take 200ms. it repeats as long as the mouse is over the note. when holding shift and mouseover, the entire chord is selected and behaves this way
+
+ctrl + up or down arrow - move the selected note up or down a step.
+ctrl + left or right arrow - move the selected note left or right in the score, swapping places with the note to its left or right. if there is no note to the left or right, the note moves a little bit in a gradual motion like a protagonist in a platformer game
+
+ctrl + shift + up or down arrow - change the accidental of the selected note. if already double sharp, no change. if already double flat, no change.
+
+shift + left or right arrow - add
+

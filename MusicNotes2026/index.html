@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MusicNotes2026</title>
+
+<style>
+  :root {
+    --bg: #f7f3ea;
+    --ink: #16110c;
+    --paper: #fffdf7;
+    --accent: #8b1e1e;
+    --soft: rgba(0,0,0,0.08);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, #fff8dc, transparent 35%),
+      linear-gradient(135deg, #f7f3ea, #eee3d0);
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--ink);
+  }
+
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 8vw, 82px);
+    margin: 0;
+    letter-spacing: -2px;
+  }
+
+  .subtitle {
+    font-size: 20px;
+    opacity: 0.75;
+    margin-top: 12px;
+  }
+
+  .clef {
+    font-size: 76px;
+    margin: 20px 0 10px;
+  }
+
+  .versions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 22px;
+  }
+
+  a.card {
+    display: block;
+    padding: 26px;
+    min-height: 170px;
+    background: var(--paper);
+    color: var(--ink);
+    text-decoration: none;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    box-shadow: 8px 8px 0 var(--soft);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  a.card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 12px 12px 0 var(--soft);
+  }
+
+  .version {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: 1px;
+    font-weight: bold;
+  }
+
+  .card h2 {
+    margin: 10px 0;
+    font-size: 28px;
+  }
+
+  .card p {
+    margin: 0;
+    line-height: 1.45;
+    opacity: 0.75;
+  }
+
+  footer {
+    margin-top: 50px;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 14px;
+  }
+</style>
+</head>
+
+<body>
+
+<main>
+  <header>
+    <div class="clef">𝄞</div>
+    <h1>MusicNotes2026</h1>
+    <p class="subtitle">
+      Interactive handwritten music notation experiments
+    </p>
+  </header>
+
+  <section class="versions">
+
+    <a class="card" href="MusicNotes2026-0001.html">
+      <div class="version">Version 1</div>
+      <h2>Basic Staff</h2>
+      <p>Click or touch the staff to create snapped noteheads.</p>
+    </a>
+
+    <a class="card" href="MusicNotes2026-0002.html">
+      <div class="version">Version 2</div>
+      <h2>Notes + Context Menu</h2>
+      <p>Long-press notes to set values, rests, and edit symbols.</p>
+    </a>
+
+    <a class="card" href="MusicNotes2026-0003.html">
+      <div class="version">Version 3</div>
+      <h2>Scrolling Canvas</h2>
+      <p>Horizontal camera movement with notes, cursor, and staff interaction.</p>
+    </a>
+
+    <a class="card" href="MusicNotes2026-0004.html">
+      <div class="version">Version 4</div>
+      <h2>Game Feel</h2>
+      <p>Fast note spawning, smooth scrolling, cursor deletion, and spacing physics.</p>
+    </a>
+
+    <a class="card" href="MusicNotes2026-0005.html">
+      <div class="version">Version 5</div>
+      <h2>Manuscript Style</h2>
+      <p>Hand-drawn noteheads, imperfect stems, accidentals, bar lines, and exports.</p>
+    </a>
+
+    <a class="card" href="MusicNotes2026-0006-dinosaurio.html">
+      <div class="version">Version 6</div>
+      <h2>Dinosaurio</h2>
+      <p>Scale-degree keypad composition with tonic and octave controls.</p>
+    </a>
+
+  </section>
+
+  <footer>
+    MusicNotes2026 · Bach manuscript energy · Canvas notation engine
+  </footer>
+</main>
+
+</body>
+</html>

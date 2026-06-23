@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Canvas Staff Composer</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+  background: #bbeeff;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+
+
+const AppState = {
+  notes: [],
+  nextId: 1,
+  cursorIndex: 0,
+  cursorBlinkStart: performance.now(),
+
+  camera: {
+    x: 0,
+    zoom: 1,
+    velocityX: 0,
+    momentum: false
+  },
+
+  input: {
+    down: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    lastTime: 0,
+    dragging: false,
+    didLongPress: false,
+    longPressTimer: null
+  },
+
+  pinch: {
+    active: false,
+    pointers: new Map(),
+    startDistance: 1,
+    startZoom: 1,
+    centerScreenX: 0,
+    centerWorldX: 0
+  },
+  
+  noteInput: {
+  tonicLetter: "C",
+  tonicOctave: 4,
+  accidental: "natural",
+  value: "1/4",
+  shift: false,
+  tonicMenuOpen: false
+},
+
+  canvasMenu: {
+    visible: false,
+    x: 0,
+    y: 0,
+    noteId: null
+  }
+};
+
+const Layout = {
+  S: 18,
+  staff: {},
+  table: { scrollY: 0 },
+  inputPanel: {},
+  keypad: {},
+  sidePanel: {},
+
+  update() {
+    const bottomH = canvas.height * 0.48;
+    const topH = canvas.height - bottomH;
+    const padSize = Math.min(bottomH * 0.68, canvas.width * 0.42);
+    //const padSize = Math.min(bottomH * 0.82, canvas.width * 0.42);
+
+    this.staff = {
+      x: 0,
+      y: 0,
+      w: canvas.width,
+      h: topH * 0.58
+    };
+
+    this.table = {
+      x: 0,
+      y: this.staff.h,
+      w: canvas.width,
+      h: topH - this.staff.h,
+      scrollY: this.table.scrollY || 0
+    };
+
+    this.inputPanel = {
+      x: 0,
+      y: topH,
+      w: canvas.width,
+      h: bottomH
+    };
+
+    this.keypad = {
+      x: canvas.width - padSize - 20,
+      y: topH + 20,
+      w: padSize,
+      h: padSize
+    };
+
+    this.sidePanel = {
+      x: 20,
+      y: topH + 20,
+      w: Math.max(160, this.keypad.x - 50),
+      h: bottomH - 40
+    };
+  },
+
+  staffTop() {
+    return 110;
+  },
+
+  lineY(i) {
+    return this.staffTop() + i * this.S;
+  },
+
+  bottomLineY() {
+    return this.lineY(4);
+  }
+};
+
+const Notes = {
+  letters: ["C", "D", "E", "F", "G", "A", "B"],
+
+  accidentalSymbol: {
+    "double-flat": "𝄫",
+    flat: "♭",
+    natural: "♮",
+    sharp: "♯",
+    "double-sharp": "𝄪"
+  },
+
+  accidentalOffset: {
+    "double-flat": -2,
+    flat: -1,
+    natural: 0,
+    sharp: 1,
+    "double-sharp": 2
+  },
+
+  midiBase: {
+    C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11
+  },
+
+  ordered() {
+    return [...AppState.notes].sort((a, b) => {
+      if (a.x !== b.x) return a.x - b.x;
+      return a.y - b.y;
+    });
+  },
+
+  letterIndex(letter) {
+    return this.letters.indexOf(letter);
+  },
+  
+  diatonicStep(letter, octave) {
+    return (octave - 4) * 7 + this.letterIndex(letter);
+  },
+
+  yFromPitch(letter, octave) {
+    // Treble clef: E4 is the bottom staff line.
+    const e4Step = this.diatonicStep("E", 4);
+    const noteStep = this.diatonicStep(letter, octave);
+
+    return Layout.bottomLineY() - (noteStep - e4Step) * (Layout.S / 2);
+  },
+
+  pitchFromDegree(degree) {
+  const tonicIndex =
+    this.letterIndex(AppState.noteInput.tonicLetter);
+
+  const absolute =
+    tonicIndex + (degree - 1);
+
+  const letter =
+    this.letters[absolute % 7];
+
+  const octave =
+    AppState.noteInput.tonicOctave +
+    Math.floor(absolute / 7);
+
+  return { letter, octave };
+},
+
+  create({ x, letter, octave, accidental }) {
+    return {
+      id: AppState.nextId++,
+      x,
+      layoutX: x,
+      drawX: x,
+      letter,
+      octave,
+      y: this.yFromPitch(letter, octave),
+      accidental,
+      showAccidental: accidental !== "natural",
+      value: AppState.noteInput.value
+    };
+  },
+
+  createFromDegree(degree, addToChord = false) {
+    const ordered = this.ordered();
+    let x;
+
+    if (addToChord && ordered.length && AppState.cursorIndex > 0) {
+      x = ordered[AppState.cursorIndex - 1].x;
+    } else if (!ordered.length) {
+      x = AppState.camera.x + 220;
+    } else if (AppState.cursorIndex <= 0) {
+      x = ordered[0].x - 34;
+    } else if (AppState.cursorIndex >= ordered.length) {
+      x = ordered[ordered.length - 1].x + 34;
+    } else {
+      x = (ordered[AppState.cursorIndex - 1].x + ordered[AppState.cursorIndex].x) / 2;
+    }
+
+    const pitch = this.pitchFromDegree(degree);
+
+    const note = this.create({
+      x,
+      letter: pitch.letter,
+      octave: pitch.octave,
+      accidental: AppState.noteInput.accidental
+    });
+
+    AppState.notes.push(note);
+    this.layout();
+
+    const newOrdered = this.ordered();
+    AppState.cursorIndex = newOrdered.findIndex(n => n.id === note.id) + 1;
+
+    this.resetCursorBlink();
+    this.scrollToNote(note);
+  },
+
+  deleteBehindCursor() {
+    const ordered = this.ordered();
+    const index = AppState.cursorIndex - 1;
+    if (index < 0) return;
+
+    const target = ordered[index];
+    AppState.notes = AppState.notes.filter(n => n.id !== target.id);
+    AppState.cursorIndex = Math.max(0, AppState.cursorIndex - 1);
+
+    this.layout();
+    this.resetCursorBlink();
+  },
+
+  moveCursor(delta) {
+    AppState.cursorIndex = Math.max(
+      0,
+      Math.min(this.ordered().length, AppState.cursorIndex + delta)
+    );
+
+    this.resetCursorBlink();
+  },
+
+  layout() {
+    const ordered = this.ordered();
+    if (!ordered.length) return;
+
+    ordered[0].layoutX = ordered[0].x;
+
+    for (let i = 1; i < ordered.length; i++) {
+      const prev = ordered[i - 1];
+      const cur = ordered[i];
+
+      if (cur.x === prev.x) {
+        cur.layoutX = prev.layoutX;
+      } else {
+        cur.layoutX = Math.max(cur.x, prev.layoutX + 34);
+      }
+    }
+  },
+
+  updateAnimation() {
+    for (const n of AppState.notes) {
+      n.drawX += (n.layoutX - n.drawX) * 0.22;
+      n.y = this.yFromPitch(n.letter, n.octave);
+    }
+  },
+
+  chordOf(note) {
+    return AppState.notes.filter(n => n.x === note.x);
+  },
+
+  stemOwner(note) {
+    return this.chordOf(note).reduce(
+      (highest, n) => n.y < highest.y ? n : highest,
+      note
+    );
+  },
+
+  midi(note) {
+    return (
+      (note.octave + 1) * 12 +
+      this.midiBase[note.letter] +
+      this.accidentalOffset[note.accidental]
+    );
+  },
+
+  resetCursorBlink() {
+    AppState.cursorBlinkStart = performance.now();
+  },
+
+  scrollToNote(note) {
+    const sx = Input.worldToScreenX(note.layoutX);
+    const rightLimit = canvas.width * 0.72;
+    const leftLimit = canvas.width * 0.18;
+
+    let target = AppState.camera.x;
+
+    if (sx > rightLimit) {
+      target += (sx - rightLimit) / AppState.camera.zoom;
+    }
+
+    if (sx < leftLimit) {
+      target -= (leftLimit - sx) / AppState.camera.zoom;
+    }
+
+    Input.smoothPanTo(target, 100);
+  }
+};
+
+const CanvasUI = {
+  visibleButtons: [],
+
+  rebuild() {
+    const buttons = [];
+
+    const p = Layout.sidePanel;
+    const gap = 10;
+    const rowH = 46;
+
+    const add = (id, label, w, h, action) => {
+      buttons.push({
+        type: "button",
+        id,
+        label,
+        x: 0,
+        y: 0,
+        w,
+        h,
+        action
+      });
+    };
+
+    add("delete", "Delete", 90, 40, () => Notes.deleteBehindCursor());
+    add("shift", "Shift", 90, 40, () => AppState.noteInput.shift = !AppState.noteInput.shift);
+    add(
+      "tonic",
+      `Tonic ${AppState.noteInput.tonicLetter}${AppState.noteInput.tonicOctave}`,
+      125,
+      40,
+      () => AppState.noteInput.tonicMenuOpen = !AppState.noteInput.tonicMenuOpen
+    );
+    add("midi", "MIDI", 80, 40, () => Exporter.midi());
+    add("xml", "MusicXML", 110, 40, () => Exporter.musicXML());
+    add("pdf", "PDF", 70, 40, () => Exporter.pdf());
+    
+
+    let x = p.x;
+    let y = p.y;
+    const maxX = Layout.keypad.x - 15;
+
+    for (const b of buttons) {
+      if (x + b.w > maxX) {
+        x = p.x;
+        y += rowH + gap;
+      }
+
+      b.x = x;
+      b.y = y;
+
+      x += b.w + gap;
+    }
+    
+    // Arrow cluster below numpad
+  const k = Layout.keypad;
+  const arrowSize = 46;
+  const gap2 = 8;
+
+  const centerX = k.x + k.w / 2;
+  const rowY = k.y + k.h + 14;
+  const upY = rowY - arrowSize - gap2;
+
+  buttons.push({
+    type: "button",
+    id: "up",
+    label: "↑",
+    x: centerX - arrowSize / 2,
+    y: upY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => {
+      // for now same as left, or use later for table scroll
+      Notes.moveCursor(-1);
+    }
+  });
+
+  buttons.push({
+    type: "button",
+    id: "left",
+    label: "←",
+    x: centerX - arrowSize * 1.5 - gap2,
+    y: rowY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => Notes.moveCursor(-1)
+  });
+
+  buttons.push({
+    type: "button",
+    id: "down",
+    label: "↓",
+    x: centerX - arrowSize / 2,
+    y: rowY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => {
+      // for now same as right, or use later for table scroll
+      Notes.moveCursor(1);
+    }
+  });
+
+  buttons.push({
+    type: "button",
+  id: "right",
+  label: "→",
+  x: centerX + arrowSize / 2 + gap2,
+  y: rowY,
+  w: arrowSize,
+  h: arrowSize,
+  action: () => Notes.moveCursor(1)
+});
+
+    this.visibleButtons = [
+      ...buttons,
+      ...this.keypadButtons()
+    ];
+
+    if (AppState.noteInput.tonicMenuOpen) {
+      this.visibleButtons.push(...this.tonicMenuButtons(buttons));
+    }
+  },
+  
+  
+  
+  
+  
+  keypadButtons() {
+  const k = Layout.keypad;
+  const buttons = [];
+
+  const noteValues = [
+    ["1", "𝅝"],
+    ["1/2", "𝅗𝅥"],
+    ["1/4", "♩"],
+    ["1/8", "♪"],
+    ["1/16", "𝅘𝅥𝅯"]
+  ];
+
+  const valueH = 38;
+  const accidentalH = 38;
+  const gap = 10;
+
+  noteValues.forEach((v, i) => {
+    buttons.push({
+      type: "noteValue",
+      value: v[0],
+      label: v[1],
+      x: k.x + i * (k.w / 5),
+      y: k.y,
+      w: k.w / 5,
+      h: valueH
+    });
+  });
+
+  const acc = [
+    ["double-flat", "𝄫"],
+    ["flat", "♭"],
+    ["natural", "♮"],
+    ["sharp", "♯"],
+    ["double-sharp", "𝄪"]
+  ];
+
+  acc.forEach((a, i) => {
+    buttons.push({
+      type: "accidental",
+      value: a[0],
+      label: a[1],
+      x: k.x + i * (k.w / 5),
+      y: k.y + valueH + gap,
+      w: k.w / 5,
+      h: accidentalH
+    });
+  });
+
+  const gridY = k.y + valueH + gap + accidentalH + 12;
+  const cellW = k.w / 3;
+  const cellH = (k.h - valueH - gap - accidentalH - 12) / 3;
+
+    for (let degree = 1; degree <= 9; degree++) {
+      const i = degree - 1;
+
+      buttons.push({
+        type: "degree",
+        value: degree,
+        label: String(degree),
+        x: k.x + (i % 3) * cellW,
+        y: gridY + Math.floor(i / 3) * cellH,
+        w: cellW,
+        h: cellH
+      });
+    }
+
+    return buttons;
+  },
+
+  tonicMenuButtons(buttons) {
+    const tonic = buttons.find(b => b.id === "tonic");
+    if (!tonic) return [];
+
+    const out = [];
+    const letters = ["C", "D", "E", "F", "G", "A", "B"];
+    
+    const menuW = 124;
+    const menuH = 9 * 34;
+
+    let x = tonic.x;
+    let y = tonic.y + tonic.h + 8;
+
+    if (x + menuW > canvas.width - 10) {
+      x = canvas.width - menuW - 10;
+    }
+
+    if (y + menuH > canvas.height - 10) {
+      y = tonic.y - menuH - 8;
+    }
+
+    if (y < 10) {
+      y = 10;
+    }
+
+    letters.forEach((letter, i) => {
+      out.push({
+        type: "tonicLetter",
+        value: letter,
+        label: letter,
+        x,
+        y: y + i * 34,
+        w: 56,
+        h: 32
+      });
+    });
+
+    for (let octave = 0; octave <= 8; octave++) {
+      out.push({
+        type: "tonicOctave",
+        value: octave,
+        label: String(octave),
+        x: x + 64,
+        y: y + octave * 34,
+        w: 56,
+        h: 32
+      });
+    }
+
+    return out;
+  },
+
+  hit(x, y) {
+    for (let i = this.visibleButtons.length - 1; i >= 0; i--) {
+      const b = this.visibleButtons[i];
+
+      if (
+        x >= b.x &&
+        x <= b.x + b.w &&
+        y >= b.y &&
+        y <= b.y + b.h
+      ) {
+        return b;
+      }
+    }
+
+    return null;
+  },
+
+  activate(b) {
+    if (!b) return;
+
+    if (b.action) {
+      b.action();
+      return;
+    }
+    
+    if (b.type === "noteValue") {
+  AppState.noteInput.value = b.value;
+  return;
+}
+
+    if (b.type === "degree") {
+      Notes.createFromDegree(b.value, AppState.noteInput.shift);
+      return;
+    }
+
+    if (b.type === "accidental") {
+      AppState.noteInput.accidental = b.value;
+      return;
+    }
+
+    if (b.type === "tonicLetter") {
+      AppState.noteInput.tonicLetter = b.value;
+      return;
+    }
+
+    if (b.type === "tonicOctave") {
+      AppState.noteInput.tonicOctave = b.value;
+      return;
+    }
+  }
+};
+
+const Input = {
+  screenToWorldX(sx) {
+    return sx / AppState.camera.zoom + AppState.camera.x;
+  },
+
+  worldToScreenX(wx) {
+    return (wx - AppState.camera.x) * AppState.camera.zoom;
+  },
+  
+  pointer(e) {
+  const r = canvas.getBoundingClientRect();
+
+  const sx =
+    (e.clientX - r.left) * (canvas.width / r.width);
+
+  const sy =
+    (e.clientY - r.top) * (canvas.height / r.height);
+
+  return {
+    sx,
+    sy,
+    wx: this.screenToWorldX(sx)
+  };
+},
+  
+  bind() {
+  canvas.addEventListener("pointerdown", e => this.down(e));
+  canvas.addEventListener("pointermove", e => this.move(e));
+  canvas.addEventListener("pointerup", e => this.up(e));
+  canvas.addEventListener("pointercancel", e => this.cancel(e));
+  canvas.addEventListener("wheel", e => this.wheel(e), { passive: false });
+},
+  down(e) {
+    canvas.setPointerCapture(e.pointerId);
+
+    const p = this.pointer(e);
+    const hit = CanvasUI.hit(p.sx, p.sy);
+
+    if (hit) {
+      AppState.input.down = true;
+      AppState.input.pointerId = e.pointerId;
+      AppState.input.startX = p.sx;
+      AppState.input.startY = p.sy;
+      AppState.input.lastX = p.sx;
+      AppState.input.lastY = p.sy;
+      return;
+    }
+
+    AppState.pinch.pointers.set(e.pointerId, {
+      x: e.clientX,
+      y: e.clientY
+    });
+
+    if (AppState.pinch.pointers.size === 2) {
+      const pts = [...AppState.pinch.pointers.values()];
+      const dx = pts[1].x - pts[0].x;
+      const dy = pts[1].y - pts[0].y;
+
+      AppState.pinch.active = true;
+      AppState.pinch.startDistance = Math.hypot(dx, dy);
+      AppState.pinch.startZoom = AppState.camera.zoom;
+      AppState.pinch.centerScreenX = (pts[0].x + pts[1].x) / 2;
+      AppState.pinch.centerWorldX = this.screenToWorldX(AppState.pinch.centerScreenX);
+
+      return;
+    }
+
+    Object.assign(AppState.input, {
+      down: true,
+      pointerId: e.pointerId,
+      startX: p.sx,
+      startY: p.sy,
+      lastX: p.sx,
+      lastY: p.sy,
+      lastTime: performance.now(),
+      dragging: false,
+      didLongPress: false
+    });
+
+    AppState.camera.momentum = false;
+  },
+
+  move(e) {
+    if (AppState.pinch.pointers.has(e.pointerId)) {
+      AppState.pinch.pointers.set(e.pointerId, {
+        x: e.clientX,
+        y: e.clientY
+      });
+    }
+
+    if (AppState.pinch.active && AppState.pinch.pointers.size >= 2) {
+      const pts = [...AppState.pinch.pointers.values()];
+      const dx = pts[1].x - pts[0].x;
+      const dy = pts[1].y - pts[0].y;
+      const dist = Math.hypot(dx, dy);
+
+      AppState.camera.zoom = Math.max(
+        0.45,
+        Math.min(2.8, AppState.pinch.startZoom * dist / AppState.pinch.startDistance)
+      );
+
+      AppState.camera.x =
+        AppState.pinch.centerWorldX -
+        AppState.pinch.centerScreenX / AppState.camera.zoom;
+
+      AppState.camera.x = Math.max(0, AppState.camera.x);
+      return;
+    }
+
+    if (!AppState.input.down || AppState.input.pointerId !== e.pointerId) return;
+
+    const p = this.pointer(e);
+    const totalDx = p.sx - AppState.input.startX;
+    const totalDy = p.sy - AppState.input.startY;
+
+    if (!AppState.input.dragging) {
+      if (
+        Math.hypot(totalDx, totalDy) > 14 &&
+        Math.abs(totalDx) > Math.abs(totalDy) * 1.25
+      ) {
+        AppState.input.dragging = true;
+        AppState.input.lastX = p.sx;
+        AppState.input.lastY = p.sy;
+        AppState.input.lastTime = performance.now();
+      }
+
+      return;
+    }
+
+    const dx = p.sx - AppState.input.lastX;
+    const now = performance.now();
+    const dt = Math.max(1, now - AppState.input.lastTime);
+    const worldDx = dx / AppState.camera.zoom;
+
+    AppState.camera.x = Math.max(0, AppState.camera.x - worldDx);
+    AppState.camera.velocityX = (-worldDx) / dt;
+
+    AppState.input.lastX = p.sx;
+    AppState.input.lastY = p.sy;
+    AppState.input.lastTime = now;
+  },
+  
+  up(e) {
+  const p = this.pointer(e);
+  const hit = CanvasUI.hit(p.sx, p.sy);
+
+  if (hit) {
+    CanvasUI.activate(hit);
+    this.cleanup(e);
+    return;
+  }
+
+  const wasDragging = AppState.input.dragging;
+  this.cleanup(e);
+
+  if (wasDragging) {
+    AppState.camera.momentum = true;
+  }
+},
+
+  cancel(e) {
+    this.cleanup(e);
+  },
+
+  cleanup(e) {
+    AppState.pinch.pointers.delete(e.pointerId);
+
+    if (AppState.pinch.pointers.size < 2) {
+      AppState.pinch.active = false;
+    }
+
+    AppState.input.down = false;
+    AppState.input.pointerId = null;
+  },
+
+  wheel(e) {
+    e.preventDefault();
+
+    const p = this.pointer(e);
+
+    if (e.ctrlKey) {
+      const before = this.screenToWorldX(p.sx);
+
+      AppState.camera.zoom *= e.deltaY < 0 ? 1.08 : 0.92;
+      AppState.camera.zoom = Math.max(0.45, Math.min(2.8, AppState.camera.zoom));
+
+      const after = this.screenToWorldX(p.sx);
+      AppState.camera.x += before - after;
+      AppState.camera.x = Math.max(0, AppState.camera.x);
+    } else {
+      AppState.camera.x = Math.max(
+        0,
+        AppState.camera.x + e.deltaY / AppState.camera.zoom
+      );
+    }
+  },
+
+  updateMomentum() {
+    if (!AppState.camera.momentum) return;
+
+    AppState.camera.x = Math.max(
+      0,
+      AppState.camera.x + AppState.camera.velocityX * 16
+    );
+
+    AppState.camera.velocityX *= 0.94;
+
+    if (Math.abs(AppState.camera.velocityX) < 0.01) {
+      AppState.camera.momentum = false;
+    }
+  },
+
+  smoothPanTo(targetX, duration) {
+    const startX = AppState.camera.x;
+    const endX = Math.max(0, targetX);
+    const startTime = performance.now();
+
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+
+      AppState.camera.x = startX + (endX - startX) * eased;
+
+      if (t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+};
+
+const Renderer = {
+
+  notehead(sx, y, value) {
+  ctx.save();
+  ctx.translate(sx, y);
+  ctx.rotate(-0.23);
+
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "black";
+  ctx.lineWidth = 2;
+
+  if (value === "1" || value === "1/2") {
+    // hollow notehead made with bezier curves
+    ctx.beginPath();
+    ctx.moveTo(-8, 0);
+    ctx.bezierCurveTo(-8, -5, -3, -8, 4, -6);
+    ctx.bezierCurveTo(11, -4, 11, 3, 6, 6);
+    ctx.bezierCurveTo(0, 9, -8, 6, -8, 0);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-3, 1);
+    ctx.bezierCurveTo(-2, -2, 2, -4, 5, -3);
+    ctx.bezierCurveTo(7, -2, 6, 2, 3, 4);
+    ctx.bezierCurveTo(0, 5, -4, 4, -3, 1);
+    ctx.fillStyle = "#bbeeff";
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 7.5, 5.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+},
+
+flag(sx, y, stemDown, value) {
+  if (value !== "1/8" && value !== "1/16") return;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  const flags = value === "1/16" ? 2 : 1;
+  const stemX = stemDown ? sx - 9 : sx + 9;
+
+  for (let i = 0; i < flags; i++) {
+    const offset = i * 9;
+
+    ctx.beginPath();
+
+    if (stemDown) {
+      const startY = y + 44 - offset;
+      ctx.moveTo(stemX, startY);
+      ctx.bezierCurveTo(
+        stemX + 18, startY + 8,
+        stemX + 22, startY + 22,
+        stemX + 8, startY + 30
+      );
+    } else {
+      const startY = y - 44 + offset;
+      ctx.moveTo(stemX, startY);
+      ctx.bezierCurveTo(
+        stemX + 18, startY + 8,
+        stemX + 22, startY + 22,
+        stemX + 8, startY + 30
+      );
+    }
+
+    ctx.stroke();
+  }
+
+  ctx.restore();
+},
+
+  clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  },
+
+  staff() {
+    ctx.save();
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    for (let i = 0; i < 5; i++) {
+      const y = Layout.lineY(i);
+
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    ctx.font = "90px serif";
+    ctx.fillStyle = "black";
+    ctx.fillText("𝄞", 45, Layout.lineY(4) + 30);
+
+    ctx.restore();
+  },
+  
+  ledgerLines(note, sx) {
+    const top = Layout.lineY(0);
+    const bottom = Layout.lineY(4);
+    const step = Layout.S / 2;
+    const width = 26;
+
+    ctx.save();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    // Above staff
+    if (note.y < top) {
+      for (let y = top - step * 2; y >= note.y; y -= step * 2) {
+        ctx.beginPath();
+        ctx.moveTo(sx - width / 2, y);
+        ctx.lineTo(sx + width / 2, y);
+        ctx.stroke();
+      }
+    }
+
+    // Below staff
+    if (note.y > bottom) {
+      for (let y = bottom + step * 2; y <= note.y; y += step * 2) {
+        ctx.beginPath();
+        ctx.moveTo(sx - width / 2, y);
+        ctx.lineTo(sx + width / 2, y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  },
+
+  note(note) {
+    const sx = Input.worldToScreenX(note.drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+    
+    this.ledgerLines(note, sx);
+
+    if (note.showAccidental) {
+      ctx.save();
+      ctx.font = "24px serif";
+      ctx.fillStyle = "black";
+      ctx.fillText(Notes.accidentalSymbol[note.accidental], sx - 28, note.y + 8);
+      ctx.restore();
+    }
+
+this.notehead(sx, note.y, note.value);
+
+const owner = Notes.stemOwner(note);
+
+if (owner.id === note.id && note.value !== "1") {
+  const chord = Notes.chordOf(note);
+  const highest = Math.min(...chord.map(n => n.y));
+  const lowest = Math.max(...chord.map(n => n.y));
+
+  const middleLineY = Layout.lineY(2);
+  const stemDown = highest <= middleLineY;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+
+  if (stemDown) {
+    ctx.moveTo(sx - 9, highest);
+    ctx.lineTo(sx - 9, lowest + 44);
+  } else {
+    ctx.moveTo(sx + 9, lowest);
+    ctx.lineTo(sx + 9, highest - 44);
+  }
+
+  ctx.stroke();
+  ctx.restore();
+
+  this.flag(sx, stemDown ? lowest : highest, stemDown, note.value);
+}
+
+  },
+
+  cursor() {
+    const ordered = Notes.ordered();
+    let x = AppState.camera.x + 180;
+
+    if (ordered.length) {
+      if (AppState.cursorIndex <= 0) {
+        x = ordered[0].layoutX - 30;
+      } else if (AppState.cursorIndex >= ordered.length) {
+        x = ordered[ordered.length - 1].layoutX + 30;
+      } else {
+        x = (ordered[AppState.cursorIndex - 1].layoutX + ordered[AppState.cursorIndex].layoutX) / 2;
+      }
+    }
+
+    const blink = Math.floor((performance.now() - AppState.cursorBlinkStart) / 420) % 2;
+    if (blink === 1) return;
+
+    const sx = Input.worldToScreenX(x);
+
+    ctx.save();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(sx, Layout.lineY(0) - 25);
+    ctx.lineTo(sx, Layout.lineY(4) + 25);
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  table() {
+    const a = Layout.table;
+    const ordered = Notes.ordered();
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.rect(a.x, a.y, a.w, a.h);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fillRect(a.x, a.y, a.w, a.h);
+
+    ctx.fillStyle = "black";
+    ctx.font = "14px sans-serif";
+    ctx.textBaseline = "middle";
+
+    let y = a.y + 22;
+
+    ctx.fillText("#", 12, y);
+    ctx.fillText("X", 60, y);
+    ctx.fillText("Pitch", 120, y);
+    ctx.fillText("Acc", 190, y);
+
+    y += 24;
+
+    ordered.forEach((n, i) => {
+      if (i === AppState.cursorIndex - 1) {
+        ctx.fillStyle = "rgba(255,0,0,0.13)";
+        ctx.fillRect(0, y - 12, a.w, 24);
+      }
+
+      ctx.fillStyle = "black";
+      ctx.fillText(i + 1, 12, y);
+      ctx.fillText(Math.round(n.x), 60, y);
+      ctx.fillText(`${n.letter}${n.octave}`, 120, y);
+      ctx.fillText(Notes.accidentalSymbol[n.accidental], 190, y);
+
+      y += 24;
+    });
+
+    ctx.restore();
+  },
+
+  inputPanel() {
+    const p = Layout.inputPanel;
+
+    ctx.save();
+    ctx.fillStyle = "rgba(220,240,255,0.96)";
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+    ctx.restore();
+  },
+
+  button(b, active) {
+    ctx.save();
+
+    ctx.fillStyle = active ? "rgba(255,230,80,0.95)" : "rgba(255,255,255,0.92)";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.roundRect(b.x, b.y, b.w, b.h, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "black";
+    ctx.font = b.type === "degree" ? "30px sans-serif" : "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+
+    ctx.restore();
+  },
+
+  ui() {
+    for (const b of CanvasUI.visibleButtons) {
+      const active =
+      (b.type === "noteValue" && b.value === AppState.noteInput.value) ||
+        (b.id === "shift" && AppState.noteInput.shift) ||
+        (b.type === "accidental" && b.value === AppState.noteInput.accidental) ||
+        (b.type === "tonicLetter" && b.value === AppState.noteInput.tonicLetter) ||
+        (b.type === "tonicOctave" && b.value === AppState.noteInput.tonicOctave);
+
+      this.button(b, active);
+    }
+  },
+
+  render() {
+  
+  Layout.update();
+  CanvasUI.rebuild();
+
+  
+    this.clear();
+    this.staff();
+
+    for (const n of AppState.notes) {
+      this.note(n);
+    }
+
+    this.cursor();
+    this.table();
+    this.inputPanel();
+    this.ui();
+  }
+};
+
+const Exporter = {
+  download(name, type, content) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = name;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  },
+
+  groupedNotes() {
+    const groups = [];
+
+    for (const n of Notes.ordered()) {
+      let g = groups.find(x => x.x === n.x);
+
+      if (!g) {
+        g = { x: n.x, notes: [] };
+        groups.push(g);
+      }
+
+      g.notes.push(n);
+    }
+
+    return groups;
+  },
+
+  musicXML() {
+    const alter = {
+      "double-flat": -2,
+      flat: -1,
+      natural: 0,
+      sharp: 1,
+      "double-sharp": 2
+    };
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+<part-list>
+<score-part id="P1"><part-name>Music</part-name></score-part>
+</part-list>
+<part id="P1">
+<measure number="1">
+<attributes>
+<divisions>8</divisions>
+<key><fifths>0</fifths></key>
+<time><beats>4</beats><beat-type>4</beat-type></time>
+<clef><sign>G</sign><line>2</line></clef>
+</attributes>
+`;
+
+    for (const group of this.groupedNotes()) {
+      group.notes.forEach((n, i) => {
+        xml += `<note>\n`;
+
+        if (i > 0) xml += `<chord/>\n`;
+
+        xml += `<pitch>
+<step>${n.letter}</step>
+`;
+
+        if (alter[n.accidental] !== 0) {
+          xml += `<alter>${alter[n.accidental]}</alter>\n`;
+        }
+
+        xml += `<octave>${n.octave}</octave>
+</pitch>
+<duration>8</duration>
+<type>quarter</type>
+</note>
+`;
+      });
+    }
+
+    xml += `</measure></part></score-partwise>`;
+
+    this.download("score.musicxml", "application/xml", xml);
+  },
+
+  writeVarLen(value) {
+    let buffer = value & 0x7F;
+    const bytes = [];
+
+    while ((value >>= 7)) {
+      buffer <<= 8;
+      buffer |= ((value & 0x7F) | 0x80);
+    }
+
+    while (true) {
+      bytes.push(buffer & 0xFF);
+
+      if (buffer & 0x80) buffer >>= 8;
+      else break;
+    }
+
+    return bytes;
+  },
+
+  midi() {
+    const track = [];
+
+    track.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
+
+    for (const group of this.groupedNotes()) {
+      group.notes.forEach(n => {
+        track.push(0x00, 0x90, Notes.midi(n), 100);
+      });
+
+      group.notes.forEach((n, i) => {
+        track.push(
+          ...(i === 0 ? this.writeVarLen(480) : [0x00]),
+          0x80,
+          Notes.midi(n),
+          0
+        );
+      });
+    }
+
+    track.push(0x00, 0xFF, 0x2F, 0x00);
+
+    const len = track.length;
+
+    const bytes = [
+      0x4D,0x54,0x68,0x64,
+      0x00,0x00,0x00,0x06,
+      0x00,0x00,
+      0x00,0x01,
+      0x01,0xE0,
+      0x4D,0x54,0x72,0x6B,
+      (len >> 24) & 255,
+      (len >> 16) & 255,
+      (len >> 8) & 255,
+      len & 255,
+      ...track
+    ];
+
+    this.download("score.mid", "audio/midi", new Uint8Array(bytes));
+  },
+  
+  pdf() {
+  alert("Exporter.pdf called");
+
+  const dataURL = canvas.toDataURL("image/png");
+
+  const win = window.open();
+
+  if (win) {
+    win.document.write(`
+      <html>
+      <body style="margin:0;background:white">
+        <img src="${dataURL}" style="width:100%;display:block">
+      </body>
+      </html>
+    `);
+    win.document.close();
+    return;
+  }
+
+  alert("Popup blocked. Try Chrome menu > Share > Print.");
+}
+  
+  
+  
+  /*
+  pdf() {
+ 
+  console.log("Exporter.pdf called");
+  alert("Exporter.pdf called");
+  const dataURL = canvas.toDataURL("image/png");
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Score Export</title>
+<style>
+body { margin: 0; background: white; }
+img { width: 100%; display: block; }
+</style>
+</head>
+<body>
+<img src="${dataURL}">
+</body>
+</html>
+`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "score-print.html";
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+  
+  */
+  
+
+};
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  Layout.update();
+  CanvasUI.rebuild();
+}
+
+function animate() {
+  Input.updateMomentum();
+  Notes.layout();
+  Notes.updateAnimation();
+  Renderer.render();
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
+Input.bind();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
+
+<!--
+
+
+ Tonic menu: you press and hold and it opens up kind of like a wheel almost like some date selectors where because it's infinitely CDEFG and then you can scroll up or down and same with the octave numbers
+
+
+
+
+
+
+
+
+
+
+
+-->

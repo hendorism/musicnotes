@@ -1,0 +1,3329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Canvas Staff Composer</title>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+  background: #bbeeff;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script src="vendor/vexflow-4.2.2.js"></script>
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const VF = window.Vex?.Flow;
+const vexContext = VF ? new VF.CanvasContext(ctx) : null;
+
+
+
+const AppState = {
+  notes: [],
+  nextId: 1,
+  undoStack: [],
+  cursorIndex: 0,
+  cursorStaffOffset: 0,
+  cursorBlinkStart: performance.now(),
+  lastFrameTime: performance.now(),
+  selection: null,
+
+  tableScroll: {
+    y: 0,
+    velocity: 0
+  },
+
+  tonicGuideAnimation: {
+    fromY: null,
+    toY: null,
+    displayY: null,
+    startedAt: 0,
+    duration: 400
+  },
+
+  camera: {
+    x: 0,
+    zoom: 1,
+    velocityX: 0,
+    momentum: false
+  },
+
+  input: {
+    down: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    lastTime: 0,
+    dragging: false,
+    didLongPress: false,
+    longPressTimer: null
+  },
+
+  pinch: {
+    active: false,
+    pointers: new Map(),
+    startDistance: 1,
+    startZoom: 1,
+    centerScreenX: 0,
+    centerWorldX: 0
+  },
+  
+  noteInput: {
+  tonicLetter: "C",
+  tonicOctave: 4,
+  accidental: "natural",
+  selectedAccidental: "natural",
+  value: "1/4",
+  shift: false,
+  selectedShift: false,
+  tonicMenuOpen: false
+},
+
+  canvasMenu: {
+    visible: false,
+    x: 0,
+    y: 0,
+    noteId: null
+  },
+
+  hover: {
+    noteId: null,
+    chordX: null,
+    startedAt: 0,
+    sx: null,
+    sy: null,
+    shiftChord: false
+  }
+};
+
+const Layout = {
+  S: 18,
+  staff: {},
+  table: { scrollY: 0 },
+  inputPanel: {},
+  keypad: {},
+  sidePanel: {},
+
+  update() {
+    const bottomH = canvas.height * 0.48;
+    const topH = canvas.height - bottomH;
+    const padSize = Math.min(bottomH * 0.68, canvas.width * 0.42);
+    //const padSize = Math.min(bottomH * 0.82, canvas.width * 0.42);
+
+    this.staff = {
+      x: 0,
+      y: 0,
+      w: canvas.width,
+      h: topH * 0.58
+    };
+
+    this.table = {
+      x: 0,
+      y: this.staff.h,
+      w: canvas.width,
+      h: canvas.height - this.staff.h,
+      scrollY: this.table.scrollY || 0
+    };
+
+    this.inputPanel = {
+      x: 0,
+      y: topH,
+      w: canvas.width,
+      h: bottomH
+    };
+
+    this.keypad = {
+      x: canvas.width - padSize - 20,
+      y: topH + 20,
+      w: padSize,
+      h: padSize
+    };
+
+    this.sidePanel = {
+      x: 20,
+      y: topH + 20,
+      w: Math.max(160, this.keypad.x - 50),
+      h: bottomH - 40
+    };
+  },
+
+  staffTop() {
+    return 110;
+  },
+
+  lineY(i) {
+    return this.staffTop() + i * this.S;
+  },
+
+  bottomLineY() {
+    return this.lineY(4);
+  }
+};
+
+const Notes = {
+  letters: ["C", "D", "E", "F", "G", "A", "B"],
+  minTonicOctave: -1,
+  maxTonicOctave: 9,
+
+  accidentalSymbol: {
+    "double-flat": "𝄫",
+    flat: "♭",
+    natural: "♮",
+    sharp: "♯",
+    "double-sharp": "𝄪"
+  },
+
+  keySignatureSymbol: {
+    sharp: "♯",
+    flat: "♭"
+  },
+
+  keySignatureLines: {
+    sharp: [0, 3, -0.5, 2.5, 5.5, 1.5, 4.5],
+    flat: [4, 1, 4.5, 1.5, 5, 2, 5.5]
+  },
+
+  keySignaturePitches: {
+    sharp: [
+      ["F", 5],
+      ["C", 5],
+      ["G", 5],
+      ["D", 5],
+      ["A", 4],
+      ["E", 5],
+      ["B", 4]
+    ],
+    flat: [
+      ["B", 4],
+      ["E", 5],
+      ["A", 4],
+      ["D", 5],
+      ["G", 4],
+      ["C", 5],
+      ["F", 4]
+    ]
+  },
+
+  accidentalOffset: {
+    "double-flat": -2,
+    flat: -1,
+    natural: 0,
+    sharp: 1,
+    "double-sharp": 2
+  },
+
+  offsetAccidental: {
+    "-2": "double-flat",
+    "-1": "flat",
+    0: "natural",
+    1: "sharp",
+    2: "double-sharp"
+  },
+
+  midiBase: {
+    C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11
+  },
+
+  snapshot() {
+    return {
+      notes: AppState.notes.map(note => ({ ...note })),
+      nextId: AppState.nextId,
+      cursorIndex: AppState.cursorIndex,
+      cursorStaffOffset: AppState.cursorStaffOffset,
+      selection: AppState.selection ? { ...AppState.selection } : null,
+      noteInput: { ...AppState.noteInput }
+    };
+  },
+
+  saveUndo() {
+    AppState.undoStack.push(this.snapshot());
+
+    if (AppState.undoStack.length > 100) {
+      AppState.undoStack.shift();
+    }
+  },
+
+  undo() {
+    const previous = AppState.undoStack.pop();
+    if (!previous) return;
+
+    AppState.notes = previous.notes.map(note => ({ ...note }));
+    AppState.nextId = previous.nextId;
+    AppState.cursorIndex = previous.cursorIndex;
+    AppState.cursorStaffOffset = previous.cursorStaffOffset;
+    AppState.selection = previous.selection ? { ...previous.selection } : null;
+    AppState.noteInput = {
+      ...AppState.noteInput,
+      ...previous.noteInput,
+      shift: Input.heldShiftKeys.size > 0
+        ? true
+        : previous.noteInput.selectedShift
+    };
+
+    this.layout();
+    this.resetCursorBlink();
+  },
+
+  setTonicOctave(octave) {
+    AppState.noteInput.tonicOctave = Math.max(
+      this.minTonicOctave,
+      Math.min(this.maxTonicOctave, octave)
+    );
+  },
+
+  changeTonicOctave(octave) {
+    const nextOctave = Math.max(
+      this.minTonicOctave,
+      Math.min(this.maxTonicOctave, octave)
+    );
+
+    if (nextOctave === AppState.noteInput.tonicOctave) return;
+
+    this.saveUndo();
+    AppState.noteInput.tonicOctave = nextOctave;
+  },
+
+  changeTonicLetter(letter) {
+    if (!this.letters.includes(letter)) return;
+    if (letter === AppState.noteInput.tonicLetter) return;
+
+    this.saveUndo();
+    AppState.noteInput.tonicLetter = letter;
+  },
+
+  ordered() {
+    return [...AppState.notes].sort((a, b) => {
+      if (a.x !== b.x) return a.x - b.x;
+      return (a.y ?? 0) - (b.y ?? 0);
+    });
+  },
+
+  letterIndex(letter) {
+    return this.letters.indexOf(letter);
+  },
+  
+  diatonicStep(letter, octave) {
+    return (octave - 4) * 7 + this.letterIndex(letter);
+  },
+
+  yFromPitch(letter, octave) {
+    // Treble clef: E4 is the bottom staff line.
+    const e4Step = this.diatonicStep("E", 4);
+    const noteStep = this.diatonicStep(letter, octave);
+
+    return Layout.bottomLineY() - (noteStep - e4Step) * (Layout.S / 2);
+  },
+
+  pitchFromDegree(degree) {
+  const tonicIndex =
+    this.letterIndex(AppState.noteInput.tonicLetter);
+
+  const absolute =
+    tonicIndex + (degree - 1);
+
+  const letter =
+    this.letters[absolute % 7];
+
+  const octave =
+    AppState.noteInput.tonicOctave +
+    Math.floor(absolute / 7);
+
+  return { letter, octave };
+},
+
+  stepTonic(delta) {
+    const currentIndex = this.letterIndex(AppState.noteInput.tonicLetter);
+    if (currentIndex < 0) return;
+
+    let nextIndex = currentIndex + delta;
+    let nextOctave = AppState.noteInput.tonicOctave;
+
+    if (nextIndex < 0) {
+      if (nextOctave <= this.minTonicOctave) return;
+      nextIndex = this.letters.length - 1;
+      nextOctave -= 1;
+    } else if (nextIndex >= this.letters.length) {
+      if (nextOctave >= this.maxTonicOctave) return;
+      nextIndex = 0;
+      nextOctave += 1;
+    }
+
+    this.saveUndo();
+    AppState.noteInput.tonicLetter = this.letters[nextIndex];
+    AppState.noteInput.tonicOctave = nextOctave;
+  },
+
+  stepTonicOctave(delta) {
+    const currentOctave = AppState.noteInput.tonicOctave;
+    const nextOctave = Math.max(
+      this.minTonicOctave,
+      Math.min(this.maxTonicOctave, currentOctave + delta)
+    );
+
+    if (nextOctave === currentOctave) return;
+
+    this.saveUndo();
+    AppState.noteInput.tonicOctave = nextOctave;
+  },
+
+  create({ x, letter, octave, accidental, showAccidental, staff = 0 }) {
+    return {
+      id: AppState.nextId++,
+      kind: "note",
+      x,
+      layoutX: x,
+      drawX: x,
+      letter,
+      octave,
+      y: this.yFromPitch(letter, octave),
+      staff,
+      accidental,
+      showAccidental,
+      value: AppState.noteInput.value
+    };
+  },
+
+  keySignatureAt(x) {
+    return this.ordered()
+      .filter(item => item.kind === "keysig" && item.x <= x)
+      .at(-1) || null;
+  },
+
+  keySignatureOffsetForLetter(keySignature, letter) {
+    if (!keySignature || keySignature.count === 0) return 0;
+
+    const pitches = this.keySignaturePitches[keySignature.accidental] || [];
+    const affectedLetters = pitches
+      .slice(0, keySignature.count)
+      .map(([pitchLetter]) => pitchLetter);
+
+    if (!affectedLetters.includes(letter)) return 0;
+
+    return keySignature.accidental === "flat" ? -1 : 1;
+  },
+
+  accidentalContextStartX(x) {
+    const previousBoundary = this.ordered()
+      .filter(item =>
+        (item.kind === "barline" || item.kind === "keysig") &&
+        item.x <= x
+      )
+      .at(-1);
+
+    return previousBoundary ? previousBoundary.x : Number.NEGATIVE_INFINITY;
+  },
+
+  prevailingAccidentalOffset(letter, octave, staff, x) {
+    const startX = this.accidentalContextStartX(x);
+    const previousNote = this.ordered()
+      .filter(item =>
+        item.kind === "note" &&
+        item.x >= startX &&
+        item.x < x &&
+        item.letter === letter &&
+        item.octave === octave &&
+        (item.staff ?? 0) === staff &&
+        item.showAccidental
+      )
+      .at(-1);
+
+    return previousNote
+      ? this.accidentalOffset[previousNote.accidental] ?? 0
+      : null;
+  },
+
+  effectiveAccidental(letter, octave, staff, x, selectedAccidental) {
+    const keySignatureOffset = this.keySignatureOffsetForLetter(
+      this.keySignatureAt(x),
+      letter
+    );
+    const selectedOffset = this.accidentalOffset[selectedAccidental] ?? 0;
+    const prevailingOffset = this.prevailingAccidentalOffset(
+      letter,
+      octave,
+      staff,
+      x
+    );
+    const baseOffset = selectedOffset === 0 && prevailingOffset !== null
+      ? prevailingOffset
+      : keySignatureOffset;
+    const effectiveOffset = Math.max(
+      -2,
+      Math.min(2, baseOffset + selectedOffset)
+    );
+
+    return {
+      accidental: this.offsetAccidental[effectiveOffset],
+      showAccidental: selectedOffset !== 0
+    };
+  },
+
+  insertionX(addToChord = false) {
+    const ordered = this.ordered();
+    const previous = ordered[AppState.cursorIndex - 1];
+
+    if (
+      addToChord &&
+      previous &&
+      previous.kind !== "barline" &&
+      previous.letter
+    ) {
+      return previous.x;
+    }
+
+    if (!ordered.length) return AppState.camera.x + 220;
+    if (AppState.cursorIndex <= 0) return ordered[0].x - 34;
+    if (AppState.cursorIndex >= ordered.length) {
+      return ordered[ordered.length - 1].x + 34;
+    }
+
+    return (
+      ordered[AppState.cursorIndex - 1].x +
+      ordered[AppState.cursorIndex].x
+    ) / 2;
+  },
+
+  createFromDegree(degree, addToChord = false) {
+    this.saveUndo();
+    const x = this.insertionX(addToChord);
+
+    const pitch = this.pitchFromDegree(degree);
+    const selectedAccidental = AppState.noteInput.accidental;
+    const staff = 0;
+    const effectiveAccidental = this.effectiveAccidental(
+      pitch.letter,
+      pitch.octave,
+      staff,
+      x,
+      selectedAccidental
+    );
+
+    const note = this.create({
+      x,
+      letter: pitch.letter,
+      octave: pitch.octave,
+      staff,
+      accidental: effectiveAccidental.accidental,
+      showAccidental: effectiveAccidental.showAccidental
+    });
+
+    AppState.notes.push(note);
+
+    AppState.noteInput.selectedAccidental = "natural";
+
+    if (Input.heldAccidentals.size === 0) {
+      AppState.noteInput.accidental = "natural";
+    }
+
+    this.layout();
+
+    const newOrdered = this.ordered();
+    if (addToChord) {
+      let lastChordIndex = -1;
+
+      newOrdered.forEach((item, index) => {
+        if (item.kind === "note" && item.x === note.x) {
+          lastChordIndex = index;
+        }
+      });
+
+      AppState.cursorIndex = lastChordIndex + 1;
+    } else {
+      AppState.cursorIndex = newOrdered.findIndex(n => n.id === note.id) + 1;
+    }
+
+    this.syncCursorToActiveNote();
+    this.resetCursorBlink();
+    this.scrollToNote(note);
+  },
+
+  createBarline() {
+    this.saveUndo();
+    const barline = {
+      id: AppState.nextId++,
+      kind: "barline",
+      x: this.insertionX(false),
+      layoutX: 0,
+      drawX: 0,
+      y: 0
+    };
+
+    barline.layoutX = barline.x;
+    barline.drawX = barline.x;
+    AppState.notes.push(barline);
+    this.layout();
+
+    const ordered = this.ordered();
+    AppState.cursorIndex = ordered.findIndex(item => item.id === barline.id) + 1;
+
+    this.resetCursorBlink();
+    this.scrollToNote(barline);
+  },
+
+  createRest() {
+    this.saveUndo();
+
+    const rest = {
+      id: AppState.nextId++,
+      kind: "rest",
+      x: this.insertionX(false),
+      layoutX: 0,
+      drawX: 0,
+      y: Layout.lineY(2),
+      value: AppState.noteInput.value
+    };
+
+    rest.layoutX = rest.x;
+    rest.drawX = rest.x;
+    AppState.notes.push(rest);
+    this.layout();
+
+    const ordered = this.ordered();
+    AppState.cursorIndex = ordered.findIndex(item => item.id === rest.id) + 1;
+
+    this.resetCursorBlink();
+    this.scrollToNote(rest);
+  },
+
+  keySignatureX() {
+    const active = this.activeItem();
+
+    if (
+      active &&
+      active.kind === "note" &&
+      this.chordOf(active).length > 1
+    ) {
+      return active.x - 34;
+    }
+
+    return this.insertionX(false);
+  },
+
+  createKeySignature(count, accidental) {
+    const safeCount = Math.max(0, Math.min(7, count));
+    const safeAccidental = accidental === "flat" ? "flat" : "sharp";
+
+    this.saveUndo();
+
+    const keySignature = {
+      id: AppState.nextId++,
+      kind: "keysig",
+      x: this.keySignatureX(),
+      layoutX: 0,
+      drawX: 0,
+      y: 0,
+      count: safeCount,
+      accidental: safeAccidental
+    };
+
+    keySignature.layoutX = keySignature.x;
+    keySignature.drawX = keySignature.x;
+    AppState.notes.push(keySignature);
+    this.layout();
+
+    const ordered = this.ordered();
+    AppState.cursorIndex =
+      ordered.findIndex(item => item.id === keySignature.id) + 1;
+
+    this.resetCursorBlink();
+    this.scrollToNote(keySignature);
+  },
+
+  deleteBehindCursor() {
+    const ordered = this.ordered();
+    const index = AppState.cursorIndex - 1;
+    if (index < 0) return;
+
+    this.saveUndo();
+    const activeItem = ordered[index];
+    let target = activeItem;
+
+    if (activeItem.kind === "note") {
+      const chord = this.chordOf(activeItem);
+      target = this.chordDeleteTarget(chord, activeItem);
+    }
+
+    const targetIndex = ordered.findIndex(item => item.id === target.id);
+
+    AppState.notes = AppState.notes.filter(n => n.id !== target.id);
+
+    if (targetIndex >= 0 && targetIndex < AppState.cursorIndex) {
+      AppState.cursorIndex -= 1;
+    }
+
+    AppState.cursorIndex = Math.max(
+      0,
+      Math.min(AppState.cursorIndex, AppState.notes.length)
+    );
+
+    this.layout();
+    this.syncCursorToActiveNote();
+    this.resetCursorBlink();
+  },
+
+  clearSelection() {
+    AppState.selection = null;
+  },
+
+  selectedRange() {
+    const ordered = this.ordered();
+    if (!ordered.length) return null;
+
+    if (AppState.selection) {
+      return {
+        start: Math.max(
+          0,
+          Math.min(ordered.length - 1, AppState.selection.start)
+        ),
+        end: Math.max(
+          0,
+          Math.min(ordered.length - 1, AppState.selection.end)
+        ),
+        activeEdge: AppState.selection.activeEdge
+      };
+    }
+
+    if (AppState.cursorIndex <= 0) return null;
+
+    const index = Math.min(AppState.cursorIndex - 1, ordered.length - 1);
+    return { start: index, end: index, activeEdge: "right" };
+  },
+
+  isIndexSelected(index) {
+    const range = this.selectedRange();
+    if (!range) return false;
+
+    return index >= range.start && index <= range.end;
+  },
+
+  isItemSelected(item) {
+    const ordered = this.ordered();
+    const index = ordered.findIndex(candidate => candidate.id === item.id);
+
+    return index >= 0 && this.isIndexSelected(index);
+  },
+
+  selectionEdgeForDelta(delta) {
+    return delta < 0 ? "left" : "right";
+  },
+
+  extendSelection(delta, useOppositeEdge = false) {
+    const ordered = this.ordered();
+    if (!ordered.length || delta === 0) return;
+
+    const activeIndex = Math.max(
+      0,
+      Math.min(ordered.length - 1, AppState.cursorIndex - 1)
+    );
+
+    if (!AppState.selection) {
+      const nextIndex = Math.max(
+        0,
+        Math.min(ordered.length - 1, activeIndex + delta)
+      );
+
+      if (nextIndex === activeIndex) return;
+
+      AppState.selection = {
+        start: Math.min(activeIndex, nextIndex),
+        end: Math.max(activeIndex, nextIndex),
+        activeEdge: this.selectionEdgeForDelta(delta)
+      };
+    } else {
+      let edge = AppState.selection.activeEdge;
+
+      if (useOppositeEdge) {
+        edge = edge === "left" ? "right" : "left";
+      }
+
+      if (edge === "left") {
+        AppState.selection.start = Math.max(
+          0,
+          Math.min(AppState.selection.end, AppState.selection.start + delta)
+        );
+      } else {
+        AppState.selection.end = Math.max(
+          AppState.selection.start,
+          Math.min(ordered.length - 1, AppState.selection.end + delta)
+        );
+      }
+    }
+
+    const activeEdge = useOppositeEdge
+      ? AppState.selection.activeEdge === "left"
+        ? "right"
+        : "left"
+      : AppState.selection.activeEdge;
+    const cursorEdgeIndex = activeEdge === "left"
+      ? AppState.selection.start
+      : AppState.selection.end;
+
+    AppState.cursorIndex = cursorEdgeIndex + 1;
+    this.syncCursorToActiveNote();
+    this.resetCursorBlink();
+  },
+
+  slideSelection(delta) {
+    const ordered = this.ordered();
+    if (!ordered.length || delta === 0) return;
+
+    if (!AppState.selection) {
+      const activeIndex = Math.max(
+        0,
+        Math.min(ordered.length - 1, AppState.cursorIndex - 1)
+      );
+      AppState.selection = {
+        start: activeIndex,
+        end: activeIndex,
+        activeEdge: "right"
+      };
+    }
+
+    const nextStart = AppState.selection.start + delta;
+    const nextEnd = AppState.selection.end + delta;
+
+    if (nextStart < 0 || nextEnd >= ordered.length) return;
+
+    AppState.selection.start = nextStart;
+    AppState.selection.end = nextEnd;
+
+    const cursorEdgeIndex = AppState.selection.activeEdge === "left"
+      ? AppState.selection.start
+      : AppState.selection.end;
+
+    AppState.cursorIndex = cursorEdgeIndex + 1;
+    this.syncCursorToActiveNote();
+    this.resetCursorBlink();
+  },
+
+  moveCursor(delta) {
+    this.clearSelection();
+    AppState.cursorIndex = Math.max(
+      0,
+      Math.min(this.ordered().length, AppState.cursorIndex + delta)
+    );
+
+    this.syncCursorToActiveNote();
+    this.resetCursorBlink();
+  },
+
+  moveCursorVertical(delta) {
+    AppState.cursorStaffOffset += delta;
+    this.resetCursorBlink();
+  },
+
+  updateTableScroll(dt = 16) {
+    const ordered = this.ordered();
+    const a = Layout.table;
+    const rowH = 24;
+    const headerH = 46;
+    const contentH = headerH + ordered.length * rowH;
+    const maxScroll = Math.max(0, contentH - a.h);
+
+    if (!ordered.length || AppState.cursorIndex <= 0) {
+      AppState.tableScroll.y += (0 - AppState.tableScroll.y) * 0.08;
+      AppState.tableScroll.velocity *= 0.82;
+      Layout.table.scrollY = AppState.tableScroll.y;
+      return;
+    }
+
+    const selectedRowCenter =
+      headerH +
+      (Math.min(AppState.cursorIndex - 1, ordered.length - 1) + 0.5) * rowH;
+    const viewTop = AppState.tableScroll.y;
+    const viewBottom = viewTop + a.h;
+    const middleTop = viewTop + a.h / 3;
+    const middleBottom = viewTop + a.h * 2 / 3;
+    let target = AppState.tableScroll.y;
+
+    if (selectedRowCenter < middleTop) {
+      target = selectedRowCenter - a.h / 3;
+    } else if (selectedRowCenter > middleBottom) {
+      target = selectedRowCenter - a.h * 2 / 3;
+    }
+
+    target = Math.max(0, Math.min(maxScroll, target));
+
+    const seconds = Math.min(0.05, Math.max(0.001, dt / 1000));
+    const distance = target - AppState.tableScroll.y;
+    const acceleration = distance * 72;
+
+    AppState.tableScroll.velocity += acceleration * seconds;
+    AppState.tableScroll.velocity *= Math.pow(0.0009, seconds);
+
+    const maxVelocity = Math.max(700, Math.abs(distance) * 14 + 260);
+    AppState.tableScroll.velocity = Math.max(
+      -maxVelocity,
+      Math.min(maxVelocity, AppState.tableScroll.velocity)
+    );
+
+    AppState.tableScroll.y += AppState.tableScroll.velocity * seconds;
+
+    if (Math.abs(distance) < 0.35 && Math.abs(AppState.tableScroll.velocity) < 8) {
+      AppState.tableScroll.y = target;
+      AppState.tableScroll.velocity = 0;
+    }
+
+    if (AppState.tableScroll.y < 0) {
+      AppState.tableScroll.y = 0;
+      AppState.tableScroll.velocity = 0;
+    } else if (AppState.tableScroll.y > maxScroll) {
+      AppState.tableScroll.y = maxScroll;
+      AppState.tableScroll.velocity = 0;
+    }
+
+    Layout.table.scrollY = AppState.tableScroll.y;
+  },
+
+  spacingAfter(item) {
+    if (item.kind === "keysig") {
+      return Math.max(34, item.count * 12 + 18);
+    }
+
+    return 34;
+  },
+
+  layout() {
+    const ordered = this.ordered();
+    if (!ordered.length) return;
+
+    ordered[0].layoutX = ordered[0].x;
+
+    for (let i = 1; i < ordered.length; i++) {
+      const prev = ordered[i - 1];
+      const cur = ordered[i];
+
+      if (cur.x === prev.x) {
+        cur.layoutX = prev.layoutX;
+      } else {
+        cur.layoutX = Math.max(cur.x, prev.layoutX + this.spacingAfter(prev));
+      }
+    }
+  },
+
+  updateAnimation() {
+    const now = performance.now();
+    for (const n of AppState.notes) {
+      n.drawX += (n.layoutX - n.drawX) * 0.22;
+
+      if (n.kind === "note") {
+        n.y = this.yFromPitch(n.letter, n.octave);
+
+        const selectionTarget = this.isItemSelected(n) ? 1 : 0;
+        const currentSelection = n.selectionAmount ?? 0;
+
+        if (n.selectionTarget !== selectionTarget) {
+          n.selectionFrom = currentSelection;
+          n.selectionTarget = selectionTarget;
+          n.selectionStartedAt = now;
+        }
+
+        const selectionT = Math.min(
+          1,
+          (now - (n.selectionStartedAt ?? now)) / 200
+        );
+        const easedSelection = selectionT < 0.5
+          ? 2 * selectionT * selectionT
+          : 1 - Math.pow(-2 * selectionT + 2, 2) / 2;
+
+        n.selectionAmount =
+          (n.selectionFrom ?? currentSelection) +
+          (selectionTarget - (n.selectionFrom ?? currentSelection)) *
+          easedSelection;
+      }
+    }
+  },
+
+  chordOf(note) {
+    return AppState.notes.filter(n => n.kind === "note" && n.x === note.x);
+  },
+
+  activeItem() {
+    const ordered = this.ordered();
+    if (!ordered.length || AppState.cursorIndex <= 0) return null;
+
+    return ordered[
+      Math.min(AppState.cursorIndex - 1, ordered.length - 1)
+    ];
+  },
+
+  staffOffsetFromY(y) {
+    return Math.round(
+      (y - Layout.lineY(2)) / (Layout.S / 2)
+    );
+  },
+
+  syncCursorToActiveNote() {
+    const active = this.activeItem();
+    if (!active || active.kind !== "note") return;
+
+    AppState.cursorStaffOffset = this.staffOffsetFromY(active.y);
+  },
+
+  cursorY() {
+    return (
+      Layout.lineY(2) +
+      AppState.cursorStaffOffset * (Layout.S / 2)
+    );
+  },
+
+  chordDeleteTarget(chord, activeNote) {
+    const cursorY = this.cursorY();
+    const epsilon = 0.001;
+
+    return [...chord].sort((a, b) => {
+      const cursorDistanceA = Math.abs(a.y - cursorY);
+      const cursorDistanceB = Math.abs(b.y - cursorY);
+
+      if (Math.abs(cursorDistanceA - cursorDistanceB) > epsilon) {
+        return cursorDistanceA - cursorDistanceB;
+      }
+
+      const activeDistanceA = activeNote
+        ? Math.abs(a.y - activeNote.y)
+        : Number.POSITIVE_INFINITY;
+      const activeDistanceB = activeNote
+        ? Math.abs(b.y - activeNote.y)
+        : Number.POSITIVE_INFINITY;
+
+      if (Math.abs(activeDistanceA - activeDistanceB) > epsilon) {
+        return activeDistanceA - activeDistanceB;
+      }
+
+      if (Math.abs(a.y - b.y) > epsilon) {
+        return a.y - b.y;
+      }
+
+      return a.id - b.id;
+    })[0];
+  },
+
+  stemOwner(note) {
+    return this.chordOf(note).reduce(
+      (highest, n) => n.y < highest.y ? n : highest,
+      note
+    );
+  },
+
+  chordStemDown(note) {
+    const chord = this.chordOf(note);
+    const highest = Math.min(...chord.map(n => n.y));
+    return highest <= Layout.lineY(2);
+  },
+
+  noteheadScreenX(note) {
+    const baseX = note.drawX !== undefined
+      ? note.drawX
+      : note.layoutX;
+
+    return (
+      Input.worldToScreenX(baseX) +
+      (note.vexNoteheadOffsetX ??
+        this.noteheadOffset(note, this.chordStemDown(note)))
+    );
+  },
+
+  noteheadScreenY(note) {
+    return note.vexNoteheadY ?? note.y;
+  },
+
+  noteheadOffset(note, stemDown) {
+    const chord = this.chordOf(note);
+    if (chord.length < 2) return 0;
+
+    const ordered = [...chord].sort((a, b) => {
+      const aStep = this.diatonicStep(a.letter, a.octave);
+      const bStep = this.diatonicStep(b.letter, b.octave);
+      return stemDown ? bStep - aStep : aStep - bStep;
+    });
+
+    let oppositeSide = false;
+
+    for (let i = 0; i < ordered.length; i++) {
+      if (i > 0) {
+        const previousStep = this.diatonicStep(
+          ordered[i - 1].letter,
+          ordered[i - 1].octave
+        );
+        const currentStep = this.diatonicStep(
+          ordered[i].letter,
+          ordered[i].octave
+        );
+
+        oppositeSide = Math.abs(currentStep - previousStep) === 1
+          ? !oppositeSide
+          : false;
+      }
+
+      if (ordered[i].id === note.id) {
+        if (!oppositeSide) return 0;
+        return stemDown ? -18 : 18;
+      }
+    }
+
+    return 0;
+  },
+
+  midi(note) {
+    return (
+      (note.octave + 1) * 12 +
+      this.midiBase[note.letter] +
+      this.accidentalOffset[note.accidental]
+    );
+  },
+
+  frequency(note) {
+    return 440 * Math.pow(2, (this.midi(note) - 69) / 12);
+  },
+
+  resetCursorBlink() {
+    AppState.cursorBlinkStart = performance.now();
+  },
+
+  scrollToNote(note) {
+    const sx = Input.worldToScreenX(note.layoutX);
+    const rightLimit = canvas.width * 0.72;
+    const leftLimit = canvas.width * 0.18;
+
+    let target = AppState.camera.x;
+
+    if (sx > rightLimit) {
+      target += (sx - rightLimit) / AppState.camera.zoom;
+    }
+
+    if (sx < leftLimit) {
+      target -= (leftLimit - sx) / AppState.camera.zoom;
+    }
+
+    Input.smoothPanTo(target, 100);
+  }
+};
+
+const CanvasUI = {
+  visibleButtons: [],
+
+  rebuild() {
+    const buttons = [];
+
+    const p = Layout.sidePanel;
+    const gap = 10;
+    const rowH = 46;
+
+    const add = (id, label, w, h, action) => {
+      buttons.push({
+        type: "button",
+        id,
+        label,
+        x: 0,
+        y: 0,
+        w,
+        h,
+        action
+      });
+    };
+
+    add("midi", "MIDI", 80, 40, () => Exporter.midi());
+    add("xml", "MusicXML", 110, 40, () => Exporter.musicXML());
+    add("pdf", "PDF", 70, 40, () => Exporter.pdf());
+    
+
+    let x = p.x;
+    let y = p.y;
+    const maxX = Layout.keypad.x - 15;
+
+    for (const b of buttons) {
+      if (x + b.w > maxX) {
+        x = p.x;
+        y += rowH + gap;
+      }
+
+      b.x = x;
+      b.y = y;
+
+      x += b.w + gap;
+    }
+    
+    // Arrow cluster below numpad
+  const k = Layout.keypad;
+  const arrowSize = 46;
+  const gap2 = 8;
+
+  const centerX = k.x + k.w / 2;
+  const upY = k.y + k.h + 18;
+  const rowY = upY + arrowSize + gap2;
+  const topSideY = upY;
+
+  buttons.push({
+    type: "button",
+    id: "delete",
+    label: "Delete",
+    x: centerX - arrowSize * 1.5 - gap2,
+    y: topSideY,
+    w: arrowSize * 1.45,
+    h: arrowSize,
+    action: () => Notes.deleteBehindCursor()
+  });
+
+  buttons.push({
+    type: "button",
+    id: "up",
+    label: "↑",
+    x: centerX - arrowSize / 2,
+    y: upY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => {
+      Notes.moveCursorVertical(-1);
+    }
+  });
+
+  buttons.push({
+    type: "button",
+    id: "shift",
+    label: "Shift",
+    x: centerX + arrowSize / 2 + gap2,
+    y: topSideY,
+    w: arrowSize * 1.45,
+    h: arrowSize,
+    action: () => {
+      AppState.noteInput.selectedShift = !AppState.noteInput.selectedShift;
+
+      if (Input.heldShiftKeys.size === 0) {
+        AppState.noteInput.shift = AppState.noteInput.selectedShift;
+      }
+    }
+  });
+
+  buttons.push({
+    type: "button",
+    id: "left",
+    label: "←",
+    x: centerX - arrowSize * 1.5 - gap2,
+    y: rowY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => Notes.moveCursor(-1)
+  });
+
+  buttons.push({
+    type: "button",
+    id: "down",
+    label: "↓",
+    x: centerX - arrowSize / 2,
+    y: rowY,
+    w: arrowSize,
+    h: arrowSize,
+    action: () => {
+      Notes.moveCursorVertical(1);
+    }
+  });
+
+  buttons.push({
+    type: "button",
+  id: "right",
+  label: "→",
+  x: centerX + arrowSize / 2 + gap2,
+  y: rowY,
+  w: arrowSize,
+  h: arrowSize,
+  action: () => Notes.moveCursor(1)
+});
+
+    const tonicButtons = this.tonicControlButtons();
+
+    this.visibleButtons = [
+      ...buttons,
+      ...tonicButtons,
+      ...this.keypadButtons()
+    ];
+
+    if (AppState.noteInput.tonicMenuOpen) {
+      this.visibleButtons.push(...this.tonicMenuButtons(tonicButtons));
+    }
+  },
+
+  tonicControlButtons() {
+    const k = Layout.keypad;
+    const valueH = 38;
+    const accidentalH = 38;
+    const gap = 10;
+    const gridY = k.y + valueH + gap + accidentalH + 12;
+    const cellH = (k.h - valueH - gap - accidentalH - 12) / 3;
+    const controlGap = 10;
+    const totalW = Math.min(124, Math.max(86, k.x - Layout.sidePanel.x - 100));
+    const halfW = totalW / 2;
+    const x = k.x - controlGap - totalW;
+    const y = gridY + cellH;
+    const toggleMenu = () => {
+      AppState.noteInput.tonicMenuOpen = !AppState.noteInput.tonicMenuOpen;
+    };
+
+    return [
+      {
+        type: "tonicDisplay",
+        id: "tonic-letter",
+        label: AppState.noteInput.tonicLetter,
+        x,
+        y,
+        w: halfW,
+        h: cellH,
+        action: toggleMenu
+      },
+      {
+        type: "tonicDisplay",
+        id: "tonic-octave",
+        label: String(AppState.noteInput.tonicOctave),
+        x: x + halfW,
+        y,
+        w: halfW,
+        h: cellH,
+        action: toggleMenu
+      }
+    ];
+  },
+  
+  
+  
+  
+  
+  keypadButtons() {
+  const k = Layout.keypad;
+  const buttons = [];
+
+  const noteValues = [
+    ["1/64", "64"],
+    ["1/32", "32"],
+    ["1/16", "𝅘𝅥𝅯"],
+    ["1/8", "♪"],
+    ["1/4", "♩"],
+    ["1/2", "𝅗𝅥"],
+    ["1", "𝅝"]
+  ];
+
+  const valueH = 38;
+  const accidentalH = 38;
+  const gap = 10;
+
+  noteValues.forEach((v, i) => {
+    buttons.push({
+      type: "noteValue",
+      value: v[0],
+      label: v[1],
+      x: k.x + i * (k.w / noteValues.length),
+      y: k.y,
+      w: k.w / noteValues.length,
+      h: valueH
+    });
+  });
+
+  const acc = [
+    ["double-flat", "𝄫"],
+    ["flat", "♭"],
+    ["natural", "♮"],
+    ["sharp", "♯"],
+    ["double-sharp", "𝄪"]
+  ];
+
+  acc.forEach((a, i) => {
+    buttons.push({
+      type: "accidental",
+      value: a[0],
+      label: a[1],
+      x: k.x + i * (k.w / 5),
+      y: k.y + valueH + gap,
+      w: k.w / 5,
+      h: accidentalH
+    });
+  });
+
+  const gridY = k.y + valueH + gap + accidentalH + 12;
+  const cellW = k.w / 3;
+  const cellH = (k.h - valueH - gap - accidentalH - 12) / 3;
+
+    for (let degree = 1; degree <= 9; degree++) {
+      const i = degree - 1;
+
+      buttons.push({
+        type: "degree",
+        value: degree,
+        label: String(degree),
+        x: k.x + (i % 3) * cellW,
+        y: gridY + Math.floor(i / 3) * cellH,
+        w: cellW,
+        h: cellH
+      });
+    }
+
+    return buttons;
+  },
+
+  tonicMenuButtons(buttons) {
+    const tonic = buttons.find(b => b.id === "tonic-letter");
+    if (!tonic) return [];
+
+    const out = [];
+    const letters = ["C", "D", "E", "F", "G", "A", "B"];
+    
+    const menuW = 124;
+    const menuH = 9 * 34;
+
+    let x = tonic.x;
+    let y = tonic.y + tonic.h + 8;
+
+    if (x + menuW > canvas.width - 10) {
+      x = canvas.width - menuW - 10;
+    }
+
+    if (y + menuH > canvas.height - 10) {
+      y = tonic.y - menuH - 8;
+    }
+
+    if (y < 10) {
+      y = 10;
+    }
+
+    letters.forEach((letter, i) => {
+      out.push({
+        type: "tonicLetter",
+        value: letter,
+        label: letter,
+        x,
+        y: y + i * 34,
+        w: 56,
+        h: 32
+      });
+    });
+
+    for (let octave = 0; octave <= 8; octave++) {
+      out.push({
+        type: "tonicOctave",
+        value: octave,
+        label: String(octave),
+        x: x + 64,
+        y: y + octave * 34,
+        w: 56,
+        h: 32
+      });
+    }
+
+    return out;
+  },
+
+  hit(x, y) {
+    for (let i = this.visibleButtons.length - 1; i >= 0; i--) {
+      const b = this.visibleButtons[i];
+
+      if (
+        x >= b.x &&
+        x <= b.x + b.w &&
+        y >= b.y &&
+        y <= b.y + b.h
+      ) {
+        return b;
+      }
+    }
+
+    return null;
+  },
+
+  activate(b) {
+    if (!b) return;
+
+    if (b.action) {
+      b.action();
+      return;
+    }
+    
+    if (b.type === "noteValue") {
+  AppState.noteInput.value = b.value;
+  return;
+}
+
+    if (b.type === "degree") {
+      Notes.createFromDegree(b.value, AppState.noteInput.shift);
+      return;
+    }
+
+    if (b.type === "accidental") {
+      AppState.noteInput.selectedAccidental = b.value;
+
+      if (Input.heldAccidentals.size === 0) {
+        AppState.noteInput.accidental = b.value;
+      }
+
+      return;
+    }
+
+    if (b.type === "tonicLetter") {
+      Notes.changeTonicLetter(b.value);
+      return;
+    }
+
+    if (b.type === "tonicOctave") {
+      Notes.changeTonicOctave(b.value);
+      return;
+    }
+  }
+};
+
+const Input = {
+  accidentalKeyMap: {
+    KeyA: "double-flat",
+    KeyS: "flat",
+    KeyD: "natural",
+    KeyF: "sharp",
+    KeyG: "double-sharp"
+  },
+
+  noteValueKeyMap: {
+    Digit1: "1/64",
+    Digit2: "1/32",
+    Digit3: "1/16",
+    Digit4: "1/8",
+    Digit5: "1/4",
+    Digit6: "1/2",
+    Digit7: "1"
+  },
+
+  degreeKeyMap: {
+    Numpad1: 1,
+    Numpad2: 2,
+    Numpad3: 3,
+    Numpad4: 4,
+    Numpad5: 5,
+    Numpad6: 6,
+    Numpad7: 7,
+    Numpad8: 8,
+    Numpad9: 9,
+    Comma: 1,
+    Period: 2,
+    Slash: 3,
+    KeyL: 4,
+    Semicolon: 5,
+    Quote: 6,
+    KeyO: 7,
+    KeyP: 8,
+    BracketLeft: 9,
+    BracketRight: 9
+  },
+
+  heldAccidentals: new Map(),
+  heldDegreeKeys: new Set(),
+  degreeChordLeader: null,
+  heldShiftKeys: new Set(),
+  shiftReleaseTimers: new Map(),
+  selectionSlideHeld: false,
+  tonicModifierHeld: false,
+  keySignatureModifierHeld: false,
+  keySignatureAccidental: "sharp",
+
+  screenToWorldX(sx) {
+    return sx / AppState.camera.zoom + AppState.camera.x;
+  },
+
+  worldToScreenX(wx) {
+    return (wx - AppState.camera.x) * AppState.camera.zoom;
+  },
+  
+  pointer(e) {
+  const r = canvas.getBoundingClientRect();
+
+  const sx =
+    (e.clientX - r.left) * (canvas.width / r.width);
+
+  const sy =
+    (e.clientY - r.top) * (canvas.height / r.height);
+
+  return {
+    sx,
+    sy,
+    wx: this.screenToWorldX(sx)
+  };
+},
+
+  hoverNotes() {
+    if (AppState.hover.noteId === null) return [];
+
+    const note = AppState.notes.find(n =>
+      n.kind === "note" &&
+      n.id === AppState.hover.noteId
+    );
+
+    if (!note) return [];
+
+    return AppState.hover.shiftChord
+      ? Notes.chordOf(note)
+      : [note];
+  },
+
+  updateHover(p, shiftKey = false) {
+    AppState.hover.sx = p.sx;
+    AppState.hover.sy = p.sy;
+
+    const shifted = shiftKey || this.heldShiftKeys.size > 0;
+    let best = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+
+    for (const note of AppState.notes) {
+      if (note.kind !== "note") continue;
+
+      const sx = Notes.noteheadScreenX(note);
+      const sy = Notes.noteheadScreenY(note);
+      const dx = (p.sx - sx) / 18;
+      const dy = (p.sy - sy) / 14;
+      const score = dx * dx + dy * dy;
+
+      if (score <= 1 && score < bestScore) {
+        best = note;
+        bestScore = score;
+      }
+    }
+
+    const nextNoteId = best ? best.id : null;
+    const nextChordX = best && shifted ? best.x : null;
+    const changed =
+      AppState.hover.noteId !== nextNoteId ||
+      AppState.hover.chordX !== nextChordX ||
+      AppState.hover.shiftChord !== (best ? shifted : false);
+
+    if (changed) {
+      AppState.hover.startedAt = performance.now();
+    }
+
+    AppState.hover.noteId = nextNoteId;
+    AppState.hover.chordX = nextChordX;
+    AppState.hover.shiftChord = best ? shifted : false;
+  },
+
+  refreshHover(shiftKey = false) {
+    if (AppState.hover.sx === null || AppState.hover.sy === null) return;
+
+    this.updateHover(
+      {
+        sx: AppState.hover.sx,
+        sy: AppState.hover.sy,
+        wx: this.screenToWorldX(AppState.hover.sx)
+      },
+      shiftKey
+    );
+  },
+
+  clearHover() {
+    AppState.hover.noteId = null;
+    AppState.hover.chordX = null;
+    AppState.hover.shiftChord = false;
+    AppState.hover.startedAt = 0;
+    AppState.hover.sx = null;
+    AppState.hover.sy = null;
+  },
+  
+  bind() {
+  canvas.addEventListener("pointerdown", e => this.down(e));
+  canvas.addEventListener("pointermove", e => this.move(e));
+  canvas.addEventListener("pointerup", e => this.up(e));
+  canvas.addEventListener("pointercancel", e => this.cancel(e));
+  canvas.addEventListener("pointerleave", () => this.clearHover());
+  canvas.addEventListener("wheel", e => this.wheel(e), { passive: false });
+  window.addEventListener("keydown", e => this.keydown(e));
+  window.addEventListener("keyup", e => this.keyup(e));
+  window.addEventListener("blur", () => this.releaseAccidentals());
+},
+
+  keydown(e) {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+
+      if (e.code === "KeyZ" && !e.shiftKey) {
+        Notes.undo();
+      }
+
+      return;
+    }
+
+    const shiftAltArrow =
+      e.altKey &&
+      e.shiftKey &&
+      (e.code === "ArrowLeft" || e.code === "ArrowRight");
+
+    if (e.altKey && !shiftAltArrow) return;
+
+    if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+      e.preventDefault();
+
+      if (this.shiftReleaseTimers.has(e.code)) {
+        clearTimeout(this.shiftReleaseTimers.get(e.code));
+        this.shiftReleaseTimers.delete(e.code);
+      }
+
+      this.heldShiftKeys.add(e.code);
+      AppState.noteInput.shift = true;
+      this.refreshHover(true);
+      return;
+    }
+
+    if (e.code === "KeyN") {
+      e.preventDefault();
+      this.tonicModifierHeld = true;
+      return;
+    }
+
+    if (e.code === "KeyK") {
+      e.preventDefault();
+
+      if (!this.keySignatureModifierHeld && !e.repeat) {
+        this.keySignatureAccidental = "sharp";
+      }
+
+      this.keySignatureModifierHeld = true;
+      return;
+    }
+
+    if (e.code === "KeyZ") {
+      e.preventDefault();
+      this.selectionSlideHeld = true;
+      return;
+    }
+
+    if (e.code === "Space") {
+      e.preventDefault();
+
+      if (!e.repeat) {
+        Notes.createBarline();
+      }
+
+      return;
+    }
+
+    if (e.code === "Backspace" || e.code === "Delete") {
+      e.preventDefault();
+      Notes.deleteBehindCursor();
+      return;
+    }
+
+    if (
+      this.tonicModifierHeld &&
+      (e.code === "ArrowLeft" || e.code === "ArrowRight")
+    ) {
+      e.preventDefault();
+      Notes.stepTonic(e.code === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    if (
+      this.tonicModifierHeld &&
+      (e.code === "ArrowUp" || e.code === "ArrowDown")
+    ) {
+      e.preventDefault();
+      Notes.stepTonicOctave(e.code === "ArrowUp" ? 1 : -1);
+      return;
+    }
+
+    if (this.keySignatureModifierHeld) {
+      if (e.code === "Minus" || e.code === "NumpadSubtract") {
+        e.preventDefault();
+
+        if (!e.repeat) {
+          this.keySignatureAccidental =
+            this.keySignatureAccidental === "flat" ? "sharp" : "flat";
+        }
+
+        return;
+      }
+
+      const keySigMatch = e.code.match(/^(?:Numpad|Digit)([0-7])$/);
+
+      if (keySigMatch) {
+        e.preventDefault();
+
+        if (!e.repeat) {
+          Notes.createKeySignature(
+            Number(keySigMatch[1]),
+            this.keySignatureAccidental
+          );
+        }
+
+        return;
+      }
+
+      if (e.code.match(/^(?:Numpad|Digit)[89]$/)) {
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (
+      e.shiftKey &&
+      this.selectionSlideHeld &&
+      (e.code === "ArrowLeft" || e.code === "ArrowRight")
+    ) {
+      e.preventDefault();
+      Notes.slideSelection(e.code === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    if (
+      e.shiftKey &&
+      (e.code === "ArrowLeft" || e.code === "ArrowRight")
+    ) {
+      e.preventDefault();
+      Notes.extendSelection(
+        e.code === "ArrowLeft" ? -1 : 1,
+        e.altKey
+      );
+      return;
+    }
+
+    if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+      e.preventDefault();
+      Notes.moveCursor(e.code === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    if (e.code === "ArrowUp" || e.code === "ArrowDown") {
+      e.preventDefault();
+      Notes.moveCursorVertical(e.code === "ArrowUp" ? -1 : 1);
+      return;
+    }
+
+    if (this.tonicModifierHeld) {
+      const octaveMatch = e.code.match(/^(?:Numpad|Digit)([1-9])$/);
+      const tonicMatch = e.code.match(/^Key([A-G])$/);
+
+      if (octaveMatch) {
+        e.preventDefault();
+        Notes.changeTonicOctave(Number(octaveMatch[1]));
+        return;
+      }
+
+      if (tonicMatch) {
+        e.preventDefault();
+        Notes.changeTonicLetter(tonicMatch[1]);
+        return;
+      }
+    }
+
+    const noteValue = this.noteValueKeyMap[e.code];
+
+    if (noteValue) {
+      e.preventDefault();
+      AppState.noteInput.value = noteValue;
+      return;
+    }
+
+    const accidental = this.accidentalKeyMap[e.code];
+
+    if (accidental) {
+      e.preventDefault();
+
+      if (!this.heldAccidentals.has(e.code)) {
+        this.heldAccidentals.set(e.code, accidental);
+      }
+
+      AppState.noteInput.accidental = accidental;
+      return;
+    }
+
+    if (e.code === "Digit0" || e.code === "Numpad0") {
+      e.preventDefault();
+
+      if (!e.repeat) {
+        Notes.createRest();
+      }
+
+      return;
+    }
+
+    const degree = this.degreeKeyMap[e.code];
+    if (!degree) return;
+
+    e.preventDefault();
+
+    if (e.repeat || this.heldDegreeKeys.has(e.code)) return;
+
+    const leaderIsHeld =
+      this.degreeChordLeader !== null &&
+      this.heldDegreeKeys.has(this.degreeChordLeader);
+    const addToChord =
+      AppState.noteInput.shift ||
+      e.shiftKey ||
+      leaderIsHeld;
+
+    if (this.heldDegreeKeys.size === 0) {
+      this.degreeChordLeader = e.code;
+    }
+
+    this.heldDegreeKeys.add(e.code);
+    Notes.createFromDegree(
+      degree,
+      addToChord
+    );
+  },
+
+  keyup(e) {
+    if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+      e.preventDefault();
+
+      if (this.shiftReleaseTimers.has(e.code)) {
+        clearTimeout(this.shiftReleaseTimers.get(e.code));
+      }
+
+      const timer = setTimeout(() => {
+        this.heldShiftKeys.delete(e.code);
+        AppState.noteInput.shift = this.heldShiftKeys.size > 0
+          ? true
+          : AppState.noteInput.selectedShift;
+        this.shiftReleaseTimers.delete(e.code);
+        this.refreshHover(false);
+      }, 80);
+
+      this.shiftReleaseTimers.set(e.code, timer);
+
+      return;
+    }
+
+    if (e.code === "KeyN") {
+      e.preventDefault();
+      this.tonicModifierHeld = false;
+      return;
+    }
+
+    if (e.code === "KeyK") {
+      e.preventDefault();
+      this.keySignatureModifierHeld = false;
+      this.keySignatureAccidental = "sharp";
+      return;
+    }
+
+    if (e.code === "KeyZ") {
+      e.preventDefault();
+      this.selectionSlideHeld = false;
+      return;
+    }
+
+    if (this.heldDegreeKeys.has(e.code)) {
+      e.preventDefault();
+      this.heldDegreeKeys.delete(e.code);
+
+      if (e.code === this.degreeChordLeader) {
+        this.degreeChordLeader = null;
+      }
+
+      if (this.heldDegreeKeys.size === 0) {
+        this.degreeChordLeader = null;
+      }
+
+      return;
+    }
+
+    if (!this.heldAccidentals.has(e.code)) return;
+
+    e.preventDefault();
+    this.heldAccidentals.delete(e.code);
+    this.restoreAccidental();
+  },
+
+  restoreAccidental() {
+    const held = [...this.heldAccidentals.values()];
+
+    AppState.noteInput.accidental = held.length
+      ? held[held.length - 1]
+      : AppState.noteInput.selectedAccidental;
+  },
+
+  isDegreeHeld(degree) {
+    for (const code of this.heldDegreeKeys) {
+      if (this.degreeKeyMap[code] === degree) return true;
+    }
+
+    return false;
+  },
+
+  releaseAccidentals() {
+    this.tonicModifierHeld = false;
+    this.keySignatureModifierHeld = false;
+    this.keySignatureAccidental = "sharp";
+
+    for (const timer of this.shiftReleaseTimers.values()) {
+      clearTimeout(timer);
+    }
+
+    this.shiftReleaseTimers.clear();
+
+    this.heldShiftKeys.clear();
+    this.selectionSlideHeld = false;
+    AppState.noteInput.shift = AppState.noteInput.selectedShift;
+    this.heldDegreeKeys.clear();
+    this.degreeChordLeader = null;
+    this.heldAccidentals.clear();
+    this.restoreAccidental();
+    this.refreshHover(false);
+  },
+
+  down(e) {
+    canvas.setPointerCapture(e.pointerId);
+
+    const p = this.pointer(e);
+    this.updateHover(p, e.shiftKey);
+    const hit = CanvasUI.hit(p.sx, p.sy);
+
+    if (hit) {
+      AppState.input.down = true;
+      AppState.input.pointerId = e.pointerId;
+      AppState.input.startX = p.sx;
+      AppState.input.startY = p.sy;
+      AppState.input.lastX = p.sx;
+      AppState.input.lastY = p.sy;
+      return;
+    }
+
+    AppState.pinch.pointers.set(e.pointerId, {
+      x: e.clientX,
+      y: e.clientY
+    });
+
+    if (AppState.pinch.pointers.size === 2) {
+      const pts = [...AppState.pinch.pointers.values()];
+      const dx = pts[1].x - pts[0].x;
+      const dy = pts[1].y - pts[0].y;
+
+      AppState.pinch.active = true;
+      AppState.pinch.startDistance = Math.hypot(dx, dy);
+      AppState.pinch.startZoom = AppState.camera.zoom;
+      AppState.pinch.centerScreenX = (pts[0].x + pts[1].x) / 2;
+      AppState.pinch.centerWorldX = this.screenToWorldX(AppState.pinch.centerScreenX);
+
+      return;
+    }
+
+    Object.assign(AppState.input, {
+      down: true,
+      pointerId: e.pointerId,
+      startX: p.sx,
+      startY: p.sy,
+      lastX: p.sx,
+      lastY: p.sy,
+      lastTime: performance.now(),
+      dragging: false,
+      didLongPress: false
+    });
+
+    AppState.camera.momentum = false;
+  },
+
+  move(e) {
+    const p = this.pointer(e);
+    this.updateHover(p, e.shiftKey);
+
+    if (AppState.pinch.pointers.has(e.pointerId)) {
+      AppState.pinch.pointers.set(e.pointerId, {
+        x: e.clientX,
+        y: e.clientY
+      });
+    }
+
+    if (AppState.pinch.active && AppState.pinch.pointers.size >= 2) {
+      const pts = [...AppState.pinch.pointers.values()];
+      const dx = pts[1].x - pts[0].x;
+      const dy = pts[1].y - pts[0].y;
+      const dist = Math.hypot(dx, dy);
+
+      AppState.camera.zoom = Math.max(
+        0.45,
+        Math.min(2.8, AppState.pinch.startZoom * dist / AppState.pinch.startDistance)
+      );
+
+      AppState.camera.x =
+        AppState.pinch.centerWorldX -
+        AppState.pinch.centerScreenX / AppState.camera.zoom;
+
+      AppState.camera.x = Math.max(0, AppState.camera.x);
+      return;
+    }
+
+    if (!AppState.input.down || AppState.input.pointerId !== e.pointerId) return;
+
+    const totalDx = p.sx - AppState.input.startX;
+    const totalDy = p.sy - AppState.input.startY;
+
+    if (!AppState.input.dragging) {
+      if (
+        Math.hypot(totalDx, totalDy) > 14 &&
+        Math.abs(totalDx) > Math.abs(totalDy) * 1.25
+      ) {
+        AppState.input.dragging = true;
+        AppState.input.lastX = p.sx;
+        AppState.input.lastY = p.sy;
+        AppState.input.lastTime = performance.now();
+      }
+
+      return;
+    }
+
+    const dx = p.sx - AppState.input.lastX;
+    const now = performance.now();
+    const dt = Math.max(1, now - AppState.input.lastTime);
+    const worldDx = dx / AppState.camera.zoom;
+
+    AppState.camera.x = Math.max(0, AppState.camera.x - worldDx);
+    AppState.camera.velocityX = (-worldDx) / dt;
+
+    AppState.input.lastX = p.sx;
+    AppState.input.lastY = p.sy;
+    AppState.input.lastTime = now;
+  },
+  
+  up(e) {
+  const p = this.pointer(e);
+  const hit = CanvasUI.hit(p.sx, p.sy);
+
+  if (hit) {
+    CanvasUI.activate(hit);
+    this.cleanup(e);
+    return;
+  }
+
+  const wasDragging = AppState.input.dragging;
+  this.cleanup(e);
+
+  if (wasDragging) {
+    AppState.camera.momentum = true;
+  }
+},
+
+  cancel(e) {
+    this.cleanup(e);
+  },
+
+  cleanup(e) {
+    AppState.pinch.pointers.delete(e.pointerId);
+
+    if (AppState.pinch.pointers.size < 2) {
+      AppState.pinch.active = false;
+    }
+
+    AppState.input.down = false;
+    AppState.input.pointerId = null;
+  },
+
+  wheel(e) {
+    e.preventDefault();
+
+    const p = this.pointer(e);
+
+    if (e.ctrlKey) {
+      const before = this.screenToWorldX(p.sx);
+
+      AppState.camera.zoom *= e.deltaY < 0 ? 1.08 : 0.92;
+      AppState.camera.zoom = Math.max(0.45, Math.min(2.8, AppState.camera.zoom));
+
+      const after = this.screenToWorldX(p.sx);
+      AppState.camera.x += before - after;
+      AppState.camera.x = Math.max(0, AppState.camera.x);
+    } else {
+      AppState.camera.x = Math.max(
+        0,
+        AppState.camera.x + e.deltaY / AppState.camera.zoom
+      );
+    }
+  },
+
+  updateMomentum() {
+    if (!AppState.camera.momentum) return;
+
+    AppState.camera.x = Math.max(
+      0,
+      AppState.camera.x + AppState.camera.velocityX * 16
+    );
+
+    AppState.camera.velocityX *= 0.94;
+
+    if (Math.abs(AppState.camera.velocityX) < 0.01) {
+      AppState.camera.momentum = false;
+    }
+  },
+
+  smoothPanTo(targetX, duration) {
+    const startX = AppState.camera.x;
+    const endX = Math.max(0, targetX);
+    const startTime = performance.now();
+
+    function step(now) {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+
+      AppState.camera.x = startX + (endX - startX) * eased;
+
+      if (t < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+};
+
+const Renderer = {
+  vexStave: null,
+  vexFailed: false,
+
+  createVexStave() {
+    if (!VF || !vexContext || this.vexFailed) return null;
+
+    return new VF.Stave(
+      0,
+      Layout.lineY(0) - Layout.S * 4,
+      canvas.width,
+      {
+        left_bar: false,
+        right_bar: false,
+        fill_style: "black",
+        spacing_between_lines_px: Layout.S
+      }
+    ).setContext(vexContext);
+  },
+
+  notehead(sx, y, value) {
+  ctx.save();
+  ctx.translate(sx, y);
+  ctx.rotate(-0.23);
+
+  ctx.strokeStyle = "black";
+  ctx.fillStyle = "black";
+  ctx.lineWidth = 2;
+
+  if (value === "1" || value === "1/2") {
+    // hollow notehead made with bezier curves
+    ctx.beginPath();
+    ctx.moveTo(-8, 0);
+    ctx.bezierCurveTo(-8, -5, -3, -8, 4, -6);
+    ctx.bezierCurveTo(11, -4, 11, 3, 6, 6);
+    ctx.bezierCurveTo(0, 9, -8, 6, -8, 0);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-3, 1);
+    ctx.bezierCurveTo(-2, -2, 2, -4, 5, -3);
+    ctx.bezierCurveTo(7, -2, 6, 2, 3, 4);
+    ctx.bezierCurveTo(0, 5, -4, 4, -3, 1);
+    ctx.fillStyle = "#bbeeff";
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 7.5, 5.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+},
+
+  noteheadOverlay(note, { scale = 1, alpha = 1, color = "black" } = {}) {
+    const sx = Notes.noteheadScreenX(note);
+    const sy = Notes.noteheadScreenY(note);
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.translate(sx, sy);
+    ctx.rotate(-0.23);
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+
+    if (note.value === "1" || note.value === "1/2") {
+      ctx.beginPath();
+      ctx.moveTo(-8, 0);
+      ctx.bezierCurveTo(-8, -5, -3, -8, 4, -6);
+      ctx.bezierCurveTo(11, -4, 11, 3, 6, 6);
+      ctx.bezierCurveTo(0, 9, -8, 6, -8, 0);
+      ctx.closePath();
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 7.5, 5.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  },
+
+  selectionHalo(note) {
+    const amount = note.selectionAmount ?? 0;
+    if (amount <= 0.001) return;
+
+    const sx = Notes.noteheadScreenX(note);
+    const sy = Notes.noteheadScreenY(note);
+
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.globalAlpha = 0.86 * amount;
+    ctx.filter = `blur(${2.4 * amount}px)`;
+    ctx.translate(sx, sy);
+    ctx.rotate(-0.23);
+    ctx.scale(1 + 0.18 * amount, 1 + 0.18 * amount);
+    ctx.fillStyle = "#72ddff";
+
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 12.8, 8.9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  },
+
+  interactionOverlays() {
+    const now = performance.now();
+
+    for (const note of AppState.notes) {
+      if (note.kind !== "note") continue;
+      this.selectionHalo(note);
+    }
+
+    const hoverNotes = Input.hoverNotes();
+    if (!hoverNotes.length) return;
+
+    const phase = ((now - AppState.hover.startedAt) % 300) / 300;
+    const eased = phase < 0.5
+      ? 2 * phase * phase
+      : 1 - Math.pow(-2 * phase + 2, 2) / 2;
+
+    for (const note of hoverNotes) {
+      this.noteheadOverlay(note, {
+        scale: eased,
+        alpha: 1,
+        color: "black"
+      });
+
+      this.noteheadOverlay(note, {
+        scale: 1 + 0.5 * eased,
+        alpha: 1 - eased,
+        color: "black"
+      });
+    }
+  },
+
+flag(sx, y, stemDown, value) {
+  if (
+    value !== "1/8" &&
+    value !== "1/16" &&
+    value !== "1/32" &&
+    value !== "1/64"
+  ) return;
+
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  const flags = {
+    "1/8": 1,
+    "1/16": 2,
+    "1/32": 3,
+    "1/64": 4
+  }[value] || 0;
+  const stemX = stemDown ? sx - 9 : sx + 9;
+
+  for (let i = 0; i < flags; i++) {
+    const offset = i * 9;
+
+    ctx.beginPath();
+
+    if (stemDown) {
+      const startY = y + 44 - offset;
+      ctx.moveTo(stemX, startY);
+      ctx.bezierCurveTo(
+        stemX + 18, startY + 8,
+        stemX + 22, startY + 22,
+        stemX + 8, startY + 30
+      );
+    } else {
+      const startY = y - 44 + offset;
+      ctx.moveTo(stemX, startY);
+      ctx.bezierCurveTo(
+        stemX + 18, startY + 8,
+        stemX + 22, startY + 22,
+        stemX + 8, startY + 30
+      );
+    }
+
+    ctx.stroke();
+  }
+
+  ctx.restore();
+},
+
+  clear() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  },
+
+  staff() {
+    if (VF && !this.vexFailed) {
+      try {
+        this.vexStave = this.createVexStave();
+        this.vexStave.addClef("treble").draw();
+        return;
+      } catch (error) {
+        this.vexFailed = true;
+        this.vexStave = null;
+        console.error("VexFlow staff rendering failed; using Canvas fallback.", error);
+      }
+    }
+
+    ctx.save();
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    for (let i = 0; i < 5; i++) {
+      const y = Layout.lineY(i);
+
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    ctx.font = "90px serif";
+    ctx.fillStyle = "black";
+    ctx.fillText("𝄞", 45, Layout.lineY(4) + 30);
+
+    ctx.restore();
+  },
+
+  tonicGuide() {
+    const y = this.animatedTonicGuideY();
+
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 255, 90, 0.16)";
+    ctx.fillRect(0, y - Layout.S / 2, canvas.width, Layout.S);
+
+    const ledgerVisibility = this.tonicLedgerVisibility(y);
+    const guideLineAlpha = y >= Layout.lineY(0) && y <= Layout.lineY(4)
+      ? 0.22
+      : 0.22 * ledgerVisibility;
+
+    ctx.strokeStyle = `rgba(0, 255, 90, ${guideLineAlpha})`;
+    ctx.lineWidth = 2;
+
+    for (const lineY of this.tonicGuideLineYs(y)) {
+      ctx.beginPath();
+      ctx.moveTo(0, lineY);
+      ctx.lineTo(canvas.width, lineY);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    this.tonicLedgerGlints(y, this.tonicLedgerVisibility(y));
+  },
+
+  tonicTargetY() {
+    return Notes.yFromPitch(
+      AppState.noteInput.tonicLetter,
+      AppState.noteInput.tonicOctave
+    );
+  },
+
+  easeInOutCubic(t) {
+    return t < 0.5
+      ? 4 * t * t * t
+      : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  },
+
+  tonicGuideDuration(distance) {
+    const octaveDistance = Layout.S / 2 * 7;
+    const proportionalDuration = distance / octaveDistance * 400;
+
+    return Math.max(
+      70,
+      Math.min(400, proportionalDuration)
+    );
+  },
+
+  animatedTonicGuideY() {
+    const animation = AppState.tonicGuideAnimation;
+    const targetY = this.tonicTargetY();
+    const now = performance.now();
+
+    if (animation.toY === null || animation.displayY === null) {
+      animation.fromY = targetY;
+      animation.toY = targetY;
+      animation.displayY = targetY;
+      animation.startedAt = now;
+      return targetY;
+    }
+
+    if (Math.abs(animation.toY - targetY) > 0.001) {
+      animation.fromY = animation.displayY;
+      animation.toY = targetY;
+      animation.startedAt = now;
+      animation.duration = this.tonicGuideDuration(
+        Math.abs(animation.toY - animation.fromY)
+      );
+    }
+
+    const t = Math.min(
+      1,
+      (now - animation.startedAt) / animation.duration
+    );
+    const eased = this.easeInOutCubic(t);
+
+    animation.displayY =
+      animation.fromY +
+      (animation.toY - animation.fromY) * eased;
+
+    if (t >= 1) {
+      animation.displayY = animation.toY;
+    }
+
+    return animation.displayY;
+  },
+
+  tonicIsOnLine(y) {
+    const step = Layout.S / 2;
+    const unitsFromTopLine = Math.round((y - Layout.lineY(0)) / step);
+
+    return Math.abs(y - (Layout.lineY(0) + unitsFromTopLine * step)) < 0.01 &&
+      unitsFromTopLine % 2 === 0;
+  },
+
+  tonicGuideLineYs(y) {
+    const top = Layout.lineY(0);
+    const bottom = Layout.lineY(4);
+    const step = Layout.S / 2;
+
+    if (y >= top && y <= bottom) return [y];
+
+    return this.tonicLedgerLineYs(y);
+  },
+
+  tonicLedgerVisibility(y) {
+    const top = Layout.lineY(0);
+    const bottom = Layout.lineY(4);
+    const distanceOutside = y < top
+      ? top - y
+      : y > bottom
+        ? y - bottom
+        : 0;
+
+    return Math.max(
+      0,
+      Math.min(1, distanceOutside / (Layout.S * 1.5))
+    );
+  },
+
+  tonicLedgerLineYs(y) {
+    const top = Layout.lineY(0);
+    const bottom = Layout.lineY(4);
+    const step = Layout.S / 2;
+    const lines = [];
+
+    if (y < top) {
+      for (let lineY = top - step * 2; lineY >= y; lineY -= step * 2) {
+        lines.push(lineY);
+      }
+
+      if (!this.tonicIsOnLine(y)) {
+        const lastLine = lines.at(-1) ?? top;
+        lines.push(lastLine - step * 2);
+      }
+    } else if (y > bottom) {
+      for (let lineY = bottom + step * 2; lineY <= y; lineY += step * 2) {
+        lines.push(lineY);
+      }
+
+      if (!this.tonicIsOnLine(y)) {
+        const lastLine = lines.at(-1) ?? bottom;
+        lines.push(lastLine + step * 2);
+      }
+    }
+
+    return lines;
+  },
+
+  tonicLedgerGlints(y, visibility = 1) {
+    const ledgerYs = this.tonicLedgerLineYs(y);
+    if (!ledgerYs.length || visibility <= 0.001) return;
+
+    const now = performance.now();
+    const cycle = 1850;
+    const phase = (now % cycle) / cycle;
+    const length = 68;
+    const x = phase * (canvas.width + length * 2) - length;
+    const sparkle = Math.sin(phase * Math.PI);
+
+    ctx.save();
+    ctx.globalAlpha = visibility;
+    ctx.lineCap = "round";
+    ctx.shadowColor = "rgba(145, 255, 205, 0.75)";
+    ctx.shadowBlur = 10 + sparkle * 8;
+
+    for (const lineY of ledgerYs) {
+      const gradient = ctx.createLinearGradient(x - length / 2, lineY, x + length / 2, lineY);
+      gradient.addColorStop(0, "rgba(0, 255, 90, 0)");
+      gradient.addColorStop(0.32, `rgba(120, 255, 205, ${0.08 + sparkle * 0.18})`);
+      gradient.addColorStop(0.5, `rgba(235, 255, 245, ${0.28 + sparkle * 0.42})`);
+      gradient.addColorStop(0.68, `rgba(120, 255, 205, ${0.08 + sparkle * 0.18})`);
+      gradient.addColorStop(1, "rgba(0, 255, 90, 0)");
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x - length / 2, lineY);
+      ctx.lineTo(x + length / 2, lineY);
+      ctx.stroke();
+
+      ctx.strokeStyle = `rgba(0, 255, 90, ${0.05 + sparkle * 0.06})`;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(0, lineY);
+      ctx.lineTo(canvas.width, lineY);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  },
+  
+  ledgerLines(note, sx) {
+    const top = Layout.lineY(0);
+    const bottom = Layout.lineY(4);
+    const step = Layout.S / 2;
+    const width = 26;
+
+    ctx.save();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    // Above staff
+    if (note.y < top) {
+      for (let y = top - step * 2; y >= note.y; y -= step * 2) {
+        ctx.beginPath();
+        ctx.moveTo(sx - width / 2, y);
+        ctx.lineTo(sx + width / 2, y);
+        ctx.stroke();
+      }
+    }
+
+    // Below staff
+    if (note.y > bottom) {
+      for (let y = bottom + step * 2; y <= note.y; y += step * 2) {
+        ctx.beginPath();
+        ctx.moveTo(sx - width / 2, y);
+        ctx.lineTo(sx + width / 2, y);
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  },
+
+  barline(barline) {
+    const sx = Input.worldToScreenX(barline.drawX);
+    if (sx < -20 || sx > canvas.width + 20) return;
+
+    ctx.save();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(sx, Layout.lineY(0));
+    ctx.lineTo(sx, Layout.lineY(4));
+    ctx.stroke();
+    ctx.restore();
+  },
+
+  keySignature(keySignature) {
+    const sx = Input.worldToScreenX(keySignature.drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+
+    const symbol = Notes.keySignatureSymbol[keySignature.accidental];
+    const pitches = Notes.keySignaturePitches[keySignature.accidental] || [];
+    const count = Math.max(0, Math.min(7, keySignature.count));
+
+    ctx.save();
+    ctx.fillStyle = "black";
+    ctx.font = "30px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    if (count === 0) {
+      ctx.font = "18px sans-serif";
+      ctx.fillText("C", sx, Layout.lineY(2));
+      ctx.restore();
+      return;
+    }
+
+    for (let i = 0; i < count; i++) {
+      const [letter, octave] = pitches[i];
+      ctx.fillText(
+        symbol,
+        sx + i * 12,
+        Notes.yFromPitch(letter, octave)
+      );
+    }
+
+    ctx.restore();
+  },
+
+  vexDuration(value) {
+    return {
+      "1": "w",
+      "1/2": "h",
+      "1/4": "q",
+      "1/8": "8",
+      "1/16": "16",
+      "1/32": "32",
+      "1/64": "64"
+    }[value] || "q";
+  },
+
+  vexAccidental(accidental) {
+    return {
+      "double-flat": "bb",
+      flat: "b",
+      natural: "n",
+      sharp: "#",
+      "double-sharp": "##"
+    }[accidental];
+  },
+
+  vexChord(notes) {
+    const ordered = [...notes].sort((a, b) =>
+      Notes.diatonicStep(a.letter, a.octave) -
+      Notes.diatonicStep(b.letter, b.octave)
+    );
+    const sx = Input.worldToScreenX(ordered[0].drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+
+    const vexNote = new VF.StaveNote({
+      keys: ordered.map(note => `${note.letter.toLowerCase()}/${note.octave}`),
+      duration: this.vexDuration(ordered[0].value),
+      clef: "treble",
+      auto_stem: true
+    });
+
+    ordered.forEach((note, index) => {
+      if (!note.showAccidental) return;
+      vexNote.addModifier(
+        new VF.Accidental(this.vexAccidental(note.accidental)),
+        index
+      );
+    });
+
+    vexNote.setStave(this.vexStave).setContext(vexContext);
+    vexNote.addToModifierContext(new VF.ModifierContext());
+
+    const tickContext = new VF.TickContext();
+    tickContext.addTickable(vexNote).preFormat();
+    tickContext.setX(sx);
+    vexNote.draw();
+
+    const noteheads = vexNote.noteHeads || vexNote.note_heads || [];
+    ordered.forEach((note, index) => {
+      const notehead = noteheads[index];
+      if (!notehead) return;
+
+      const displacement = notehead.displaced
+        ? vexNote.getStemDirection() === 1
+          ? vexNote.getRightDisplacedHeadPx()
+          : -vexNote.getLeftDisplacedHeadPx()
+        : 0;
+      const width = typeof notehead.getWidth === "function"
+        ? notehead.getWidth()
+        : notehead.glyphProps?.getWidth?.() ??
+          (vexNote.getNoteHeadEndX() - vexNote.getNoteHeadBeginX()) ??
+          12;
+
+      note.vexNoteheadOffsetX = notehead.x + displacement + width / 2 - sx;
+      note.vexNoteheadY = notehead.y;
+    });
+  },
+
+  vexRest(rest) {
+    const sx = Input.worldToScreenX(rest.drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+
+    const vexRest = new VF.StaveNote({
+      keys: ["b/4"],
+      duration: `${this.vexDuration(rest.value)}r`,
+      clef: "treble"
+    });
+
+    vexRest.setStave(this.vexStave).setContext(vexContext);
+    vexRest.addToModifierContext(new VF.ModifierContext());
+
+    const tickContext = new VF.TickContext();
+    tickContext.addTickable(vexRest).preFormat();
+    tickContext.setX(sx);
+    vexRest.draw();
+  },
+
+  music() {
+    const notes = Notes.ordered().filter(item => item.kind === "note");
+    const rests = Notes.ordered().filter(item => item.kind === "rest");
+
+    if (VF && this.vexStave && !this.vexFailed) {
+      try {
+        const chords = new Map();
+
+        for (const note of notes) {
+          if (!chords.has(note.x)) chords.set(note.x, []);
+          chords.get(note.x).push(note);
+        }
+
+        for (const chord of chords.values()) {
+          this.vexChord(chord);
+        }
+
+        for (const rest of rests) {
+          this.vexRest(rest);
+        }
+
+        return;
+      } catch (error) {
+        this.vexFailed = true;
+        console.error("VexFlow note rendering failed; using Canvas fallback.", error);
+      }
+    }
+
+    for (const note of notes) {
+      this.note(note);
+    }
+
+    for (const rest of rests) {
+      this.rest(rest);
+    }
+  },
+
+  rest(rest) {
+    const sx = Input.worldToScreenX(rest.drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+
+    ctx.save();
+    ctx.fillStyle = "black";
+    ctx.font = "24px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("𝄽", sx, Layout.lineY(2));
+    ctx.restore();
+  },
+
+  note(note) {
+    const sx = Input.worldToScreenX(note.drawX);
+    if (sx < -80 || sx > canvas.width + 80) return;
+
+    const chord = Notes.chordOf(note);
+    const highest = Math.min(...chord.map(n => n.y));
+    const lowest = Math.max(...chord.map(n => n.y));
+    const middleLineY = Layout.lineY(2);
+    const stemDown = highest <= middleLineY;
+    const headOffset = Notes.noteheadOffset(note, stemDown);
+    const headX = sx + headOffset;
+    note.vexNoteheadOffsetX = headOffset;
+    note.vexNoteheadY = note.y;
+
+    this.ledgerLines(note, headX);
+
+    if (note.showAccidental) {
+      ctx.save();
+      ctx.font = "24px serif";
+      ctx.fillStyle = "black";
+      ctx.fillText(Notes.accidentalSymbol[note.accidental], headX - 28, note.y + 8);
+      ctx.restore();
+    }
+
+this.notehead(headX, note.y, note.value);
+
+const owner = Notes.stemOwner(note);
+
+if (owner.id === note.id && note.value !== "1") {
+  ctx.save();
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+
+  if (stemDown) {
+    ctx.moveTo(sx - 9, highest);
+    ctx.lineTo(sx - 9, lowest + 44);
+  } else {
+    ctx.moveTo(sx + 9, lowest);
+    ctx.lineTo(sx + 9, highest - 44);
+  }
+
+  ctx.stroke();
+  ctx.restore();
+
+  this.flag(sx, stemDown ? lowest : highest, stemDown, note.value);
+}
+
+  },
+
+  cursor() {
+    const ordered = Notes.ordered();
+    let sx = Input.worldToScreenX(AppState.camera.x + 180);
+
+    if (ordered.length) {
+      if (AppState.cursorIndex <= 0) {
+        sx = Input.worldToScreenX(ordered[0].layoutX - 30);
+      } else {
+        const selectedIndex = Math.min(
+          AppState.cursorIndex - 1,
+          ordered.length - 1
+        );
+        const selected = ordered[selectedIndex];
+        const chord = selected.kind === "note"
+          ? Notes.chordOf(selected)
+          : [];
+
+        if (chord.length > 1) {
+          sx = Notes.noteheadScreenX(selected);
+        } else if (selected.kind === "note") {
+          sx = Notes.noteheadScreenX(selected) + 22;
+        } else {
+          const nextPosition = ordered
+            .slice(selectedIndex + 1)
+            .find(item => item.layoutX > selected.layoutX);
+
+          const x = nextPosition
+            ? (selected.layoutX + nextPosition.layoutX) / 2
+            : selected.layoutX + 30;
+
+          sx = Input.worldToScreenX(x);
+        }
+      }
+    }
+
+    const blink = Math.floor((performance.now() - AppState.cursorBlinkStart) / 420) % 2;
+    if (blink === 1) return;
+
+    const verticalTop = Layout.lineY(0) - 25;
+    const verticalBottom = Layout.lineY(4) + 25;
+    const verticalLength = verticalBottom - verticalTop;
+    const goldenRatio = (1 + Math.sqrt(5)) / 2;
+    const horizontalLength = verticalLength / goldenRatio;
+    const cursorY = Notes.cursorY();
+
+    ctx.save();
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(sx, verticalTop);
+    ctx.lineTo(sx, verticalBottom);
+    ctx.moveTo(sx - horizontalLength / 2, cursorY);
+    ctx.lineTo(sx + horizontalLength / 2, cursorY);
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  table() {
+    const a = Layout.table;
+    const ordered = Notes.ordered();
+    const rowH = 24;
+    const headerH = 46;
+    const scrollY = AppState.tableScroll.y;
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.rect(a.x, a.y, a.w, a.h);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fillRect(a.x, a.y, a.w, a.h);
+    ctx.fillStyle = "rgba(255,255,255,0.20)";
+    ctx.fillRect(a.x, a.y + a.h / 3, a.w, a.h / 3);
+
+    ctx.fillStyle = "black";
+    ctx.font = "14px sans-serif";
+    ctx.textBaseline = "middle";
+
+    let y = a.y + 22;
+
+    ctx.fillText("#", 12, y);
+    ctx.fillText("X", 60, y);
+    ctx.fillText("Pitch", 120, y);
+    ctx.fillText("Acc", 190, y);
+    ctx.fillText("Hz", 235, y);
+
+    ctx.beginPath();
+    ctx.rect(a.x, a.y + headerH, a.w, Math.max(0, a.h - headerH));
+    ctx.clip();
+
+    ordered.forEach((n, i) => {
+      y = a.y + headerH + i * rowH + rowH / 2 - scrollY;
+      if (y < a.y + headerH - rowH || y > a.y + a.h + rowH) return;
+
+      if (Notes.isIndexSelected(i)) {
+        ctx.fillStyle = "rgba(45,190,255,0.16)";
+        ctx.fillRect(0, y - rowH / 2, a.w, rowH);
+      }
+
+      if (i === AppState.cursorIndex - 1) {
+        ctx.fillStyle = "rgba(255,0,0,0.13)";
+        ctx.fillRect(0, y - rowH / 2, a.w, rowH);
+      }
+
+      ctx.fillStyle = "black";
+      ctx.fillText(i + 1, 12, y);
+      ctx.fillText(Math.round(n.x), 60, y);
+
+      if (n.kind === "barline") {
+        ctx.fillText("Barline", 120, y);
+      } else if (n.kind === "keysig") {
+        const symbol = Notes.keySignatureSymbol[n.accidental];
+        ctx.fillText(`Key ${n.count}${symbol}`, 120, y);
+      } else if (n.kind === "rest") {
+        ctx.fillText(`Rest ${n.value}`, 120, y);
+      } else {
+        ctx.fillText(`${n.letter}${n.octave}`, 120, y);
+        ctx.fillText(Notes.accidentalSymbol[n.accidental], 190, y);
+        ctx.fillText(Notes.frequency(n).toFixed(2), 235, y);
+      }
+    });
+
+    ctx.restore();
+  },
+
+  inputPanel() {
+    const p = Layout.inputPanel;
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(0,0,0,0.18)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+    ctx.restore();
+  },
+
+  button(b, active) {
+    ctx.save();
+
+    ctx.fillStyle = active ? "rgba(255,230,80,0.95)" : "rgba(255,255,255,0.92)";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.roundRect(b.x, b.y, b.w, b.h, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "black";
+    ctx.font = b.type === "degree" ? "30px sans-serif" : "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+
+    ctx.restore();
+  },
+
+  ui() {
+    for (const b of CanvasUI.visibleButtons) {
+      const active =
+      (b.type === "noteValue" && b.value === AppState.noteInput.value) ||
+        (b.type === "degree" && Input.isDegreeHeld(b.value)) ||
+        (b.id === "shift" && AppState.noteInput.shift) ||
+        (b.type === "tonicDisplay" && Input.tonicModifierHeld) ||
+        (b.type === "accidental" && b.value === AppState.noteInput.accidental) ||
+        (b.type === "tonicLetter" && b.value === AppState.noteInput.tonicLetter) ||
+        (b.type === "tonicOctave" && b.value === AppState.noteInput.tonicOctave);
+
+      this.button(b, active);
+    }
+  },
+
+  render() {
+  
+  Layout.update();
+  CanvasUI.rebuild();
+
+  
+    this.clear();
+    this.staff();
+    this.tonicGuide();
+
+    this.music();
+    this.interactionOverlays();
+
+    for (const item of AppState.notes) {
+      if (item.kind === "barline") this.barline(item);
+      if (item.kind === "keysig") this.keySignature(item);
+    }
+
+    this.cursor();
+    this.table();
+    this.inputPanel();
+    this.ui();
+  }
+};
+
+const Exporter = {
+  download(name, type, content) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = name;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  },
+
+  groupedNotes() {
+    const groups = [];
+
+    for (const n of Notes.ordered().filter(item => item.kind === "note")) {
+      let g = groups.find(x => x.x === n.x);
+
+      if (!g) {
+        g = { x: n.x, notes: [] };
+        groups.push(g);
+      }
+
+      g.notes.push(n);
+    }
+
+    return groups;
+  },
+
+  musicXML() {
+    const alter = {
+      "double-flat": -2,
+      flat: -1,
+      natural: 0,
+      sharp: 1,
+      "double-sharp": 2
+    };
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="3.1">
+<part-list>
+<score-part id="P1"><part-name>Music</part-name></score-part>
+</part-list>
+<part id="P1">
+<measure number="1">
+<attributes>
+<divisions>8</divisions>
+<key><fifths>0</fifths></key>
+<time><beats>4</beats><beat-type>4</beat-type></time>
+<clef><sign>G</sign><line>2</line></clef>
+</attributes>
+`;
+
+    for (const group of this.groupedNotes()) {
+      group.notes.forEach((n, i) => {
+        xml += `<note>\n`;
+
+        if (i > 0) xml += `<chord/>\n`;
+
+        xml += `<pitch>
+<step>${n.letter}</step>
+`;
+
+        if (alter[n.accidental] !== 0) {
+          xml += `<alter>${alter[n.accidental]}</alter>\n`;
+        }
+
+        xml += `<octave>${n.octave}</octave>
+</pitch>
+<duration>8</duration>
+<type>quarter</type>
+</note>
+`;
+      });
+    }
+
+    xml += `</measure></part></score-partwise>`;
+
+    this.download("score.musicxml", "application/xml", xml);
+  },
+
+  writeVarLen(value) {
+    let buffer = value & 0x7F;
+    const bytes = [];
+
+    while ((value >>= 7)) {
+      buffer <<= 8;
+      buffer |= ((value & 0x7F) | 0x80);
+    }
+
+    while (true) {
+      bytes.push(buffer & 0xFF);
+
+      if (buffer & 0x80) buffer >>= 8;
+      else break;
+    }
+
+    return bytes;
+  },
+
+  midi() {
+    const track = [];
+
+    track.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
+
+    for (const group of this.groupedNotes()) {
+      group.notes.forEach(n => {
+        track.push(0x00, 0x90, Notes.midi(n), 100);
+      });
+
+      group.notes.forEach((n, i) => {
+        track.push(
+          ...(i === 0 ? this.writeVarLen(480) : [0x00]),
+          0x80,
+          Notes.midi(n),
+          0
+        );
+      });
+    }
+
+    track.push(0x00, 0xFF, 0x2F, 0x00);
+
+    const len = track.length;
+
+    const bytes = [
+      0x4D,0x54,0x68,0x64,
+      0x00,0x00,0x00,0x06,
+      0x00,0x00,
+      0x00,0x01,
+      0x01,0xE0,
+      0x4D,0x54,0x72,0x6B,
+      (len >> 24) & 255,
+      (len >> 16) & 255,
+      (len >> 8) & 255,
+      len & 255,
+      ...track
+    ];
+
+    this.download("score.mid", "audio/midi", new Uint8Array(bytes));
+  },
+  
+  pdf() {
+  alert("Exporter.pdf called");
+
+  const dataURL = canvas.toDataURL("image/png");
+
+  const win = window.open();
+
+  if (win) {
+    win.document.write(`
+      <html>
+      <body style="margin:0;background:white">
+        <img src="${dataURL}" style="width:100%;display:block">
+      </body>
+      </html>
+    `);
+    win.document.close();
+    return;
+  }
+
+  alert("Popup blocked. Try Chrome menu > Share > Print.");
+}
+  
+  
+  
+  /*
+  pdf() {
+ 
+  console.log("Exporter.pdf called");
+  alert("Exporter.pdf called");
+  const dataURL = canvas.toDataURL("image/png");
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Score Export</title>
+<style>
+body { margin: 0; background: white; }
+img { width: 100%; display: block; }
+</style>
+</head>
+<body>
+<img src="${dataURL}">
+</body>
+</html>
+`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "score-print.html";
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+  
+  */
+  
+
+};
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  Layout.update();
+  CanvasUI.rebuild();
+}
+
+function animate() {
+  const now = performance.now();
+  const dt = now - AppState.lastFrameTime;
+  AppState.lastFrameTime = now;
+
+  Input.updateMomentum();
+  Notes.layout();
+  Notes.updateTableScroll(dt);
+  Notes.updateAnimation();
+  Renderer.render();
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
+Input.bind();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
+
+<!--
+
+
+ Tonic menu: you press and hold and it opens up kind of like a wheel almost like some date selectors where because it's infinitely CDEFG and then you can scroll up or down and same with the octave numbers
+
+
+
+
+
+
+
+
+
+
+
+-->
