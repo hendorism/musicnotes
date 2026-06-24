@@ -1,3 +1,22 @@
+minus on/off also affects input. while minus is on, control pad numbers always display as negative. clicking minus 5 will give you the note that is a fifth below the tonic. while t is pressed, up and down arrows control octave of the tonic.  tonic octave can never be below -1 or higher than 9. 
+
+the virtual tonic menu looks truly terrible. remake it from scratch, thinking flagship tier date picker, but with styling of true elfin-lord glory like the cursor. do the same for the virtual key menu. display the actual key signatures, without staff, but with the proportional spacing that would make it obvious to anyone who reads music. as a matter of fact, make the whole control panel elfin-lord 90's rave neon dark theme like the welcome screen image. also everything should have smooth animation 150ms duration.
+
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+Review the entire MusicNotes2026/MusicNotes2026-0006-dinosaurio.html file and associated files for structural problems, duplicated functions, unreachable code, syntax errors, and dead code.
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+Review the entire MusicNotes2026/MusicNotes2026-0006-dinosaurio.html file and associated files for structural problems, duplicated functions, unreachable code, syntax errors, and dead code.
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+Review the entire MusicNotes2026/MusicNotes2026-0006-dinosaurio.html file and associated files for structural problems, duplicated functions, unreachable code, syntax errors, and dead code.
+mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
+
+///////////
+Add a staves menu. It'll be a button that opens up a staves menu. And inside the staves menu, there will be the current staff, and then there will be a button that says add new staff. It'll create a new staff. And then, if you click on, in the staff menu, you click on one of the staves, it'll open up a sub-context menu, just like in Macintosh OS 7.6, when you had these, you know, menus within menus. And the sub-menu will have the voices within the stave. And when you click on the voice, it will select the voice, but you can long press, long press the voice, and then it opens up a menu of colors. And you will get, you know, a nice selection of, like, mostly saturated, kind of a little bit pastel-y, nice colors options, you know, like 10 options. And at the bottom of the color menu. There will be a custom color button. The custom color button will open a color chooser window, and the color chooser window will have some of the things that Photoshop offers. It will have a white to black slider. It will have a color wheel, and it will have a place where you can input a hex code number. It will accept a three-digit hex code number and a six-digit hex code number. The color wheel, you know, is the typical where it has gray in the middle, and then the outer rim of the color wheel is the most saturated. And if you go around the wheel, you go through all the primary, secondary, and intermediate colors. There will be an OK button and a cancel button.
+
+////////////////////////////////////////////////////////////////////////////
+Add a new column to the information table. This column will show a decimal ratio between the current note and the previous note. For example, if the previous note is A440 and the current note is E660 whatever, then this column will show 1.5 whatever, the ratio between 440 and 660. So it'll be the new number divided by the previous number. So if the previous number is 660 and the current number is 440, then the output will be 440 divided by 660. But of course it won't be exactly 660 because it's equal temperament.
 
 file:///C:/Users/hendo/github/musicnotes/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
 http://127.0.0.1:5501/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
@@ -5,6 +24,8 @@ http://127.0.0.1:5501/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
 https://hendorism.github.io/musicnotes/index.html
 
 https://hendorism.github.io/musicnotes/MusicNotes2026/MusicNotes2026-0006-dinosaurio.html
+
+
 
 Let's say I have a long string of notes in the key of C, and then I toss a five-sharp key signature in the middle of that string. I want to preserve the pitches as they originally were, but anything after the key signature to the end of the bar needs to have an explicit natural on it. So, you know, whenever I add or remove a key signature, we need to handle and say, does this note need an explicit accidental to show that it deviates from the key signature?
 ////////////////////////////////////////////////////////
@@ -19,4 +40,18 @@ ctrl + left or right arrow - move the selected note left or right in the score, 
 ctrl + shift + up or down arrow - change the accidental of the selected note. if already double sharp, no change. if already double flat, no change.
 
 shift + left or right arrow - add
+
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////
+
+<!--
+
+
+ Tonic menu: you press and hold and it opens up kind of like a wheel almost like some date selectors where because it's infinitely CDEFG and then you can scroll up or down and same with the octave numbers
 
