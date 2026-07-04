@@ -129,7 +129,10 @@
         staffId: null
       },
       undoStack: [],
+      startedAt: performance.now(),
+      fps: 0,
       cursorIndex: 0,
+      cursorFreeX: null,
       cursorStaffOffset: 0,
       cursorBlinkStart: performance.now(),
       lastFrameTime: performance.now(),
@@ -198,7 +201,8 @@
         didLongPress: false,
         longPressTimer: null,
         activeSliderId: null,
-        activeBeamDrag: null
+        activeBeamDrag: null,
+        activePickerDrag: null
       },
 
       cursorBezier: {
@@ -236,7 +240,9 @@
         visible: false,
         x: 0,
         y: 0,
-        noteId: null
+        noteId: null,
+        target: null,
+        items: []
       },
 
       hover: {
@@ -246,6 +252,22 @@
         sx: null,
         sy: null,
         shiftChord: false
+      },
+
+      uiMotion: {
+        items: {}
+      },
+
+      pickerScroll: {
+        tonicLetter: { offset: 0, velocity: 0, momentum: false, snapping: false },
+        tonicOctave: { offset: 0, velocity: 0, momentum: false, snapping: false },
+        keySignature: {
+          offset: 0,
+          velocity: 0,
+          momentum: false,
+          snapping: false,
+          selected: 0
+        }
       }
     };
 
@@ -403,6 +425,7 @@
             ])
           ),
           cursorIndex: AppState.cursorIndex,
+          cursorFreeX: AppState.cursorFreeX,
           cursorStaffOffset: AppState.cursorStaffOffset,
           selection: AppState.selection ? { ...AppState.selection } : null,
           noteInput: { ...AppState.noteInput }
@@ -433,6 +456,7 @@
           )
           : {};
         AppState.cursorIndex = previous.cursorIndex;
+        AppState.cursorFreeX = previous.cursorFreeX ?? null;
         AppState.cursorStaffOffset = previous.cursorStaffOffset;
         AppState.selection = previous.selection ? { ...previous.selection } : null;
         AppState.noteInput = {
@@ -496,6 +520,19 @@
         const noteStep = this.diatonicStep(letter, octave);
 
         return Layout.bottomLineY() - (noteStep - e4Step) * (Layout.S / 2);
+      },
+
+      pitchFromStaffOffset(offset = AppState.cursorStaffOffset) {
+        const e4Step = this.diatonicStep("E", 4);
+        const step = e4Step - offset;
+        const index =
+          ((step % this.letters.length) + this.letters.length) %
+          this.letters.length;
+
+        return {
+          letter: this.letters[index],
+          octave: 4 + Math.floor(step / this.letters.length)
+        };
       },
 
       pitchFromDegree(degree) {
@@ -706,6 +743,10 @@
         const previous = ordered[AppState.cursorIndex - 1];
         const next = ordered[AppState.cursorIndex];
 
+        if (!addToChord && AppState.cursorFreeX !== null) {
+          return AppState.cursorFreeX;
+        }
+
         if (
           addToChord &&
           previous &&
@@ -759,19 +800,24 @@
           Input.beamModifierHeld &&
           this.isBeamableValue(note.value)
         ) {
-          if (!Input.beamGroupSeeded) {
-            const previous = this.ordered()[AppState.cursorIndex - 1];
-            if (
-              previous &&
-              previous.kind === "note" &&
-              this.isBeamableValue(previous.value)
-            ) {
-              previous.beamGroupId = Input.activeBeamGroupId;
-            }
-            Input.beamGroupSeeded = true;
-          }
+          const previous = this.ordered()[AppState.cursorIndex - 1];
 
-          note.beamGroupId = Input.activeBeamGroupId;
+          if (
+            previous &&
+            previous.kind === "note" &&
+            this.isBeamableValue(previous.value)
+          ) {
+            if (!previous.beamGroupId) {
+              previous.beamGroupId =
+                Input.activeBeamGroupId || AppState.nextBeamGroupId++;
+            }
+
+            note.beamGroupId = previous.beamGroupId;
+            Input.activeBeamGroupId = previous.beamGroupId;
+          } else {
+            Input.activeBeamGroupId = AppState.nextBeamGroupId++;
+            note.beamGroupId = Input.activeBeamGroupId;
+          }
         }
 
         AppState.notes.push(note);
@@ -799,6 +845,7 @@
         } else {
           AppState.cursorIndex = newOrdered.findIndex(n => n.id === note.id) + 1;
         }
+        AppState.cursorFreeX = null;
 
         this.syncCursorToActiveNote();
         this.resetCursorBlink();
@@ -825,6 +872,7 @@
 
         const ordered = this.ordered();
         AppState.cursorIndex = ordered.findIndex(item => item.id === barline.id) + 1;
+        AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
         this.scrollToNote(barline);
@@ -851,6 +899,7 @@
 
         const ordered = this.ordered();
         AppState.cursorIndex = ordered.findIndex(item => item.id === rest.id) + 1;
+        AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
         this.scrollToNote(rest);
@@ -896,6 +945,7 @@
         const ordered = this.ordered();
         AppState.cursorIndex =
           ordered.findIndex(item => item.id === keySignature.id) + 1;
+        AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
         this.scrollToNote(keySignature);
@@ -1090,6 +1140,7 @@
           0,
           Math.min(this.ordered().length, AppState.cursorIndex + delta)
         );
+        AppState.cursorFreeX = null;
 
         this.syncCursorToActiveNote();
         const active = this.activeItem();
@@ -1104,6 +1155,7 @@
 
         this.clearSelection();
         AppState.cursorIndex = index + 1;
+        AppState.cursorFreeX = null;
         this.syncCursorToActiveNote();
         this.resetCursorBlink();
         this.scrollToNote(item);
@@ -1113,6 +1165,25 @@
       moveCursorVertical(delta) {
         AppState.cursorStaffOffset += delta;
         this.resetCursorBlink();
+      },
+
+      setCursorFromPoint(wx, sy) {
+        const ordered = this.ordered();
+        let index = 0;
+
+        while (
+          index < ordered.length &&
+          this.displayCenterX(ordered[index]) < wx
+        ) {
+          index++;
+        }
+
+        AppState.selection = null;
+        AppState.cursorIndex = index;
+        AppState.cursorFreeX = wx;
+        AppState.cursorStaffOffset = this.staffOffsetFromY(sy);
+        this.resetCursorBlink();
+        AppState.camera.followX = AppState.camera.x;
       },
 
       updateTableScroll(dt = 16) {
@@ -1554,8 +1625,8 @@
 
       scrollToNote(note) {
         const sx = this.displayScreenCenterX(note);
-        const rightLimit = canvas.width * 0.72;
-        const leftLimit = canvas.width * 0.18;
+        const rightLimit = canvas.width * 0.90;
+        const leftLimit = canvas.width * 0.10;
 
         let target = AppState.camera.x;
 
@@ -1881,9 +1952,9 @@
         const tonic = tonicButtons.find(b => b.id === "tonic-letter");
         const p = Layout.sidePanel;
         const gap = 8;
-        const w = 84;
-        const h = 34;
-        const x = Math.max(p.x, tonic.x - w - 12);
+        const w = Math.min(104, Math.max(88, tonic.w * 1.2));
+        const h = Math.min(48, Math.max(38, tonic.h * 0.72));
+        const x = Math.max(p.x + 8, tonic.x - w - 14);
         const y = tonic.y;
         const make = (id, label, index, action) => ({
           type: "button",
@@ -2004,7 +2075,7 @@
         const gridY = k.y + valueH + gap + accidentalH + 12;
         const cellH = (k.h - valueH - gap - accidentalH - 12) / 3;
         const controlGap = 10;
-        const totalW = Math.min(124, Math.max(86, k.x - Layout.sidePanel.x - 100));
+        const totalW = Math.min(154, Math.max(118, k.x - Layout.sidePanel.x - 96));
         const halfW = totalW / 2;
         const x = k.x - controlGap - totalW;
         const y = gridY + cellH;
@@ -2020,7 +2091,7 @@
             x,
             y,
             w: halfW,
-            h: cellH,
+            h: Math.min(62, cellH),
             action: toggleMenu
           },
           {
@@ -2030,7 +2101,7 @@
             x: x + halfW,
             y,
             w: halfW,
-            h: cellH,
+            h: Math.min(62, cellH),
             action: toggleMenu
           }
         ];
@@ -2151,49 +2222,79 @@
         const out = [];
         const letters = ["C", "D", "E", "F", "G", "A", "B"];
         const currentLetterIndex = Notes.letterIndex(AppState.noteInput.tonicLetter);
-        const rowGap = 4;
-        const rowH = Math.min(34, tonic.h);
+        const rowGap = 0;
+        const rowH = 44;
+        const step = rowH + rowGap;
         const wrapLetter = index =>
           letters[(index + letters.length) % letters.length];
+        const centerY = tonic.y + tonic.h / 2;
+        const panelH = rowH * 7;
+        const panelY = centerY - panelH / 2;
+
+        out.push({
+          type: "pickerPanel",
+          id: "tonic-letter-panel",
+          picker: "tonicLetter",
+          x: tonic.x - 8,
+          y: panelY,
+          w: tonic.w + 16,
+          h: panelH,
+          rowH,
+          centerY
+        });
+
+        out.push({
+          type: "pickerPanel",
+          id: "tonic-octave-panel",
+          picker: "tonicOctave",
+          x: octaveButton.x - 8,
+          y: panelY,
+          w: octaveButton.w + 16,
+          h: panelH,
+          rowH,
+          centerY
+        });
 
         for (let offset = -4; offset <= 4; offset++) {
-          if (offset === 0) continue;
-
-          const y = tonic.y - offset * (rowH + rowGap);
+          const y = centerY - rowH / 2 - offset * step +
+            AppState.pickerScroll.tonicLetter.offset;
           if (y < 8 || y + rowH > canvas.height - 8) continue;
 
           const letter = wrapLetter(currentLetterIndex + offset);
           out.push({
             type: "tonicLetter",
+            picker: "tonicLetter",
             value: letter,
             label: letter,
-            x: tonic.x,
+            x: tonic.x - 4,
             y,
-            w: tonic.w,
+            w: tonic.w + 8,
             h: rowH,
             pickerOffset: offset,
+            distanceFromCenter: Math.abs((y + rowH / 2 - centerY) / rowH),
             action: () => { Notes.changeTonicLetter(letter); }
           });
         }
 
         for (let offset = -4; offset <= 4; offset++) {
-          if (offset === 0) continue;
-
           const octave = AppState.noteInput.tonicOctave + offset;
           if (octave < Notes.minTonicOctave || octave > Notes.maxTonicOctave) continue;
 
-          const y = octaveButton.y - offset * (rowH + rowGap);
+          const y = centerY - rowH / 2 - offset * step +
+            AppState.pickerScroll.tonicOctave.offset;
           if (y < 8 || y + rowH > canvas.height - 8) continue;
 
           out.push({
             type: "tonicOctave",
+            picker: "tonicOctave",
             value: octave,
             label: String(octave),
-            x: octaveButton.x,
+            x: octaveButton.x - 4,
             y,
-            w: octaveButton.w,
+            w: octaveButton.w + 8,
             h: rowH,
             pickerOffset: offset,
+            distanceFromCenter: Math.abs((y + rowH / 2 - centerY) / rowH),
             action: () => { Notes.changeTonicOctave(octave); }
           });
         }
@@ -2206,23 +2307,47 @@
         if (!keyButton) return [];
 
         const out = [];
-        const gap = 2;
-        const rowH = Math.min(18, keyButton.h);
-        const make = (count, accidental, offset) => {
-          const y = keyButton.y - offset * (rowH + gap);
+        const rowH = 44;
+        const step = rowH;
+        const panelH = rowH * 7;
+        const centerY = keyButton.y + keyButton.h / 2;
+        const panelY = centerY - panelH / 2;
+        const selected = AppState.pickerScroll.keySignature.selected ?? 0;
+        out.push({
+          type: "pickerPanel",
+          id: "key-signature-panel",
+          picker: "keySignature",
+          x: keyButton.x - 10,
+          y: panelY,
+          w: keyButton.w + 20,
+          h: panelH,
+          rowH,
+          centerY
+        });
+
+        const make = value => {
+          const offset = value - selected;
+          const y = centerY - rowH / 2 - offset * step +
+            AppState.pickerScroll.keySignature.offset;
           if (y < 8 || y + rowH > canvas.height - 8) return;
 
+          const accidental = value < 0 ? "flat" : "sharp";
+          const count = Math.abs(value);
           const symbol = accidental === "flat" ? "♭" : "♯";
           out.push({
             type: "keySignatureChoice",
-            id: `key-${count}-${accidental}`,
+            picker: "keySignature",
+            id: value === 0 ? "key-0-natural" : `key-${count}-${accidental}`,
             count,
             accidental,
-            label: `${count}${symbol}`,
-            x: keyButton.x,
+            label: value === 0 ? "C" : `${count}${symbol}`,
+            x: keyButton.x - 5,
             y,
-            w: keyButton.w,
+            w: keyButton.w + 10,
             h: rowH,
+            keyValue: value,
+            pickerOffset: offset,
+            distanceFromCenter: Math.abs((y + rowH / 2 - centerY) / rowH),
             action: () => {
               Notes.createKeySignature(count, accidental);
               Input.keySignatureModifierHeld = false;
@@ -2230,20 +2355,23 @@
           });
         };
 
-        for (let count = 1; count <= 7; count++) {
-          make(count, "sharp", count);
-          make(count, "flat", -count);
+        for (let value = -7; value <= 7; value++) {
+          make(value);
         }
 
         return out;
       },
 
       hit(x, y) {
+        const contextHit = this.contextMenuHit(x, y);
+        if (contextHit) return contextHit;
+
         const menuHit = this.menuHit(x, y);
         if (menuHit) return menuHit;
 
         for (let i = this.visibleButtons.length - 1; i >= 0; i--) {
           const b = this.visibleButtons[i];
+          if (b.type === "pickerPanel") continue;
 
           if (
             x >= b.x &&
@@ -2256,6 +2384,38 @@
         }
 
         return null;
+      },
+
+      contextMenuHit(x, y) {
+        if (!AppState.canvasMenu.visible) return null;
+
+        const itemH = 26;
+        const w = 176;
+        const h = AppState.canvasMenu.items.length * itemH + 8;
+        const menuX = AppState.canvasMenu.x;
+        const menuY = AppState.canvasMenu.y;
+
+        if (
+          x < menuX ||
+          x > menuX + w ||
+          y < menuY ||
+          y > menuY + h
+        ) return null;
+
+        const index = Math.floor((y - menuY - 4) / itemH);
+        const item = AppState.canvasMenu.items[index];
+        if (!item) return null;
+
+        return {
+          type: "contextMenuItem",
+          id: item.id,
+          label: item.label,
+          action: item.action,
+          x: menuX,
+          y: menuY + 4 + index * itemH,
+          w,
+          h: itemH
+        };
       },
 
       menuHit(x, y) {
@@ -2294,6 +2454,12 @@
 
           AppState.menu.open = null;
           AppState.menu.submenu = null;
+          if (b.action) b.action();
+          return;
+        }
+
+        if (b.type === "contextMenuItem") {
+          AppState.canvasMenu.visible = false;
           if (b.action) b.action();
           return;
         }
@@ -2354,7 +2520,6 @@
       keySignatureAccidental: "sharp",
       beamModifierHeld: false,
       activeBeamGroupId: null,
-      beamGroupSeeded: false,
 
       screenToWorldX(sx) {
         return sx / AppState.camera.zoom + AppState.camera.x;
@@ -2459,6 +2624,186 @@
         }
 
         return best;
+      },
+
+      notationItemAtPoint(p) {
+        const note = this.noteheadAtPoint(p);
+        if (note) return { type: "note", item: note };
+
+        const beam = this.beamAtPoint(p);
+        if (beam) return { type: "beam", groupId: beam.groupId };
+
+        for (const item of Notes.ordered()) {
+          const sx = Notes.displayScreenCenterX(item);
+          const sy = item.kind === "keysig" || item.kind === "barline"
+            ? Layout.lineY(2)
+            : item.kind === "rest"
+              ? item.vexRestCenterY ?? Layout.lineY(2)
+              : item.y;
+          if (Math.hypot(p.sx - sx, p.sy - sy) < 18) {
+            return { type: item.kind, item };
+          }
+        }
+
+        if (
+          p.sy >= Layout.lineY(0) - 90 &&
+          p.sy <= Layout.inputPanel.y
+        ) {
+          return { type: "staff", staff: AppState.staves[0] };
+        }
+
+        return { type: "empty" };
+      },
+
+      contextItemsForTarget(target, p) {
+        const items = [];
+        const selectItem = () => {
+          if (target.item) Notes.selectItem(target.item);
+        };
+
+        if (target.type === "note") {
+          items.push(
+            { id: "select-note", label: "Select Note", action: selectItem },
+            { id: "delete-note", label: "Delete Note", action: () => { Notes.selectItem(target.item); Notes.deleteBehindCursor(); } },
+            { id: "apply-acc", label: "Apply Accidental", action: () => { Notes.selectItem(target.item); Notes.applyAccidentalToActiveNote(); } }
+          );
+        } else if (target.type === "beam") {
+          items.push(
+            { id: "select-beam", label: "Select Beam", action: () => { AppState.selectedBeamGroupId = target.groupId; } },
+            { id: "reset-beam", label: "Reset Beam", action: () => { delete AppState.beamEdits[String(target.groupId)]; } }
+          );
+        } else if (target.type === "keysig") {
+          items.push(
+            { id: "select-key", label: "Select Key Signature", action: selectItem },
+            { id: "delete-key", label: "Delete Key Signature", action: () => { Notes.selectItem(target.item); Notes.deleteBehindCursor(); } },
+            { id: "key-picker", label: "Open Key Picker", action: () => { Input.keySignatureModifierHeld = true; } }
+          );
+        } else if (target.type === "barline" || target.type === "rest") {
+          items.push(
+            { id: `select-${target.type}`, label: `Select ${target.type === "rest" ? "Rest" : "Barline"}`, action: selectItem },
+            { id: `delete-${target.type}`, label: "Delete", action: () => { Notes.selectItem(target.item); Notes.deleteBehindCursor(); } }
+          );
+        } else if (target.type === "staff") {
+          items.push(
+            { id: "rename-staff", label: "Rename Staff", action: () => CanvasUI.openRenameModal(target.staff.id) },
+            { id: "insert-barline", label: "Insert Barline", action: () => Notes.createBarline() },
+            { id: "insert-rest", label: "Insert Rest", action: () => Notes.createRest() }
+          );
+        } else {
+          items.push(
+            { id: "place-cursor", label: "Place Cursor", action: () => Notes.setCursorFromPoint(p.wx, p.sy) },
+            { id: "insert-rest", label: "Insert Rest Here", action: () => { Notes.setCursorFromPoint(p.wx, p.sy); Notes.createRest(); } },
+            { id: "insert-barline", label: "Insert Barline Here", action: () => { Notes.setCursorFromPoint(p.wx, p.sy); Notes.createBarline(); } }
+          );
+        }
+
+        return items;
+      },
+
+      openContextMenu(p) {
+        const target = this.notationItemAtPoint(p);
+        AppState.canvasMenu.visible = true;
+        AppState.canvasMenu.x = Math.min(canvas.width - 184, Math.max(8, p.sx));
+        AppState.canvasMenu.y = Math.min(canvas.height - 140, Math.max(CanvasUI.menuBarHeight + 8, p.sy));
+        AppState.canvasMenu.target = target;
+        AppState.canvasMenu.items = this.contextItemsForTarget(target, p);
+      },
+
+      pickerAtPoint(p) {
+        return CanvasUI.visibleButtons.find(b =>
+          b.type === "pickerPanel" &&
+          p.sx >= b.x &&
+          p.sx <= b.x + b.w &&
+          p.sy >= b.y &&
+          p.sy <= b.y + b.h
+        ) || null;
+      },
+
+      pickerStep(picker) {
+        return 44;
+      },
+
+      nudgePickerSelection(picker, delta) {
+        if (picker === "tonicLetter") {
+          Notes.stepTonic(delta);
+        } else if (picker === "tonicOctave") {
+          Notes.stepTonicOctave(delta);
+        } else if (picker === "keySignature") {
+          const scroll = AppState.pickerScroll.keySignature;
+          scroll.selected = Math.max(-7, Math.min(7, (scroll.selected ?? 0) + delta));
+        }
+      },
+
+      normalizePickerScroll(picker) {
+        const scroll = AppState.pickerScroll[picker];
+        if (!scroll) return;
+
+        const step = this.pickerStep(picker);
+
+        while (scroll.offset >= step) {
+          this.nudgePickerSelection(picker, 1);
+          scroll.offset -= step;
+        }
+
+        while (scroll.offset <= -step) {
+          this.nudgePickerSelection(picker, -1);
+          scroll.offset += step;
+        }
+
+        if (picker === "keySignature") {
+          const selected = scroll.selected ?? 0;
+          if (selected <= -7 && scroll.offset < 0) {
+            scroll.offset = 0;
+            scroll.velocity = 0;
+          }
+          if (selected >= 7 && scroll.offset > 0) {
+            scroll.offset = 0;
+            scroll.velocity = 0;
+          }
+        }
+      },
+
+      snapPicker(picker) {
+        const scroll = AppState.pickerScroll[picker];
+        if (!scroll) return;
+
+        const step = this.pickerStep(picker);
+        if (Math.abs(scroll.offset) > step / 2) {
+          this.nudgePickerSelection(picker, scroll.offset > 0 ? 1 : -1);
+          scroll.offset += scroll.offset > 0 ? -step : step;
+        }
+
+        scroll.snapping = true;
+      },
+
+      updatePickerMomentum(dt = 16) {
+        const seconds = Math.min(0.05, Math.max(0.001, dt / 1000));
+
+        for (const picker of Object.keys(AppState.pickerScroll)) {
+          const scroll = AppState.pickerScroll[picker];
+          if (!scroll.momentum && !scroll.snapping) continue;
+
+          if (scroll.momentum) {
+            scroll.offset += scroll.velocity * seconds;
+            scroll.velocity *= Math.pow(0.02, seconds);
+            this.normalizePickerScroll(picker);
+
+            if (Math.abs(scroll.velocity) < 14) {
+              scroll.momentum = false;
+              scroll.velocity = 0;
+              this.snapPicker(picker);
+            }
+          }
+
+          if (scroll.snapping) {
+            scroll.offset *= Math.pow(0.00035, seconds);
+
+            if (Math.abs(scroll.offset) < 0.45) {
+              scroll.offset = 0;
+              scroll.snapping = false;
+            }
+          }
+        }
       },
 
       updateHover(p, shiftKey = false) {
@@ -2575,6 +2920,10 @@
         canvas.addEventListener("pointermove", e => this.move(e));
         canvas.addEventListener("pointerup", e => this.up(e));
         canvas.addEventListener("pointercancel", e => this.cancel(e));
+        canvas.addEventListener("contextmenu", e => {
+          e.preventDefault();
+          this.openContextMenu(this.pointer(e));
+        });
         canvas.addEventListener("pointerleave", () => this.clearHover());
         canvas.addEventListener("wheel", e => this.wheel(e), { passive: false });
         importFileInput?.addEventListener("change", e => this.importFile(e));
@@ -2711,12 +3060,14 @@
         if (e.code === "KeyB" && !this.tonicModifierHeld) {
           e.preventDefault();
 
-          if (!this.beamModifierHeld && !e.repeat) {
-            this.activeBeamGroupId = AppState.nextBeamGroupId++;
-            this.beamGroupSeeded = false;
+          if (!e.repeat) {
+            this.beamModifierHeld = !this.beamModifierHeld;
+            if (!this.beamModifierHeld) {
+              this.activeBeamGroupId = null;
+            }
+            CanvasUI.notify(this.beamModifierHeld ? "Beaming on" : "Beaming off");
           }
 
-          this.beamModifierHeld = true;
           return;
         }
 
@@ -2787,6 +3138,15 @@
             e.code === "ArrowLeft" ? -1 : 1,
             e.altKey
           );
+          return;
+        }
+
+        if (
+          this.tonicModifierHeld &&
+          (e.code === "ArrowUp" || e.code === "ArrowDown")
+        ) {
+          e.preventDefault();
+          Notes.stepTonicOctave(e.code === "ArrowUp" ? 1 : -1);
           return;
         }
 
@@ -2929,9 +3289,6 @@
 
         if (e.code === "KeyB") {
           e.preventDefault();
-          this.beamModifierHeld = false;
-          this.activeBeamGroupId = null;
-          this.beamGroupSeeded = false;
           return;
         }
 
@@ -2985,9 +3342,6 @@
 
         this.heldShiftKeys.clear();
         this.selectionSlideHeld = false;
-        this.beamModifierHeld = false;
-        this.activeBeamGroupId = null;
-        this.beamGroupSeeded = false;
         AppState.noteInput.shift = AppState.noteInput.selectedShift;
         this.heldDegreeKeys.clear();
         this.degreeChordLeader = null;
@@ -3002,10 +3356,23 @@
           return;
         }
 
+        if (e.button === 2) {
+          e.preventDefault();
+          this.openContextMenu(this.pointer(e));
+          return;
+        }
+
         canvas.setPointerCapture(e.pointerId);
 
         const p = this.pointer(e);
         this.updateHover(p, e.shiftKey);
+        const contextHit = CanvasUI.contextMenuHit(p.sx, p.sy);
+        if (contextHit) {
+          CanvasUI.activate(contextHit);
+          return;
+        }
+
+        AppState.canvasMenu.visible = false;
         const beamHandle = this.beamHandleAtPoint(p);
         if (beamHandle) {
           const edit = Renderer.beamEdit(beamHandle.groupId);
@@ -3044,6 +3411,30 @@
         }
 
         const hit = CanvasUI.hit(p.sx, p.sy);
+        const pickerPanel = this.pickerAtPoint(p);
+
+        if (pickerPanel) {
+          const picker = pickerPanel.picker;
+          const scroll = AppState.pickerScroll[picker];
+          if (scroll) {
+            scroll.momentum = false;
+            scroll.snapping = false;
+            AppState.input.down = true;
+            AppState.input.pointerId = e.pointerId;
+            AppState.input.startX = p.sx;
+            AppState.input.startY = p.sy;
+            AppState.input.lastX = p.sx;
+            AppState.input.lastY = p.sy;
+            AppState.input.lastTime = performance.now();
+            AppState.input.dragging = false;
+            AppState.input.activePickerDrag = {
+              picker,
+              started: false,
+              targetHit: hit && hit.picker === picker ? hit : null
+            };
+            return;
+          }
+        }
 
         if (hit) {
           if (hit.type === "cursorSlider" || hit.type === "controlSlider") {
@@ -3096,6 +3487,18 @@
           didLongPress: false
         });
 
+        clearTimeout(AppState.input.longPressTimer);
+        AppState.input.longPressTimer = setTimeout(() => {
+          if (
+            AppState.input.down &&
+            AppState.input.pointerId === e.pointerId &&
+            !AppState.input.dragging
+          ) {
+            AppState.input.didLongPress = true;
+            this.openContextMenu(p);
+          }
+        }, 520);
+
         AppState.camera.momentum = false;
       },
 
@@ -3133,6 +3536,32 @@
 
         if (!AppState.input.down || AppState.input.pointerId !== e.pointerId) return;
 
+        if (AppState.input.activePickerDrag) {
+          const drag = AppState.input.activePickerDrag;
+          const scroll = AppState.pickerScroll[drag.picker];
+          const dyTotal = p.sy - AppState.input.startY;
+          const dy = p.sy - AppState.input.lastY;
+          const now = performance.now();
+          const dt = Math.max(1, now - AppState.input.lastTime);
+
+          if (!drag.started && Math.abs(dyTotal) > 8) {
+            drag.started = true;
+            AppState.input.dragging = true;
+          }
+
+          if (drag.started && scroll) {
+            scroll.offset += dy;
+            scroll.velocity = dy / dt * 1000;
+            scroll.snapping = false;
+            this.normalizePickerScroll(drag.picker);
+          }
+
+          AppState.input.lastX = p.sx;
+          AppState.input.lastY = p.sy;
+          AppState.input.lastTime = now;
+          return;
+        }
+
         if (AppState.input.activeBeamDrag) {
           const drag = AppState.input.activeBeamDrag;
           const edit = Renderer.beamEdit(drag.groupId);
@@ -3162,6 +3591,14 @@
 
         const totalDx = p.sx - AppState.input.startX;
         const totalDy = p.sy - AppState.input.startY;
+
+        if (
+          Math.hypot(totalDx, totalDy) > 10 &&
+          AppState.input.longPressTimer
+        ) {
+          clearTimeout(AppState.input.longPressTimer);
+          AppState.input.longPressTimer = null;
+        }
 
         if (!AppState.input.dragging) {
           if (
@@ -3197,6 +3634,28 @@
         this.updateHover(p, e.shiftKey);
         const hit = CanvasUI.hit(p.sx, p.sy);
 
+        if (AppState.input.activePickerDrag) {
+          const drag = AppState.input.activePickerDrag;
+          const scroll = AppState.pickerScroll[drag.picker];
+
+          if (drag.started) {
+            if (scroll && Math.abs(scroll.velocity) > 20) {
+              scroll.momentum = true;
+            } else {
+              this.snapPicker(drag.picker);
+            }
+            this.cleanup(e);
+            return;
+          }
+
+          const target = hit && hit.picker === drag.picker
+            ? hit
+            : drag.targetHit;
+          this.cleanup(e);
+          if (target) CanvasUI.activate(target);
+          return;
+        }
+
         if (AppState.input.activeSliderId) {
           const slider = CanvasUI.visibleButtons.find(
             b =>
@@ -3215,7 +3674,10 @@
         }
 
         const wasDragging = AppState.input.dragging;
+        const didLongPress = AppState.input.didLongPress;
         this.cleanup(e);
+
+        if (didLongPress) return;
 
         if (wasDragging) {
           AppState.camera.momentum = true;
@@ -3225,6 +3687,14 @@
         const note = this.noteheadAtPoint(p);
         if (note) {
           Notes.selectItem(note);
+          return;
+        }
+
+        if (
+          p.sy >= Layout.lineY(0) - 90 &&
+          p.sy <= Layout.inputPanel.y
+        ) {
+          Notes.setCursorFromPoint(p.wx, p.sy);
         }
       },
 
@@ -3243,12 +3713,32 @@
         AppState.input.pointerId = null;
         AppState.input.activeSliderId = null;
         AppState.input.activeBeamDrag = null;
+        AppState.input.activePickerDrag = null;
+        clearTimeout(AppState.input.longPressTimer);
+        AppState.input.longPressTimer = null;
       },
 
       wheel(e) {
         e.preventDefault();
 
         const p = this.pointer(e);
+        const pickerPanel = this.pickerAtPoint(p);
+
+        if (pickerPanel) {
+          const picker = pickerPanel.picker;
+          const scroll = AppState.pickerScroll[picker];
+
+          if (scroll) {
+            scroll.momentum = false;
+            scroll.snapping = false;
+            scroll.offset -= e.deltaY;
+            scroll.velocity = -e.deltaY * 7.2;
+            this.normalizePickerScroll(picker);
+            scroll.momentum = true;
+          }
+
+          return;
+        }
 
         if (e.ctrlKey) {
           const before = this.screenToWorldX(p.sx);
@@ -3659,9 +4149,6 @@
         ) {
           const r = this.coverImageRect(welcomeImage);
           ctx.drawImage(welcomeImage, r.x, r.y, r.w, r.h);
-        } else if (!AppState.welcome.imageFailed) {
-          ctx.fillStyle = "#bbeeff";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
         ctx.restore();
@@ -4479,6 +4966,10 @@
       cursorScreenX() {
         const ordered = Notes.ordered();
 
+        if (AppState.cursorFreeX !== null) {
+          return Input.worldToScreenX(AppState.cursorFreeX);
+        }
+
         if (!ordered.length) {
           return Input.worldToScreenX(AppState.camera.x + 180);
         }
@@ -5049,7 +5540,30 @@
       },
 
       inputPanel() {
-        // Intentionally borderless: the controls float over the note table.
+        const p = Layout.inputPanel;
+
+        ctx.save();
+        const g = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+        g.addColorStop(0, "rgba(4, 2, 18, 0.18)");
+        g.addColorStop(0.42, "rgba(34, 8, 62, 0.24)");
+        g.addColorStop(1, "rgba(0, 42, 74, 0.20)");
+        ctx.fillStyle = g;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+
+        const glow = ctx.createRadialGradient(
+          Layout.keypad.x + Layout.keypad.w / 2,
+          Layout.keypad.y + Layout.keypad.h / 2,
+          10,
+          Layout.keypad.x + Layout.keypad.w / 2,
+          Layout.keypad.y + Layout.keypad.h / 2,
+          Math.max(Layout.keypad.w, Layout.keypad.h) * 0.82
+        );
+        glow.addColorStop(0, "rgba(255, 74, 220, 0.12)");
+        glow.addColorStop(0.38, "rgba(74, 235, 255, 0.08)");
+        glow.addColorStop(1, "rgba(74, 235, 255, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.restore();
       },
 
       accidentalAdvisory() {
@@ -5109,64 +5623,238 @@
         ctx.quadraticCurveTo(x, y, x + radius, y);
       },
 
+      motionValue(id, target, duration = 150) {
+        const now = performance.now();
+        const state = AppState.uiMotion.items[id] ||
+          { value: target ? 0 : 1, from: target ? 0 : 1, target, startedAt: now };
+
+        if (state.target !== target) {
+          state.from = state.value;
+          state.target = target;
+          state.startedAt = now;
+        }
+
+        const t = Math.min(1, Math.max(0, (now - state.startedAt) / duration));
+        const eased = t < 0.5
+          ? 2 * t * t
+          : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
+        state.value = state.from + (state.target - state.from) * eased;
+        AppState.uiMotion.items[id] = state;
+        return state.value;
+      },
+
+      neonPanel(rect, amount = 1) {
+        ctx.save();
+        ctx.globalAlpha = amount;
+        const g = ctx.createLinearGradient(rect.x, rect.y, rect.x + rect.w, rect.y + rect.h);
+        g.addColorStop(0, "rgba(8, 5, 30, 0.92)");
+        g.addColorStop(0.45, "rgba(30, 8, 60, 0.86)");
+        g.addColorStop(1, "rgba(0, 34, 58, 0.88)");
+
+        ctx.shadowColor = "rgba(80, 245, 255, 0.34)";
+        ctx.shadowBlur = 24;
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        this.roundedRectPath(rect.x, rect.y, rect.w, rect.h, 18);
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 1.4;
+        ctx.strokeStyle = "rgba(112, 238, 255, 0.62)";
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(255, 80, 220, 0.36)";
+        ctx.beginPath();
+        this.roundedRectPath(rect.x + 3, rect.y + 3, rect.w - 6, rect.h - 6, 15);
+        ctx.stroke();
+
+        const cx = rect.x + rect.w / 2;
+        const glow = ctx.createRadialGradient(cx, rect.y + rect.h * 0.25, 2, cx, rect.y + rect.h * 0.25, rect.w * 0.8);
+        glow.addColorStop(0, "rgba(255,255,255,0.16)");
+        glow.addColorStop(0.42, "rgba(80,245,255,0.08)");
+        glow.addColorStop(1, "rgba(80,245,255,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        this.roundedRectPath(rect.x + 4, rect.y + 4, rect.w - 8, rect.h - 8, 15);
+        ctx.fill();
+        ctx.restore();
+      },
+
+      drawKeySignaturePreview(b, activeAmount) {
+        const count = b.count ?? 0;
+        const accidental = b.accidental ?? "sharp";
+        const symbol = Notes.keySignatureSymbol[accidental];
+        const pitches = Notes.keySignaturePitches[accidental] || [];
+        const spacing = Math.min(10.5, Math.max(8, b.w / 9));
+        const totalW = Math.max(0, count - 1) * spacing;
+        const startX = b.x + b.w / 2 - totalW / 2;
+        const centerY = b.y + b.h / 2;
+        const scaleY = 0.38;
+
+        ctx.save();
+        ctx.font = `${Math.min(26, b.h * 0.76)}px serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = `rgba(235, 255, 255, ${0.78 + activeAmount * 0.22})`;
+        ctx.shadowColor = activeAmount > 0.3
+          ? "rgba(255, 242, 130, 0.82)"
+          : "rgba(102, 238, 255, 0.55)";
+        ctx.shadowBlur = 7 + activeAmount * 8;
+
+        if (count === 0) {
+          ctx.font = `${Math.min(18, b.h * 0.56)}px Geneva, sans-serif`;
+          ctx.fillText("C", b.x + b.w / 2, centerY);
+        } else {
+          for (let i = 0; i < count; i++) {
+            const [letter, octave] = pitches[i];
+            const relativeY =
+              (Notes.yFromPitch(letter, octave) - Layout.lineY(2)) * scaleY;
+            ctx.fillText(symbol, startX + i * spacing, centerY + relativeY);
+          }
+        }
+
+        ctx.restore();
+      },
+
+      pickerPanel(b) {
+        const amount = this.motionValue(`panel:${b.id}`, 1);
+        this.neonPanel(b, amount);
+      },
+
+      pickerPanelOverlay(b) {
+        const amount = this.motionValue(`panel:${b.id}`, 1);
+
+        const rowH = b.rowH ?? 44;
+        const centerY = b.centerY ?? (b.y + b.h / 2);
+        const fadeH = Math.min(112, b.h * 0.42);
+
+        ctx.save();
+        ctx.globalAlpha = amount;
+
+        const windowX = b.x + 14;
+        const windowW = b.w - 28;
+        ctx.shadowColor = "rgba(255, 245, 150, 0.72)";
+        ctx.shadowBlur = 12;
+        ctx.strokeStyle = "rgba(245, 255, 255, 0.86)";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.075)";
+        ctx.beginPath();
+        this.roundedRectPath(windowX, centerY - rowH / 2, windowW, rowH, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        const topFade = ctx.createLinearGradient(0, b.y, 0, b.y + fadeH);
+        topFade.addColorStop(0, "rgba(8, 5, 30, 0.92)");
+        topFade.addColorStop(1, "rgba(8, 5, 30, 0)");
+        ctx.fillStyle = topFade;
+        ctx.fillRect(b.x + 1, b.y + 1, b.w - 2, fadeH);
+
+        const bottomFade = ctx.createLinearGradient(0, b.y + b.h - fadeH, 0, b.y + b.h);
+        bottomFade.addColorStop(0, "rgba(8, 5, 30, 0)");
+        bottomFade.addColorStop(1, "rgba(8, 5, 30, 0.92)");
+        ctx.fillStyle = bottomFade;
+        ctx.fillRect(b.x + 1, b.y + b.h - fadeH, b.w - 2, fadeH);
+
+        ctx.restore();
+      },
+
       button(b, active) {
         ctx.save();
 
         const disabled = false;
-        const gradient = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+        const rowDistance = b.distanceFromCenter ?? 0;
+        const pickerRowAmount = b.picker
+          ? Math.max(0.24, 1 - rowDistance * 0.22)
+          : 1;
+        const pickerRowScale = b.picker
+          ? Math.max(0.82, 1 - rowDistance * 0.045)
+          : 1;
+        const activeAmount = this.motionValue(
+          `button:${b.type}:${b.id ?? b.value ?? b.label}`,
+          active ? 1 : 0
+        );
 
-        if (active) {
-          gradient.addColorStop(0, "rgba(255, 248, 142, 0.98)");
-          gradient.addColorStop(0.48, "rgba(255, 216, 74, 0.98)");
-          gradient.addColorStop(1, "rgba(235, 154, 35, 0.98)");
-        } else if (disabled) {
-          gradient.addColorStop(0, "rgba(238, 238, 238, 0.72)");
-          gradient.addColorStop(1, "rgba(198, 205, 210, 0.72)");
-        } else {
-          gradient.addColorStop(0, "rgba(255, 255, 255, 0.98)");
-          gradient.addColorStop(0.55, "rgba(235, 248, 255, 0.96)");
-          gradient.addColorStop(1, "rgba(187, 220, 240, 0.94)");
+        if (b.picker) {
+          ctx.globalAlpha = pickerRowAmount;
+          ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+          ctx.scale(pickerRowScale, pickerRowScale);
+          ctx.translate(-(b.x + b.w / 2), -(b.y + b.h / 2));
         }
 
+        const gradient = ctx.createLinearGradient(b.x, b.y, b.x + b.w, b.y + b.h);
+
+        gradient.addColorStop(0, `rgba(${12 + activeAmount * 42}, ${8 + activeAmount * 34}, ${42 + activeAmount * 10}, 0.94)`);
+        gradient.addColorStop(0.42, `rgba(${32 + activeAmount * 120}, ${8 + activeAmount * 58}, ${78 + activeAmount * 20}, 0.90)`);
+        gradient.addColorStop(1, `rgba(${0 + activeAmount * 45}, ${48 + activeAmount * 92}, ${76 + activeAmount * 70}, 0.92)`);
+
         ctx.shadowColor = active
-          ? "rgba(255, 214, 76, 0.46)"
-          : "rgba(0, 0, 0, 0.16)";
-        ctx.shadowBlur = active ? 10 : 4;
-        ctx.shadowOffsetY = active ? 1 : 2;
+          ? "rgba(255, 241, 116, 0.78)"
+          : "rgba(72, 232, 255, 0.28)";
+        ctx.shadowBlur = 9 + activeAmount * 13;
+        ctx.shadowOffsetY = 0;
 
         ctx.fillStyle = gradient;
-        ctx.strokeStyle = active
-          ? "rgba(120, 80, 0, 0.92)"
-          : "rgba(0, 0, 0, 0.56)";
-        ctx.lineWidth = active ? 2 : 1.25;
+        ctx.strokeStyle = activeAmount > 0.2
+          ? "rgba(255, 238, 125, 0.94)"
+          : "rgba(94, 232, 255, 0.58)";
+        ctx.lineWidth = 1.35 + activeAmount * 0.85;
 
         ctx.beginPath();
-        this.roundedRectPath(b.x, b.y, b.w, b.h, 11);
+        this.roundedRectPath(b.x, b.y, b.w, b.h, b.type === "degree" ? 18 : 13);
         ctx.fill();
         ctx.stroke();
 
         ctx.shadowBlur = 0;
         ctx.shadowOffsetY = 0;
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.42)";
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.20 + activeAmount * 0.34})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        const glintY = b.y + b.h * 0.72;
+        const glintY = b.y + b.h * 0.36;
         ctx.moveTo(b.x + b.w * 0.18, glintY);
         ctx.quadraticCurveTo(
           b.x + b.w / 2,
-          glintY + b.h * 0.045,
+          glintY - b.h * 0.08,
           b.x + b.w * 0.82,
           glintY
         );
         ctx.stroke();
 
-        ctx.fillStyle = disabled
-          ? "rgba(0, 0, 0, 0.34)"
-          : "rgba(0, 0, 0, 0.88)";
-        ctx.font = b.type === "degree" ? "30px sans-serif" : "15px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+        const aura = ctx.createRadialGradient(
+          b.x + b.w / 2,
+          b.y + b.h / 2,
+          1,
+          b.x + b.w / 2,
+          b.y + b.h / 2,
+          Math.max(b.w, b.h) * 0.75
+        );
+        aura.addColorStop(0, `rgba(255,255,255,${0.08 + activeAmount * 0.18})`);
+        aura.addColorStop(0.5, `rgba(255,78,220,${0.06 + activeAmount * 0.14})`);
+        aura.addColorStop(1, "rgba(80,245,255,0)");
+        ctx.fillStyle = aura;
+        ctx.beginPath();
+        this.roundedRectPath(b.x + 2, b.y + 2, b.w - 4, b.h - 4, b.type === "degree" ? 16 : 11);
+        ctx.fill();
+
+        if (b.type === "keySignatureChoice") {
+          this.drawKeySignaturePreview(b, activeAmount);
+        } else {
+          ctx.fillStyle = disabled
+            ? "rgba(120, 150, 160, 0.42)"
+            : `rgba(238, 255, 255, ${0.82 + activeAmount * 0.16})`;
+          ctx.shadowColor = activeAmount > 0.2
+            ? "rgba(255, 246, 150, 0.86)"
+            : "rgba(68, 236, 255, 0.60)";
+          ctx.shadowBlur = 5 + activeAmount * 8;
+          ctx.font = b.type === "degree"
+            ? "30px Geneva, sans-serif"
+            : b.type === "tonicDisplay"
+              ? "23px Geneva, sans-serif"
+              : "15px Geneva, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2);
+        }
 
         ctx.restore();
       },
@@ -5353,18 +6041,13 @@
         const panel = sliders.find(slider => slider.panel)?.panel;
         if (!panel) return;
 
+        this.neonPanel({ x: panel.x, y: panel.y, w: panel.size, h: panel.size }, 0.92);
+
         ctx.save();
-        ctx.fillStyle = "rgba(255,255,255,0.78)";
-        ctx.strokeStyle = "rgba(0,0,0,0.42)";
-        ctx.lineWidth = 1.25;
-
-        ctx.beginPath();
-        this.roundedRectPath(panel.x, panel.y, panel.size, panel.size, 12);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = "black";
-        ctx.font = "13px sans-serif";
+        ctx.fillStyle = "rgba(232,255,255,0.88)";
+        ctx.shadowColor = "rgba(80,245,255,0.7)";
+        ctx.shadowBlur = 6;
+        ctx.font = "13px Geneva, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
         ctx.fillText("Cursor Beziers", panel.x + 12, panel.y + 15);
@@ -5387,14 +6070,16 @@
         const active = AppState.input.activeSliderId === slider.id;
 
         ctx.save();
-        ctx.font = "12px sans-serif";
+        ctx.font = "12px Geneva, sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
-        ctx.fillStyle = "rgba(0,0,0,0.82)";
+        ctx.fillStyle = "rgba(225,255,255,0.86)";
+        ctx.shadowColor = "rgba(80,245,255,0.42)";
+        ctx.shadowBlur = 5;
         ctx.fillText(slider.label, slider.x, slider.y + slider.h * 0.28);
 
         ctx.textAlign = "right";
-        ctx.fillStyle = "rgba(0,0,0,0.58)";
+        ctx.fillStyle = "rgba(255,122,232,0.82)";
         const valueLabel = slider.type === "controlSlider"
           ? `${value.toFixed(2)}×`
           : `1/${(1 / value).toFixed(1)}`;
@@ -5402,20 +6087,23 @@
 
         ctx.lineCap = "round";
         ctx.lineWidth = 5;
-        ctx.strokeStyle = "rgba(0,0,0,0.18)";
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(80,245,255,0.20)";
         ctx.beginPath();
         ctx.moveTo(trackX, trackY);
         ctx.lineTo(trackX + trackW, trackY);
         ctx.stroke();
 
-        ctx.strokeStyle = "rgba(255,60,80,0.74)";
+        ctx.shadowColor = "rgba(255,76,220,0.62)";
+        ctx.shadowBlur = 7;
+        ctx.strokeStyle = "rgba(255,76,220,0.78)";
         ctx.beginPath();
         ctx.moveTo(trackX, trackY);
         ctx.lineTo(knobX, trackY);
         ctx.stroke();
 
-        ctx.fillStyle = active ? "rgba(255,245,120,0.98)" : "rgba(255,255,255,0.96)";
-        ctx.strokeStyle = "rgba(0,0,0,0.72)";
+        ctx.fillStyle = active ? "rgba(255,245,120,0.98)" : "rgba(128,238,255,0.92)";
+        ctx.strokeStyle = active ? "rgba(255,255,255,0.9)" : "rgba(255,76,220,0.7)";
         ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.arc(knobX, trackY, active ? 8 : 7, 0, Math.PI * 2);
@@ -5432,7 +6120,13 @@
         this.cursorSliderPanel(cursorSliders);
 
         for (const b of CanvasUI.visibleButtons) {
-          if (b.type === "menuTitle") continue;
+          if (b.type === "pickerPanel") {
+            this.pickerPanel(b);
+          }
+        }
+
+        for (const b of CanvasUI.visibleButtons) {
+          if (b.type === "menuTitle" || b.type === "pickerPanel") continue;
 
           if (b.type === "cursorSlider" || b.type === "controlSlider") {
             this.cursorSlider(b);
@@ -5448,9 +6142,33 @@
               (Input.tonicModifierHeld || AppState.noteInput.tonicMenuOpen)) ||
             (b.type === "accidental" && b.value === AppState.noteInput.accidental) ||
             (b.type === "tonicLetter" && b.value === AppState.noteInput.tonicLetter) ||
-            (b.type === "tonicOctave" && b.value === AppState.noteInput.tonicOctave);
+            (b.type === "tonicOctave" && b.value === AppState.noteInput.tonicOctave) ||
+            (b.type === "keySignatureChoice" &&
+              b.keyValue === (AppState.pickerScroll.keySignature.selected ?? 0));
 
-          this.button(b, active);
+          const panel = b.picker
+            ? CanvasUI.visibleButtons.find(candidate =>
+              candidate.type === "pickerPanel" &&
+              candidate.picker === b.picker
+            )
+            : null;
+
+          if (panel) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(panel.x, panel.y, panel.w, panel.h);
+            ctx.clip();
+            this.button(b, active);
+            ctx.restore();
+          } else {
+            this.button(b, active);
+          }
+        }
+
+        for (const b of CanvasUI.visibleButtons) {
+          if (b.type === "pickerPanel") {
+            this.pickerPanelOverlay(b);
+          }
         }
 
         this.menuBar();
@@ -5567,6 +6285,94 @@
         ctx.restore();
       },
 
+      contextMenu() {
+        if (!AppState.canvasMenu.visible || !AppState.canvasMenu.items.length) return;
+
+        const itemH = 26;
+        const w = 176;
+        const h = AppState.canvasMenu.items.length * itemH + 8;
+        const x = AppState.canvasMenu.x;
+        const y = AppState.canvasMenu.y;
+
+        this.neonPanel({ x, y, w, h }, 0.98);
+
+        ctx.save();
+        ctx.font = "13px Geneva, sans-serif";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+
+        AppState.canvasMenu.items.forEach((item, index) => {
+          const iy = y + 4 + index * itemH;
+          ctx.fillStyle = "rgba(232,255,255,0.9)";
+          ctx.shadowColor = "rgba(80,245,255,0.45)";
+          ctx.shadowBlur = 5;
+          ctx.fillText(item.label, x + 14, iy + itemH / 2);
+        });
+
+        ctx.restore();
+      },
+
+      debugHud() {
+        const sx = this.cursorScreenX();
+        const sy = this.cursorScreenY();
+        const wx = Input.screenToWorldX(sx);
+        const active = Notes.activeItem();
+        const cursorPitch = Notes.pitchFromStaffOffset();
+        const elapsed = (performance.now() - AppState.startedAt) / 1000;
+        const selectedLabel = active
+          ? active.kind === "note"
+            ? `note ${active.letter}${active.octave} ${active.value}`
+            : active.kind === "keysig"
+              ? `key ${active.count}${Notes.keySignatureSymbol[active.accidental]}`
+              : active.kind
+          : AppState.cursorFreeX !== null
+            ? "free cursor"
+            : "none";
+        const lines = [
+          `cursor screen: ${sx.toFixed(1)}, ${sy.toFixed(1)}`,
+          `cursor world: ${wx.toFixed(1)}, staff ${AppState.cursorStaffOffset}`,
+          `selected: ${selectedLabel}`,
+          `cursor note: ${cursorPitch.letter}${cursorPitch.octave}`,
+          `duration: ${elapsed.toFixed(1)}s   fps: ${AppState.fps.toFixed(1)}`,
+          `camera: x ${AppState.camera.x.toFixed(1)}  zoom ${AppState.camera.zoom.toFixed(2)}`,
+          `mode: ${AppState.playback.enabled ? "playback" : "edit"}${AppState.playback.playing ? " playing" : ""}  minus: ${AppState.minusActive ? "on" : "off"}`,
+          `notes: ${AppState.notes.length}  cursorIndex: ${AppState.cursorIndex}`
+        ];
+        const x = 8;
+        const y = CanvasUI.menuBarHeight + 8;
+        const lineH = 15;
+        const pad = 9;
+        const w = 318;
+        const h = lines.length * lineH + pad * 2;
+
+        ctx.save();
+        ctx.globalAlpha = 0.92;
+        const g = ctx.createLinearGradient(x, y, x + w, y + h);
+        g.addColorStop(0, "rgba(4, 2, 18, 0.78)");
+        g.addColorStop(1, "rgba(0, 40, 68, 0.70)");
+        ctx.fillStyle = g;
+        ctx.shadowColor = "rgba(80,245,255,0.28)";
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        this.roundedRectPath(x, y, w, h, 10);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(112,238,255,0.42)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = "12px Consolas, monospace";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "rgba(226,255,255,0.92)";
+        ctx.shadowColor = "rgba(80,245,255,0.38)";
+        ctx.shadowBlur = 4;
+        lines.forEach((line, index) => {
+          ctx.fillText(line, x + pad, y + pad + index * lineH);
+        });
+        ctx.restore();
+      },
+
       render() {
 
         Layout.update();
@@ -5591,7 +6397,9 @@
         this.table();
         this.inputPanel();
         this.ui();
+        this.contextMenu();
         this.playbackBadge();
+        this.debugHud();
         this.welcomeScreen();
       }
     };
@@ -5626,6 +6434,38 @@
         return groups;
       },
 
+      durationQuarters(value) {
+        return {
+          "1": 4,
+          "1/2": 2,
+          "1/4": 1,
+          "1/8": 0.5,
+          "1/16": 0.25,
+          "1/32": 0.125,
+          "1/64": 0.0625
+        }[value] || 1;
+      },
+
+      musicXMLDuration(value) {
+        return Math.max(1, Math.round(this.durationQuarters(value) * 64));
+      },
+
+      musicXMLType(value) {
+        return {
+          "1": "whole",
+          "1/2": "half",
+          "1/4": "quarter",
+          "1/8": "eighth",
+          "1/16": "16th",
+          "1/32": "32nd",
+          "1/64": "64th"
+        }[value] || "quarter";
+      },
+
+      midiTicks(value) {
+        return Math.max(1, Math.round(this.durationQuarters(value) * 480));
+      },
+
       musicXML() {
         const alter = {
           "double-flat": -2,
@@ -5643,7 +6483,7 @@
 <part id="P1">
 <measure number="1">
 <attributes>
-<divisions>8</divisions>
+<divisions>64</divisions>
 <key><fifths>0</fifths></key>
 <time><beats>4</beats><beat-type>4</beat-type></time>
 <clef><sign>G</sign><line>2</line></clef>
@@ -5666,8 +6506,8 @@
 
             xml += `<octave>${n.octave}</octave>
 </pitch>
-<duration>8</duration>
-<type>quarter</type>
+<duration>${this.musicXMLDuration(n.value)}</duration>
+<type>${this.musicXMLType(n.value)}</type>
 </note>
 `;
           });
@@ -5703,13 +6543,15 @@
         track.push(0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20);
 
         for (const group of this.groupedNotes()) {
+          const durationTicks = this.midiTicks(group.notes[0]?.value);
+
           group.notes.forEach(n => {
             track.push(0x00, 0x90, Notes.midi(n), 100);
           });
 
           group.notes.forEach((n, i) => {
             track.push(
-              ...(i === 0 ? this.writeVarLen(480) : [0x00]),
+              ...(i === 0 ? this.writeVarLen(durationTicks) : [0x00]),
               0x80,
               Notes.midi(n),
               0
@@ -5746,13 +6588,13 @@
         const win = window.open();
 
         if (win) {
-          win.document.write(`
-      <html>
-      <body style="margin:0;background:white">
-        <img src="${dataURL}" style="width:100%;display:block">
-      </body>
-      </html>
-    `);
+          win.document.write(
+            '<html>' +
+            '<body style="margin:0;background:white">' +
+            '<img src="' + dataURL + '" style="width:100%;display:block">' +
+            '</body>' +
+            '</html>'
+          );
           win.document.close();
           return;
         }
@@ -5776,8 +6618,13 @@
       const now = performance.now();
       const dt = now - AppState.lastFrameTime;
       AppState.lastFrameTime = now;
+      const instantFps = dt > 0 ? 1000 / dt : 0;
+      AppState.fps = AppState.fps
+        ? AppState.fps * 0.9 + instantFps * 0.1
+        : instantFps;
 
       Input.updateMomentum();
+      Input.updatePickerMomentum(dt);
       Input.updateCameraFollow(dt);
       Notes.layout();
       Notes.updateTableScroll(dt);

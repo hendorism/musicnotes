@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Lessons | Everett Music Dojo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      color: #20242a;
+      font-family: "Roboto", Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      isolation: isolate;
+      background:
+        linear-gradient(180deg, rgba(20, 18, 38, 0.3), rgba(20, 18, 38, 0.78)),
+        url("https://everettmusicdojo.com/wp-content/uploads/2025/06/EMD-1920x400-banner-Cascades-from-Pilchuck-summit.jpg") center / cover;
+      color: #fff;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 160px;
+      background: linear-gradient(180deg, transparent, #f4f4f4);
+      z-index: -1;
+    }
+
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 18px clamp(18px, 5vw, 64px);
+      background: rgba(24, 18, 48, 0.78);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      font-weight: 900;
+      font-size: clamp(1.1rem, 2vw, 1.45rem);
+    }
+
+    .nav {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .nav a {
+      opacity: 0.9;
+    }
+
+    .nav a:hover {
+      color: #83e8ff;
+    }
+
+    .hero-content {
+      width: min(1100px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 120px 0 76px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 14px;
+      color: #83e8ff;
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      width: min(760px, 100%);
+      margin: 0;
+      font-size: clamp(2.5rem, 8vw, 6.25rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      width: min(650px, 100%);
+      margin: 22px 0 0;
+      color: rgba(255, 255, 255, 0.92);
+      font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 46px;
+      padding: 12px 18px;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      border-radius: 4px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .button.primary {
+      background: #fff;
+      color: #3e0d68;
+      border-color: #fff;
+    }
+
+    .button.secondary {
+      color: #fff;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .content-band {
+      padding: 54px clamp(18px, 5vw, 64px);
+    }
+
+    .content-band.dark {
+      background: #3e0d68;
+      color: #edfaff;
+    }
+
+    .section-inner {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-heading {
+      margin: 0 0 24px;
+      color: #074784;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+
+    .dark .section-heading {
+      color: #83e8ff;
+    }
+
+    .lesson-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .lesson-card {
+      min-height: 190px;
+      padding: 22px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #d8e1ea;
+      box-shadow: 0 10px 24px rgba(35, 42, 52, 0.08);
+    }
+
+    .lesson-card h2 {
+      margin: 0 0 10px;
+      color: #3e0d68;
+      font-size: 1.25rem;
+    }
+
+    .lesson-card p {
+      margin: 0;
+      color: #4d5966;
+      line-height: 1.55;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .portrait {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+    }
+
+    .copy-block p {
+      margin: 0 0 16px;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0;
+      margin: 20px 0 0;
+      list-style: none;
+    }
+
+    .pill-list li {
+      padding: 8px 10px;
+      border: 1px solid rgba(131, 232, 255, 0.48);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f5fdff;
+      font-weight: 700;
+    }
+
+    .contact-panel {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 28px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 12px 30px rgba(35, 42, 52, 0.1);
+    }
+
+    .contact-panel h2 {
+      margin: 0 0 12px;
+      color: #3e0d68;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      line-height: 1.1;
+    }
+
+    .contact-panel p {
+      margin: 0;
+      color: #4d5966;
+      line-height: 1.65;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #333;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #b9c4d0;
+      border-radius: 4px;
+      padding: 12px;
+      color: #20242a;
+      font: inherit;
+      font-weight: 400;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    button {
+      justify-self: start;
+      border: 0;
+      border-radius: 4px;
+      padding: 13px 20px;
+      background: #074784;
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 900;
+    }
+
+    button:hover {
+      background: #3e0d68;
+    }
+
+    footer {
+      padding: 24px clamp(18px, 5vw, 64px);
+      background: #20242a;
+      color: #dfefff;
+      text-align: center;
+    }
+
+    footer a {
+      color: #83e8ff;
+      font-weight: 700;
+    }
+
+    @media (max-width: 820px) {
+      .topbar {
+        position: absolute;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .lesson-grid,
+      .split,
+      .contact-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 94vh;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .nav {
+        font-size: 0.88rem;
+      }
+
+      .hero-content {
+        padding-bottom: 52px;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .contact-panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="topbar">
+      <a class="brand" href="index.html">Everett Music Dojo</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#lessons">Lessons</a>
+        <a href="#approach">Approach</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+
+    <div class="hero-content">
+      <span class="eyebrow">Private music lessons in Everett</span>
+      <h1>Music Lessons That Build Real Musicianship</h1>
+      <p class="hero-copy">Piano, guitar, bass, drums, woodwinds, violin, voice, composition, and songwriting lessons for curious beginners, returning players, and growing performers.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#contact">Start Lessons</a>
+        <a class="button secondary" href="#lessons">See Instruments</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <section class="content-band" id="lessons">
+      <div class="section-inner">
+        <h2 class="section-heading">Choose Your Starting Point</h2>
+        <div class="lesson-grid">
+          <article class="lesson-card">
+            <h2>Piano & Keyboard</h2>
+            <p>Build note reading, rhythm, chord fluency, healthy technique, and confidence moving across the instrument.</p>
+          </article>
+          <article class="lesson-card">
+            <h2>Guitar, Bass & Drums</h2>
+            <p>Learn songs, grooves, fretboard patterns, ensemble skills, and practical musicianship that transfers to real playing.</p>
+          </article>
+          <article class="lesson-card">
+            <h2>Winds, Strings & Voice</h2>
+            <p>Study tone, pitch, reading, phrasing, and repertoire for clarinet, flute, bass clarinet, violin, and singing.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-band dark" id="approach">
+      <div class="section-inner split">
+        <div class="copy-block">
+          <h2 class="section-heading">Lessons With Notation, Ears, Theory, And Play</h2>
+          <p>Students learn written music alongside improvisation, listening, performance, and analysis. The goal is not just to get through a song, but to understand how music works and how to keep growing independently.</p>
+          <p>Each lesson is shaped around the student’s age, instrument, experience, and musical taste, with enough structure to make progress feel steady.</p>
+          <ul class="pill-list">
+            <li>Beginners welcome</li>
+            <li>Pop and classical repertoire</li>
+            <li>Composition and songwriting</li>
+            <li>Reading and ear training</li>
+            <li>Performance preparation</li>
+          </ul>
+        </div>
+        <img class="portrait" src="https://everettmusicdojo.com/wp-content/uploads/2025/01/20250106_1608536497613424184382742-600x450.jpg" alt="Everett Music Dojo studio and lesson space">
+      </div>
+    </section>
+
+    <section class="content-band" id="contact">
+      <div class="section-inner contact-panel">
+        <div>
+          <h2>Tell Us About The Student</h2>
+          <p>Share the instrument, experience level, age range, musical interests, and any scheduling notes. We will follow up with next steps.</p>
+        </div>
+        <form action="https://formspree.io/f/xrewrnew" method="POST">
+          <label>
+            Your email
+            <input type="email" name="email" autocomplete="email" required>
+          </label>
+          <label>
+            Lesson details
+            <textarea name="message" required></textarea>
+          </label>
+          <button type="submit">Send Inquiry</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Everett Music Dojo</span> · <a href="index.html">Back to main site</a>
+  </footer>
+</body>
+</html>

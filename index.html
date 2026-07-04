@@ -167,6 +167,61 @@ div.text-backdrop-div {
     max-width: 800px;
 }
 
+.featured-project {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    padding-top: 28px;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-project::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(175, 16, 142, 0.42), rgba(8, 120, 168, 0.24)),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.2), transparent 34%);
+    pointer-events: none;
+}
+
+.featured-project > * {
+    position: relative;
+}
+
+.featured-label {
+    color: #ffffff;
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.featured-project h2 {
+    margin: 0 0 10px;
+}
+
+.featured-project p {
+    text-align: center;
+}
+
+.featured-link {
+    background: #ffffff;
+    border-radius: 4px;
+    color: #074784;
+    display: inline-block;
+    margin-top: 8px;
+    padding: 12px 18px;
+    text-shadow: none;
+}
+
+.featured-link:hover {
+    background: #dfefff;
+    color: #3e0d68;
+    text-decoration: none;
+}
+
 /* ............................................. */
 
 /* .social_div {
@@ -202,6 +257,13 @@ div.text-backdrop-div {
         <img src="https://everettmusicdojo.com/wp-content/uploads/2025/06/EMD-1920x400-banner-Cascades-from-Pilchuck-summit.jpg" alt="Everett Music Dojo Banner" style="width: 100%; max-width: 1000px; height: auto; margin: 0 auto; display: block;">
     </header>
     <main>
+        <div class="text-backdrop-div featured-project">
+            <span class="featured-label">Featured MusicNotes 2026</span>
+            <h2>Dinosaurio</h2>
+            <p style="text-align: center;">Try the newest MusicNotes2026 dinosaurio build, with interactive notation practice in the latest experimental version.</p>
+            <a class="featured-link" href="MusicNotes2026/MusicNotes2026-0006-dinosaurio.html?v=20260701-blue-screen-fix">Open MusicNotes2026 Dinosaurio</a>
+        </div>
+
         <div class="text-backdrop-div">
         <h2>Welcome to Everett Music Dojo</h2>
 
