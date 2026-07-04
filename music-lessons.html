@@ -8,6 +8,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --void: #070011;
+      --night: #13002d;
+      --panel: #fbf7ff;
+      --ink: #12081f;
+      --muted: #5d526c;
+      --cyan: #00f6ff;
+      --magenta: #ff2bd6;
+      --acid: #b8ff1f;
+      --gold: #ffe66d;
+      --violet: #6d35ff;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -18,8 +31,8 @@
 
     body {
       margin: 0;
-      background: #f4f4f4;
-      color: #20242a;
+      background: var(--void);
+      color: var(--ink);
       font-family: "Roboto", Arial, sans-serif;
     }
 
@@ -35,7 +48,7 @@
       position: relative;
       isolation: isolate;
       background:
-        linear-gradient(180deg, rgba(20, 18, 38, 0.3), rgba(20, 18, 38, 0.78)),
+        linear-gradient(180deg, rgba(7, 0, 17, 0.16), rgba(7, 0, 17, 0.9)),
         url("img/studio_space.jpg") center / cover;
       color: #fff;
     }
@@ -45,7 +58,7 @@
       position: absolute;
       inset: auto 0 0;
       height: 160px;
-      background: linear-gradient(180deg, transparent, #f4f4f4);
+      background: linear-gradient(180deg, transparent, var(--void));
       z-index: -1;
     }
 
@@ -59,7 +72,9 @@
       align-items: center;
       gap: 24px;
       padding: 18px clamp(18px, 5vw, 64px);
-      background: rgba(24, 18, 48, 0.78);
+      background: rgba(7, 0, 17, 0.82);
+      border-bottom: 1px solid rgba(0, 246, 255, 0.5);
+      box-shadow: 0 0 28px rgba(255, 43, 214, 0.22);
       backdrop-filter: blur(8px);
     }
 
@@ -81,7 +96,7 @@
     }
 
     .nav a:hover {
-      color: #83e8ff;
+      color: var(--acid);
     }
 
     .hero-content {
@@ -93,7 +108,8 @@
     .eyebrow {
       display: inline-block;
       margin-bottom: 14px;
-      color: #83e8ff;
+      color: var(--cyan);
+      text-shadow: 0 0 12px rgba(0, 246, 255, 0.65);
       font-size: 0.82rem;
       font-weight: 900;
       letter-spacing: 0;
@@ -106,6 +122,9 @@
       font-size: clamp(2.5rem, 8vw, 6.25rem);
       line-height: 0.94;
       letter-spacing: 0;
+      text-shadow:
+        0 0 16px rgba(0, 246, 255, 0.72),
+        3px 3px 0 rgba(255, 43, 214, 0.72);
     }
 
     .hero-copy {
@@ -136,13 +155,16 @@
     }
 
     .button.primary {
-      background: #fff;
-      color: #3e0d68;
-      border-color: #fff;
+      background: var(--acid);
+      color: var(--night);
+      border-color: var(--acid);
+      box-shadow: 0 0 18px rgba(184, 255, 31, 0.55);
     }
 
     .button.secondary {
       color: #fff;
+      border-color: var(--cyan);
+      box-shadow: inset 0 0 18px rgba(0, 246, 255, 0.16);
     }
 
     .button:hover {
@@ -151,11 +173,17 @@
 
     .content-band {
       padding: 54px clamp(18px, 5vw, 64px);
+      background:
+        linear-gradient(90deg, rgba(0, 246, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(180deg, #fff7ff, #edfbff);
+      background-size: 42px 42px, auto;
     }
 
     .content-band.dark {
-      background: #3e0d68;
-      color: #edfaff;
+      background:
+        linear-gradient(90deg, rgba(184, 255, 31, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, var(--night), #250044 48%, #001f3b);
+      color: #f4fdff;
     }
 
     .section-inner {
@@ -165,13 +193,15 @@
 
     .section-heading {
       margin: 0 0 24px;
-      color: #074784;
+      color: var(--night);
       font-size: clamp(1.8rem, 4vw, 3rem);
       line-height: 1.05;
+      text-shadow: 2px 2px 0 rgba(255, 43, 214, 0.16);
     }
 
     .dark .section-heading {
-      color: #83e8ff;
+      color: var(--cyan);
+      text-shadow: 0 0 14px rgba(0, 246, 255, 0.48);
     }
 
     .lesson-grid {
@@ -184,20 +214,22 @@
       min-height: 190px;
       padding: 22px;
       border-radius: 8px;
-      background: #fff;
-      border: 1px solid #d8e1ea;
-      box-shadow: 0 10px 24px rgba(35, 42, 52, 0.08);
+      background: var(--panel);
+      border: 2px solid rgba(109, 53, 255, 0.34);
+      box-shadow:
+        0 10px 24px rgba(35, 42, 52, 0.08),
+        0 0 22px rgba(0, 246, 255, 0.16);
     }
 
     .lesson-card h2 {
       margin: 0 0 10px;
-      color: #3e0d68;
+      color: var(--violet);
       font-size: 1.25rem;
     }
 
     .lesson-card p {
       margin: 0;
-      color: #4d5966;
+      color: var(--muted);
       line-height: 1.55;
     }
 
@@ -213,7 +245,10 @@
       aspect-ratio: 4 / 3;
       object-fit: cover;
       border-radius: 8px;
-      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.24);
+      border: 2px solid rgba(0, 246, 255, 0.55);
+      box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.24),
+        0 0 28px rgba(255, 43, 214, 0.26);
     }
 
     .copy-block p {
@@ -235,8 +270,130 @@
       padding: 8px 10px;
       border: 1px solid rgba(131, 232, 255, 0.48);
       border-radius: 4px;
-      background: rgba(255, 255, 255, 0.08);
-      color: #f5fdff;
+      background: rgba(255, 43, 214, 0.12);
+      color: #f9fffd;
+      font-weight: 700;
+    }
+
+    .video-band {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(255, 43, 214, 0.14) 1px, transparent 1px),
+        linear-gradient(180deg, #070011, #16002c 48%, #001721);
+      background-size: 34px 34px, auto;
+      color: #fff;
+      padding-top: 64px;
+      padding-bottom: 72px;
+    }
+
+    .video-stage {
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .video-copy .section-heading {
+      color: var(--gold);
+      text-shadow:
+        0 0 15px rgba(255, 230, 109, 0.48),
+        3px 3px 0 rgba(255, 43, 214, 0.45);
+    }
+
+    .video-copy p {
+      color: rgba(244, 253, 255, 0.88);
+      font-size: 1.08rem;
+      line-height: 1.65;
+      margin: 0 0 14px;
+    }
+
+    .video-frame {
+      position: relative;
+      padding: 10px;
+      border: 2px solid var(--cyan);
+      border-radius: 8px;
+      background: #000;
+      box-shadow:
+        0 0 0 4px rgba(255, 43, 214, 0.22),
+        0 0 34px rgba(0, 246, 255, 0.42),
+        14px 14px 0 rgba(184, 255, 31, 0.18);
+      transform: rotate(-1.2deg);
+    }
+
+    .video-frame iframe {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      border: 0;
+      border-radius: 4px;
+      background: #000;
+    }
+
+    .community-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .feed-panel,
+    .brief-panel {
+      min-height: 420px;
+      border-radius: 8px;
+      background: var(--panel);
+      border: 2px solid rgba(0, 246, 255, 0.3);
+      box-shadow: 0 10px 24px rgba(35, 42, 52, 0.08);
+      overflow: hidden;
+    }
+
+    .feed-panel {
+      padding: 18px;
+    }
+
+    .brief-panel {
+      padding: 24px;
+      background: linear-gradient(180deg, #fff7ff, #eaffff);
+    }
+
+    .feed-panel h2,
+    .brief-panel h2 {
+      margin: 0 0 12px;
+      color: var(--violet);
+      font-size: 1.35rem;
+    }
+
+    .feed-panel p,
+    .brief-panel p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .fb-page,
+    .fb-page span,
+    .fb-page iframe {
+      max-width: 100%;
+      width: 100% !important;
+    }
+
+    .brief-text {
+      min-height: 220px;
+      padding: 18px;
+      border-left: 4px solid var(--magenta);
+      border-radius: 4px;
+      background: #12081f;
+      color: #eaffff;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 24px rgba(0, 246, 255, 0.12);
+    }
+
+    .brief-meta {
+      margin-top: 12px;
+      color: var(--violet);
+      font-size: 0.9rem;
       font-weight: 700;
     }
 
@@ -247,20 +404,23 @@
       align-items: start;
       padding: 28px;
       border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 12px 30px rgba(35, 42, 52, 0.1);
+      background: var(--panel);
+      border: 2px solid rgba(255, 43, 214, 0.26);
+      box-shadow:
+        0 12px 30px rgba(35, 42, 52, 0.1),
+        0 0 28px rgba(184, 255, 31, 0.16);
     }
 
     .contact-panel h2 {
       margin: 0 0 12px;
-      color: #3e0d68;
+      color: var(--violet);
       font-size: clamp(1.6rem, 3vw, 2.4rem);
       line-height: 1.1;
     }
 
     .contact-panel p {
       margin: 0;
-      color: #4d5966;
+      color: var(--muted);
       line-height: 1.65;
     }
 
@@ -282,7 +442,7 @@
       border: 1px solid #b9c4d0;
       border-radius: 4px;
       padding: 12px;
-      color: #20242a;
+      color: var(--ink);
       font: inherit;
       font-weight: 400;
     }
@@ -297,26 +457,28 @@
       border: 0;
       border-radius: 4px;
       padding: 13px 20px;
-      background: #074784;
+      background: var(--magenta);
       color: #fff;
       cursor: pointer;
       font: inherit;
       font-weight: 900;
+      box-shadow: 0 0 18px rgba(255, 43, 214, 0.38);
     }
 
     button:hover {
-      background: #3e0d68;
+      background: var(--violet);
     }
 
     footer {
       padding: 24px clamp(18px, 5vw, 64px);
-      background: #20242a;
+      background: var(--void);
       color: #dfefff;
       text-align: center;
+      border-top: 1px solid rgba(0, 246, 255, 0.34);
     }
 
     footer a {
-      color: #83e8ff;
+      color: var(--cyan);
       font-weight: 700;
     }
 
@@ -335,8 +497,14 @@
 
       .lesson-grid,
       .split,
+      .video-stage,
+      .community-grid,
       .contact-panel {
         grid-template-columns: 1fr;
+      }
+
+      .video-frame {
+        transform: none;
       }
 
       .hero {
@@ -360,6 +528,11 @@
       .contact-panel {
         padding: 20px;
       }
+
+      .video-band {
+        padding-top: 42px;
+        padding-bottom: 46px;
+      }
     }
   </style>
 </head>
@@ -370,6 +543,7 @@
       <nav class="nav" aria-label="Main navigation">
         <a href="#lessons">Lessons</a>
         <a href="#approach">Approach</a>
+        <a href="#community">Updates</a>
         <a href="#contact">Contact</a>
       </nav>
     </div>
@@ -386,6 +560,19 @@
   </section>
 
   <main>
+    <section class="content-band video-band" id="sample-video">
+      <div class="section-inner video-stage">
+        <div class="video-copy">
+          <h2 class="section-heading">Signal From The Studio</h2>
+          <p>A quick sample: real playing, real sound, and the kind of musical attention students get in lessons.</p>
+          <p>Think old-school arcade electricity, hymnbook harmony, and a practice room where curiosity gets to make a little noise.</p>
+        </div>
+        <div class="video-frame">
+          <iframe src="https://www.youtube.com/embed/GarsBk3iwAQ?si=C_zHREa619YJFqVg" title="Everett Music Dojo sample video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
     <section class="content-band" id="lessons">
       <div class="section-inner">
         <h2 class="section-heading">Choose Your Starting Point</h2>
@@ -427,6 +614,39 @@
       </div>
     </section>
 
+    <section class="content-band" id="community">
+      <div class="section-inner">
+        <h2 class="section-heading">Studio Notes And Musical Curiosities</h2>
+        <div class="community-grid">
+          <div class="feed-panel">
+            <h2>Facebook Updates</h2>
+            <p>Recent posts, recordings, announcements, and studio notes from Aaron.</p>
+            <div class="fb-page"
+              data-href="https://www.facebook.com/hendorism"
+              data-tabs="timeline"
+              data-width="500"
+              data-height="520"
+              data-small-header="false"
+              data-adapt-container-width="true"
+              data-hide-cover="false"
+              data-show-facepile="true">
+              <blockquote cite="https://www.facebook.com/hendorism" class="fb-xfbml-parse-ignore">
+                <a href="https://www.facebook.com/hendorism">Everett Music Dojo on Facebook</a>
+              </blockquote>
+            </div>
+          </div>
+
+          <div class="brief-panel">
+            <h2>ChatGPT-Style Musical History Brief</h2>
+            <p>A rotating note from music history, connecting ancient instruments, great composers, and modern sound in a way curious students can actually use.</p>
+            <div id="musicHistoryBrief" class="brief-text">Loading musical history brief...</div>
+            <div id="musicHistoryMeta" class="brief-meta"></div>
+            <button type="button" onclick="loadMusicHistoryBrief()">New Musical Fact</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="content-band" id="contact">
       <div class="section-inner contact-panel">
         <div>
@@ -451,5 +671,63 @@
   <footer>
     <span>Everett Music Dojo</span> · <a href="index.html">Back to main site</a>
   </footer>
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v23.0"></script>
+  <script>
+    const musicHistoryFacts = [
+      {
+        period: "Prehistory",
+        text: "The oldest known flutes, carved from bird bone and mammoth ivory more than 35,000 years ago, suggest that music was not a late luxury after language and toolmaking. It was part of how early humans organized breath, memory, ritual, and social attention. For musicians, the fascinating detail is that these instruments already imply pitch selection: someone chose hole placement, tested intervals, and cared enough about repeatable sound to refine the design."
+      },
+      {
+        period: "Ancient Mesopotamia",
+        text: "The Hurrian Hymn to Nikkal, written on a clay tablet around 1400 BCE, is one of the earliest surviving pieces of notated music. The notation is not like a modern score; it gives instructions for tuning and intervallic movement. That makes it a reminder that music notation began less as a complete picture of sound and more as a set of memory prompts for trained musicians who already knew the style."
+      },
+      {
+        period: "Ancient Greece",
+        text: "Greek theorists treated music as a branch of mathematics, ethics, and cosmology at once. The tetrachord, a four-note span bounded by a perfect fourth, was the basic building block of their pitch thinking. Professional musicians still recognize the deeper issue: scales are not just note collections, but cultural decisions about which intervals feel stable, expressive, tense, or complete."
+      },
+      {
+        period: "Medieval Europe",
+        text: "Guido of Arezzo's solfege system helped singers learn chant with far less rote drilling. His innovation was not merely naming notes, but giving singers a mental map for pitch relationships. Every time a student uses do-re-mi, they are using a medieval solution to a practical rehearsal problem: how to make music portable inside the mind before recordings existed."
+      },
+      {
+        period: "Renaissance",
+        text: "Renaissance polyphony can sound serene, but under the surface it is a disciplined negotiation of independence and agreement. Each voice has its own melodic dignity, yet dissonances are prepared and resolved according to shared rules. This is why Palestrina-style counterpoint still trains composers: it teaches how freedom can exist inside a carefully maintained social contract."
+      },
+      {
+        period: "Baroque",
+        text: "Basso continuo was a practical shorthand that let keyboardists, lutenists, and other chordal players realize harmonies from a bass line and figures. In modern terms, it sits somewhere between a lead sheet, a harmonic analysis, and an improvisation prompt. Baroque players were expected to understand harmony deeply enough to compose in real time."
+      },
+      {
+        period: "Classical Era",
+        text: "Sonata form is often taught as exposition, development, and recapitulation, but its real drama is tonal argument. A theme moves away from home, gets transformed under pressure, and returns changed but recognizable. That is why the form still feels theatrical: the harmony is not decoration; it is the plot."
+      },
+      {
+        period: "Romantic Era",
+        text: "Chopin's piano writing is idiomatic in a special way: it does not merely fit the hand, it teaches the hand to sing. His passagework often grows from the physical layout of the keyboard while preserving vocal rubato and harmonic surprise. The result is music where technique and expression are difficult to separate."
+      },
+      {
+        period: "Twentieth Century",
+        text: "Stravinsky's Rite of Spring shocked listeners partly because rhythm became a structural force rather than a surface pattern. Accents, ostinatos, and irregular groupings make the listener feel meter as pressure and collision. For modern performers, the lesson is huge: rhythm can carry form as powerfully as melody or harmony."
+      },
+      {
+        period: "Present Day",
+        text: "Digital audio workstations made editing sound visually precise, but they also changed how musicians imagine time. A performance can be stretched, quantized, looped, layered, and revised as an object. The academic question is not whether this is less musical; it is how notation, memory, embodiment, and authorship change when sound itself becomes editable material."
+      }
+    ];
+
+    function loadMusicHistoryBrief() {
+      const brief = document.getElementById("musicHistoryBrief");
+      const meta = document.getElementById("musicHistoryMeta");
+      if (!brief || !meta) return;
+
+      const fact = musicHistoryFacts[Math.floor(Math.random() * musicHistoryFacts.length)];
+      brief.textContent = fact.text;
+      meta.textContent = "Period: " + fact.period;
+    }
+
+    loadMusicHistoryBrief();
+  </script>
 </body>
 </html>
