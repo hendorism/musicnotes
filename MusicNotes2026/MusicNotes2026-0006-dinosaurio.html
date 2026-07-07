@@ -849,7 +849,7 @@
 
         this.syncCursorToActiveNote();
         this.resetCursorBlink();
-        this.scrollToNote(note);
+        this.snapTypingViewport(note);
       },
 
       createBarline() {
@@ -875,7 +875,7 @@
         AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
-        this.scrollToNote(barline);
+        this.snapTypingViewport(barline);
       },
 
       createRest() {
@@ -902,7 +902,7 @@
         AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
-        this.scrollToNote(rest);
+        this.snapTypingViewport(rest);
       },
 
       keySignatureX() {
@@ -948,7 +948,7 @@
         AppState.cursorFreeX = null;
 
         this.resetCursorBlink();
-        this.scrollToNote(keySignature);
+        this.snapTypingViewport(keySignature);
       },
 
       deleteBehindCursor() {
@@ -1639,6 +1639,38 @@
         }
 
         AppState.camera.followX = Math.max(0, target);
+      },
+
+      snapTypingViewport(anchor = null) {
+        const insertionWorldX = this.insertionX(false);
+        const anchorWorldX = anchor
+          ? this.displayCenterX(anchor)
+          : insertionWorldX;
+        const typingWorldX = Math.max(anchorWorldX, insertionWorldX);
+        const sx = Input.worldToScreenX(typingWorldX);
+        const leftLimit = canvas.width * 0.18;
+        const rightLimit = canvas.width * 0.72;
+
+        if (sx >= leftLimit && sx <= rightLimit) {
+          AppState.camera.followX = AppState.camera.x;
+          AppState.camera.followVelocityX = 0;
+          return;
+        }
+
+        const desiredScreenX =
+          sx > rightLimit
+            ? canvas.width * 0.58
+            : canvas.width * 0.28;
+        const target = Math.max(
+          0,
+          typingWorldX - desiredScreenX / AppState.camera.zoom
+        );
+
+        AppState.camera.x = target;
+        AppState.camera.followX = target;
+        AppState.camera.followVelocityX = 0;
+        AppState.camera.velocityX = 0;
+        AppState.camera.momentum = false;
       }
     };
 
@@ -6338,12 +6370,20 @@
           `mode: ${AppState.playback.enabled ? "playback" : "edit"}${AppState.playback.playing ? " playing" : ""}  minus: ${AppState.minusActive ? "on" : "off"}`,
           `notes: ${AppState.notes.length}  cursorIndex: ${AppState.cursorIndex}`
         ];
-        const x = 8;
-        const y = CanvasUI.menuBarHeight + 8;
         const lineH = 15;
         const pad = 9;
         const w = 318;
         const h = lines.length * lineH + pad * 2;
+        const listArea = Layout.table;
+        const listBottom = Layout.inputPanel.y || (listArea.y + listArea.h);
+        const x = Math.max(
+          listArea.x + 8,
+          listArea.x + listArea.w - w - 14
+        );
+        const y = Math.max(
+          listArea.y + 8,
+          Math.min(listBottom - h - 8, listArea.y + 12)
+        );
 
         ctx.save();
         ctx.globalAlpha = 0.92;

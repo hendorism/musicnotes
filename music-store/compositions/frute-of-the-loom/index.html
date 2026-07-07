@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frute of the Loom | Everett Music Dojo Music Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root { --void:#05050c; --panel:rgba(12,13,24,.94); --cyan:#47d7e8; --magenta:#cc4aac; --acid:#d8f078; --ink:#f4f7ff; --muted:#b9bed4; --line:rgba(116,214,232,.34); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 18% 10%, rgba(204,74,172,.16), transparent 26rem), radial-gradient(circle at 85% 8%, rgba(71,215,232,.14), transparent 24rem), linear-gradient(180deg,#03030a 0%,#090816 48%,#05050c 100%); color:var(--ink); font-family:'Share Tech Mono', monospace; }
+    body::before { content:""; position:fixed; inset:0; z-index:-1; background:linear-gradient(rgba(71,215,232,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(204,74,172,.045) 1px, transparent 1px); background-size:46px 46px; pointer-events:none; }
+    a { color:var(--acid); text-decoration:none; }
+    a:hover { color:var(--cyan); }
+    h1,h2,h3,button,.price,.license-button,.eyebrow { font-family:'Orbitron', sans-serif; letter-spacing:0; }
+    h1 { margin:0 0 12px; color:var(--cyan); font-size:clamp(2.4rem,7vw,5.2rem); line-height:.98; text-transform:uppercase; text-shadow:0 0 14px rgba(71,215,232,.52),0 0 28px rgba(204,74,172,.2); }
+    h2 { color:var(--cyan); margin-top:0; text-transform:uppercase; }
+    p { color:var(--muted); line-height:1.65; }
+    .back-link { display:inline-block; margin-bottom:22px; border-left:3px solid var(--magenta); padding-left:10px; color:var(--muted); }
+    .panel { background:linear-gradient(135deg, rgba(12,13,24,.96), rgba(23,21,38,.92)), linear-gradient(90deg, rgba(71,215,232,.04), rgba(204,74,172,.05)); border:1px solid var(--line); border-radius:8px; box-shadow:0 0 0 1px rgba(204,74,172,.1) inset,0 14px 38px rgba(0,0,0,.36); }
+    .cover-art { position:relative; min-height:360px; overflow:hidden; border:1px solid var(--line); border-radius:8px; background:radial-gradient(circle at 18% 18%, hsla(var(--cover-a),82%,62%,.58), transparent 34%), radial-gradient(circle at 84% 72%, hsla(var(--cover-b),84%,58%,.45), transparent 38%), linear-gradient(135deg, hsl(var(--cover-c),52%,12%), #05050c); box-shadow:0 22px 58px rgba(0,0,0,.42); }
+    .cover-art::before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); background-size:28px 28px; mask-image:linear-gradient(to bottom, rgba(0,0,0,.82), rgba(0,0,0,.18)); }
+    .cover-title { position:absolute; left:24px; right:24px; bottom:24px; font-family:'Orbitron', sans-serif; font-size:clamp(2rem,5vw,4rem); line-height:1; text-transform:uppercase; color:#fff; text-shadow:0 0 18px rgba(71,215,232,.55); }
+    .eyebrow { color:var(--acid); text-transform:uppercase; font-size:.82rem; }
+    button,.button { display:inline-block; border:1px solid rgba(71,215,232,.46); background:rgba(6,9,18,.78); color:var(--ink); cursor:pointer; padding:9px 11px; text-transform:uppercase; }
+    button:hover,.button:hover { border-color:var(--acid); color:var(--acid); }
+    .buy-button { background:linear-gradient(90deg, rgba(204,74,172,.9), rgba(71,215,232,.84)); color:#03030a; border-color:rgba(255,255,255,.38); }
+    .meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+    .meta-card { padding:14px; border:1px solid rgba(116,214,232,.24); background:rgba(255,255,255,.035); }
+    .meta-card strong { display:block; color:var(--ink); margin-bottom:5px; }
+    .media-frame { width:100%; aspect-ratio:16/9; border:1px solid rgba(116,214,232,.34); background:#000; }
+    .sample-frame { width:100%; height:520px; border:1px solid rgba(116,214,232,.34); background:#111; }
+    
+    main { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:42px 0 72px; }
+    .hero { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr); gap:24px; align-items:stretch; margin-bottom:24px; }
+    .intro { padding:26px; display:flex; flex-direction:column; justify-content:space-between; }
+    .description { font-size:1.08rem; }
+    .store-grid { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:22px; align-items:start; }
+    .content-stack { display:grid; gap:18px; }
+    .section { padding:22px; }
+    .checkout { position:sticky; top:18px; padding:20px; }
+    .license-options,.payment-grid { display:grid; gap:9px; margin-top:14px; }
+    .license-button { width:100%; text-align:left; line-height:1.35; }
+    .license-button.active { border-color:var(--acid); color:var(--acid); background:rgba(216,240,120,.08); }
+    .payment-link { display:block; border:1px solid rgba(71,215,232,.38); background:rgba(255,255,255,.035); padding:11px 12px; color:var(--ink); }
+    .payment-link.disabled { color:#7d8497; border-color:rgba(125,132,151,.28); cursor:not-allowed; }
+    .memo-box { margin-top:18px; padding:12px; border:1px solid rgba(204,74,172,.36); color:var(--muted); line-height:1.5; background:rgba(0,0,0,.18); }
+    .small { color:var(--muted); font-family:'Share Tech Mono', monospace; font-size:.82rem; }
+    .sample-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+    .audio-player { width:100%; height:126px; border:1px solid rgba(116,214,232,.34); background:#090816; }
+    @media (max-width:900px) { .hero,.store-grid { grid-template-columns:1fr; } .checkout { position:static; } }
+  </style>
+</head>
+<body data-composition-title="Frute of the Loom">
+  <main>
+    <a class="back-link" href="../../">Back to Music Store</a>
+    <section class="hero">
+      <div class="cover-art" style="--cover-a:235;--cover-b:321;--cover-c:49;">
+        <div class="cover-title">Frute of the Loom</div>
+      </div>
+      <div class="panel intro">
+        <div>
+          <div class="eyebrow">Everett Music Dojo score</div>
+          <h1>Frute of the Loom</h1>
+          <p class="description">Frute of the Loom is presented as a rhythmic chamber sketch: a score meant to feel playable, memorable, and a little cinematic before the first page is even opened.</p>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-card"><strong>Difficulty</strong>Intermediate</div>
+          <div class="meta-card"><strong>Instrumentation</strong>Flute or C instrument</div>
+          <div class="meta-card"><strong>Duration</strong>4:00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="store-grid">
+      <div class="content-stack">
+        <section class="panel section">
+          <h2>Performance Video</h2>
+          <iframe class="media-frame" src="https://www.youtube.com/embed/GarsBk3iwAQ?si=C_zHREa619YJFqVg" title="Performance video for Frute of the Loom" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </section>
+
+        <section class="panel section">
+          <h2>Audio Preview</h2>
+          <iframe class="audio-player" title="Audio preview for Frute of the Loom" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/aaron-dull/flewd-conduct&color=%2347d7e8&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false"></iframe>
+        </section>
+
+        <section class="panel section">
+          <h2>Sample Pages</h2>
+          <div class="sample-grid">
+            <iframe class="sample-frame" src="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf#page=1" title="Sample page 1 for Frute of the Loom"></iframe>
+            <iframe class="sample-frame" src="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf#page=2" title="Sample page 2 for Frute of the Loom"></iframe>
+          </div>
+        </section>
+      </div>
+
+      <aside class="panel checkout" aria-label="Checkout">
+        <h2>License</h2>
+        <div class="price" id="selected-price">Solo copy: $4</div>
+        <div class="license-options" id="license-options" aria-label="License options"></div>
+        <div class="payment-grid">
+          <a class="payment-link disabled" id="card-link" href="#">Credit card</a>
+          <a class="payment-link" id="venmo-link" href="#" target="_blank" rel="noopener">Venmo</a>
+          <a class="payment-link disabled" id="paypal-link" href="#">PayPal</a>
+          <a class="payment-link disabled" id="zelle-link" href="#">Zelle</a>
+        </div>
+        <div class="memo-box"><strong>Payment memo:</strong><div id="payment-memo">Select a license.</div></div>
+        <div class="memo-box"><strong>Commission a related piece:</strong> Want something like this, but written for your choir, church, school group, instrumentation, deadline, or difficulty level? <a href="../../../index.html#contact-form">Ask about a custom commission</a>.</div>
+        <div class="memo-box"><strong>Download:</strong> After payment confirmation, use the score link below or request delivery by email.<br><br><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf" target="_blank" rel="noopener">Open PDF score</a></div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const licenses = [
+      {
+            "id": "solo",
+            "label": "Solo copy",
+            "detail": "Personal use by one musician",
+            "price": 4
+      },
+      {
+            "id": "choir",
+            "label": "Choir/group license",
+            "detail": "Up to 20 singers",
+            "price": 40
+      },
+      {
+            "id": "unlimited",
+            "label": "Unlimited church/group license",
+            "detail": "Unlimited use within one church or group",
+            "price": 95
+      }
+];
+    const paymentConfig = {
+      cardUrl: "",
+      venmoUrl: "https://venmo.com/code?user_id=2177255539212288660&created=1743794426",
+      paypalUrl: "",
+      zelleRecipient: ""
+    };
+    let selectedLicense = licenses[0];
+    const selectedPrice = document.getElementById("selected-price");
+    const paymentMemo = document.getElementById("payment-memo");
+    const licenseOptions = document.getElementById("license-options");
+    const cardLink = document.getElementById("card-link");
+    const venmoLink = document.getElementById("venmo-link");
+    const paypalLink = document.getElementById("paypal-link");
+    const zelleLink = document.getElementById("zelle-link");
+    const compositionTitle = document.body.dataset.compositionTitle || "Selected composition";
+
+    function memoFor(license) { return `Music Store - ${compositionTitle} - ${license.label} - $${license.price}`; }
+    function configureLink(el, url, label, missingMessage) {
+      el.textContent = label;
+      if (!url) {
+        el.href = "#";
+        el.classList.add("disabled");
+        el.onclick = (event) => { event.preventDefault(); alert(missingMessage); };
+        return;
+      }
+      el.href = url;
+      el.classList.remove("disabled");
+      el.onclick = null;
+    }
+    function renderLicenseOptions() {
+      licenseOptions.innerHTML = "";
+      licenses.forEach((license) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `license-button${license.id === selectedLicense.id ? " active" : ""}`;
+        button.innerHTML = `${license.label}: $${license.price}<br><span class="small">${license.detail}</span>`;
+        button.addEventListener("click", () => { selectedLicense = license; updateCheckout(); });
+        licenseOptions.appendChild(button);
+      });
+    }
+    function updateCheckout() {
+      selectedPrice.textContent = `${selectedLicense.label}: $${selectedLicense.price}`;
+      paymentMemo.textContent = memoFor(selectedLicense);
+      renderLicenseOptions();
+      configureLink(cardLink, paymentConfig.cardUrl, "Credit card", "Add a Stripe, Square, or PayPal card checkout link in paymentConfig.cardUrl.");
+      configureLink(venmoLink, paymentConfig.venmoUrl, "Venmo", "Add your Venmo link in paymentConfig.venmoUrl.");
+      configureLink(paypalLink, paymentConfig.paypalUrl, "PayPal", "Add your PayPal payment link in paymentConfig.paypalUrl.");
+      configureLink(zelleLink, paymentConfig.zelleRecipient ? "#" : "", "Zelle", "Add your Zelle recipient email or phone in paymentConfig.zelleRecipient.");
+      zelleLink.onclick = (event) => {
+        event.preventDefault();
+        if (!paymentConfig.zelleRecipient) { alert("Add your Zelle recipient email or phone in paymentConfig.zelleRecipient."); return; }
+        alert(`Send $${selectedLicense.price} by Zelle to ${paymentConfig.zelleRecipient}. Memo: ${memoFor(selectedLicense)}`);
+      };
+    }
+    updateCheckout();</script>
+</body>
+</html>

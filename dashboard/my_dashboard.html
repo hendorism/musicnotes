@@ -40,31 +40,30 @@ body{
   z-index:999;
 
   display:flex;
-  justify-content:space-between;
-  align-items:center;
+  align-items:flex-start;
   gap:10px;
 
   background:rgba(0,0,0,0.92);
 
   border:1px solid #222;
 
-  border-radius:14px;
+  border-radius:12px;
 
-  padding:12px 18px;
+  padding:10px 12px;
 
-  margin-bottom:18px;
+  margin-bottom:14px;
 
   backdrop-filter:blur(8px);
 }
 
-#title{
-  font-size:1.2rem;
-  color:white;
-}
-
 #time{
-  font-size:2rem;
+  flex:0 0 auto;
+  min-width:112px;
+  text-align:right;
+  font-size:1.5rem;
   color:#8dffb6;
+  line-height:1;
+  padding-top:4px;
 }
 
 /* ===== MAIN LAYOUT ===== */
@@ -116,25 +115,57 @@ a:hover{
 }
 
 .mylinks a{
-  display:block;
+  display:inline-flex;
+  align-items:center;
 
-  padding:7px 10px;
+  min-height:24px;
+  padding:4px 8px;
 
-  border-radius:8px;
+  border:1px solid #242424;
+  border-radius:6px;
 
-  margin-bottom:4px;
+  margin:0;
+
+  background:#101010;
+  font-size:0.76rem;
+  line-height:1;
+  white-space:nowrap;
 }
 
 .mylinks a:hover{
   background:#1e1e1e;
-  transform:translateX(4px);
+  transform:translateY(-1px);
 }
 
 .mylinks hr{
   border:none;
-  height:2px;
+  width:1px;
+  height:24px;
   background:var(--accent);
-  margin:16px 0;
+  margin:0 2px;
+}
+
+#quickLinks{
+  flex:1 1 auto;
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:flex-start;
+  gap:5px;
+  min-width:0;
+}
+
+#quickLinks #weatherWidget{
+  flex:0 0 auto;
+}
+
+.linkChips{
+  flex:1 1 auto;
+  display:flex;
+  flex-wrap:wrap;
+  align-content:flex-start;
+  align-items:flex-start;
+  gap:5px;
+  min-width:0;
 }
 
 /* ===== METALS ===== */
@@ -358,16 +389,24 @@ button:hover{
   width:100% !important;
 }
 #weatherWidget{
-  transform: scale(0.85);
-  transform-origin: right center;
-  max-height:60px;
+  min-width:112px;
+  max-height:52px;
   overflow:hidden;
+  padding:3px 8px;
+  border:1px solid #242424;
+  border-radius:6px;
+  background:#0d0d0d;
 }
 
-#topbar > div:last-child{
-  display:flex;
-  align-items:center;
-  gap:12px;
+@media (max-width:800px){
+  #topbar{
+    flex-direction:column;
+  }
+
+  #time{
+    text-align:left;
+    min-width:0;
+  }
 }
 </style>
 </head>
@@ -378,11 +417,7 @@ button:hover{
 
 <div id="topbar">
 
-  <div id="title">
-    Hendorism Dashboard
-  </div>
-
-  <div style="display:flex; align-items:center; gap:14px;">
+  <div id="quickLinks" class="mylinks">
 
     <!-- WEATHER -->
     <div id="weatherWidget">
@@ -448,10 +483,38 @@ setInterval(loadWeather, 300000);
       
     </div>
 
-    <!-- CLOCK -->
-    <div id="time"></div>
+    <div class="linkChips">
+    <a target="_blank" href="index.html">home</a>
+    <hr>
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1ze65odjZNslygXlMqp_DKwvjNx878GNr4q_E8EfGSBg/edit#gid=0">2020 receipts</a>
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/1f8tpUfBzdIEaVOcOqKtC25QRB9yv7wujq2RipP5pQkc/edit#gid=0">corolla2</a>
+    <a target="_blank" href="https://docs.google.com/spreadsheets/d/13uLU9jb5vr3lriu8GiXmKDqVmyP1y8Q1NGLFhT1atQE/edit#gid=0">income/net worth</a>
+    <hr>
+    <a target="_blank" href="https://www.amazon.com/">Amazon</a>
+    <a target="_blank" href="https://www.gmail.com">Gmail</a>
+    <a target="_blank" href="https://drive.google.com/drive/my-drive">Drive</a>
+    <a target="_blank" href="https://github.com/">GitHub</a>
+    <a target="_blank" href="https://becu.org/">BECU</a>
+    <a target="_blank" href="https://seattle.craigslist.org/">craigslist</a>
+    <hr>
+    <a target="_blank" href="https://www.biblegateway.com/versions/La-Biblia-de-las-Am%C3%A9ricas-LBLA/#booklist">Biblia</a>
+    <a target="_blank" href="http://www.gutenberg.org/files/13291/13291-h/13291-h.htm">Great Men</a>
+    <a target="_blank" href="https://www.wordproject.org/bibles/de/index.htm">Die Bibel</a>
+    <a target="_blank" href="http://www.gutenberg.org/files/51783/51783-h/51783-h.htm">Blazing World</a>
+    <hr>
+    <a target="_blank" href="https://hendorism.github.io/musicnotes/index.html">musicnotes</a>
+    <a target="_blank" href="https://everettmusicdojo.com/">Everett Music Dojo</a>
+    <hr>
+    <a target="_blank" href="https://support.apple.com/en-us/HT201236">Mac keys</a>
+    <a target="_blank" href="https://documents.blackmagicdesign.com/UserManuals/DaVinci-Resolve-16-Beginners-Guide.pdf">Resolve PDF</a>
+    <a target="_blank" href="https://docs.github.com/en/free-pro-team@latest/desktop/installing-and-configuring-github-desktop/keyboard-shortcuts">GitHub keys</a>
+    <a target="_blank" href="fcc/cat_app_bootstrap/index.html">FCC cat app</a>
+    </div>
 
   </div>
+
+  <!-- CLOCK -->
+  <div id="time"></div>
 
 </div>
 
@@ -739,122 +802,6 @@ setInterval(loadWeather, 300000);
 </div>
 
 </div>
-      <!-- LINKS -->
-    <div class="panel mylinks">
-
-      <h2>Links</h2>
-
-      <a target="_blank" href="index.html">
-        hendorism.github.io/
-      </a>
-
-      <hr>
-
-      <a target="_blank"
-      href="https://docs.google.com/spreadsheets/d/1ze65odjZNslygXlMqp_DKwvjNx878GNr4q_E8EfGSBg/edit#gid=0">
-        2020 receipts
-      </a>
-
-      <a target="_blank"
-      href="https://docs.google.com/spreadsheets/d/1f8tpUfBzdIEaVOcOqKtC25QRB9yv7wujq2RipP5pQkc/edit#gid=0">
-        corolla2
-      </a>
-
-      <a target="_blank"
-      href="https://docs.google.com/spreadsheets/d/13uLU9jb5vr3lriu8GiXmKDqVmyP1y8Q1NGLFhT1atQE/edit#gid=0">
-        income/net worth
-      </a>
-
-      <hr>
-
-      <a target="_blank" href="https://www.amazon.com/">
-        Amazon
-      </a>
-
-      <a target="_blank" href="https://www.gmail.com">
-        Gmail
-      </a>
-
-      <a target="_blank"
-      href="https://drive.google.com/drive/my-drive">
-        Google Drive
-      </a>
-
-      <a target="_blank" href="https://github.com/">
-        GitHub
-      </a>
-
-      <a target="_blank" href="https://becu.org/">
-        BECU
-      </a>
-
-      <a target="_blank"
-      href="https://seattle.craigslist.org/">
-        craigslist
-      </a>
-
-      <hr>
-
-      <a target="_blank"
-      href="https://www.biblegateway.com/versions/La-Biblia-de-las-Am%C3%A9ricas-LBLA/#booklist">
-        Biblia
-      </a>
-
-      <a target="_blank"
-      href="http://www.gutenberg.org/files/13291/13291-h/13291-h.htm">
-        Great Men of Music
-      </a>
-
-      <a target="_blank"
-      href="https://www.wordproject.org/bibles/de/index.htm">
-        Die Bibel
-      </a>
-
-      <a target="_blank"
-      href="http://www.gutenberg.org/files/51783/51783-h/51783-h.htm">
-        "The Blazing World"
-      </a>
-
-      <hr>
-
-      <a target="_blank"
-      href="https://hendorism.github.io/musicnotes/index.html">
-        musicnotes
-      </a>
-
-      <a target="_blank"
-      href="https://everettmusicdojo.com/">
-        everettmusicdojo
-      </a>
-
-      <hr>
-
-      <a target="_blank"
-      href="https://support.apple.com/en-us/HT201236">
-        mac shortcuts
-      </a>
-
-      <a target="_blank"
-      href="https://documents.blackmagicdesign.com/UserManuals/DaVinci-Resolve-16-Beginners-Guide.pdf">
-        DaVinci Resolve 16 manual pdf
-      </a>
-
-      <a target="_blank"
-      href="https://docs.github.com/en/free-pro-team@latest/desktop/installing-and-configuring-github-desktop/keyboard-shortcuts">
-        GitHub Desktop shortcuts
-      </a>
-
-      <a target="_blank" href="index.html">
-        hendorism.github.io/hendorism
-      </a>
-
-      <a target="_blank"
-      href="fcc/cat_app_bootstrap/index.html">
-        fcc cat app bootstrap
-      </a>
-
-    </div>
-
 </div>
 
 <div id="cliPanel" class="panel">

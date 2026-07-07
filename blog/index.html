@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everett Music Dojo Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --void: #03020a;
+            --panel: rgba(9, 8, 25, 0.9);
+            --cyan: #00f6ff;
+            --magenta: #ff2bd6;
+            --acid: #c8ff2d;
+            --ink: #f6fbff;
+            --muted: #b7b9d8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 20% 8%, rgba(255, 43, 214, 0.26), transparent 28rem),
+                radial-gradient(circle at 82% 12%, rgba(0, 246, 255, 0.22), transparent 26rem),
+                linear-gradient(180deg, #020109 0%, #09001d 48%, #03020a 100%);
+            color: var(--ink);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background:
+                linear-gradient(rgba(0, 246, 255, 0.09) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 43, 214, 0.08) 1px, transparent 1px);
+            background-size: 42px 42px;
+            pointer-events: none;
+        }
+
+        main {
+            width: min(920px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 48px 0 72px;
+        }
+
+        a {
+            color: var(--acid);
+            text-decoration: none;
+            text-shadow: 0 0 8px rgba(200, 255, 45, 0.45);
+        }
+
+        a:hover {
+            color: var(--cyan);
+        }
+
+        h1,
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            color: var(--cyan);
+            font-size: clamp(2.4rem, 8vw, 5.2rem);
+            line-height: 0.95;
+            margin: 0 0 18px;
+            text-shadow:
+                0 0 16px rgba(0, 246, 255, 0.72),
+                0 0 32px rgba(255, 43, 214, 0.34);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 28px;
+            border-left: 3px solid var(--magenta);
+            padding-left: 10px;
+        }
+
+        .blog-card {
+            background:
+                linear-gradient(135deg, rgba(9, 8, 25, 0.9), rgba(20, 6, 50, 0.86)),
+                linear-gradient(90deg, rgba(0, 246, 255, 0.08), rgba(255, 43, 214, 0.08));
+            border: 1px solid rgba(0, 246, 255, 0.42);
+            border-radius: 10px;
+            box-shadow:
+                0 0 0 1px rgba(255, 43, 214, 0.18) inset,
+                0 0 36px rgba(0, 246, 255, 0.18),
+                0 18px 60px rgba(0, 0, 0, 0.45);
+            padding: clamp(24px, 4vw, 40px);
+        }
+
+        .date {
+            color: var(--acid);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.65;
+            max-width: 720px;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <a class="back-link" href="../index.html">Back to Everett Music Dojo</a>
+        <h1>Blog</h1>
+        <section class="blog-card">
+            <div class="date">21/11/2025</div>
+            <h2><a href="2025-11-21-equal-temperament-major-third.html">Why the Equal Temperament Major Third Feels "Bent"</a></h2>
+            <p>A music theory essay using geometry and tuning analogies to explain why the equal-tempered major third feels stretched compared with its just-intonation cousin.</p>
+        </section>
+    </main>
+</body>
+</html>

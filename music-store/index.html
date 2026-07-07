@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everett Music Dojo Music Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root { --void:#05050c; --panel:rgba(12,13,24,.94); --cyan:#47d7e8; --magenta:#cc4aac; --acid:#d8f078; --ink:#f4f7ff; --muted:#b9bed4; --line:rgba(116,214,232,.34); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 18% 10%, rgba(204,74,172,.16), transparent 26rem), radial-gradient(circle at 85% 8%, rgba(71,215,232,.14), transparent 24rem), linear-gradient(180deg,#03030a 0%,#090816 48%,#05050c 100%); color:var(--ink); font-family:'Share Tech Mono', monospace; }
+    body::before { content:""; position:fixed; inset:0; z-index:-1; background:linear-gradient(rgba(71,215,232,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(204,74,172,.045) 1px, transparent 1px); background-size:46px 46px; pointer-events:none; }
+    a { color:var(--acid); text-decoration:none; }
+    a:hover { color:var(--cyan); }
+    h1,h2,h3,button,.price,.license-button,.eyebrow { font-family:'Orbitron', sans-serif; letter-spacing:0; }
+    h1 { margin:0 0 12px; color:var(--cyan); font-size:clamp(2.4rem,7vw,5.2rem); line-height:.98; text-transform:uppercase; text-shadow:0 0 14px rgba(71,215,232,.52),0 0 28px rgba(204,74,172,.2); }
+    h2 { color:var(--cyan); margin-top:0; text-transform:uppercase; }
+    p { color:var(--muted); line-height:1.65; }
+    .back-link { display:inline-block; margin-bottom:22px; border-left:3px solid var(--magenta); padding-left:10px; color:var(--muted); }
+    .panel { background:linear-gradient(135deg, rgba(12,13,24,.96), rgba(23,21,38,.92)), linear-gradient(90deg, rgba(71,215,232,.04), rgba(204,74,172,.05)); border:1px solid var(--line); border-radius:8px; box-shadow:0 0 0 1px rgba(204,74,172,.1) inset,0 14px 38px rgba(0,0,0,.36); }
+    .cover-art { position:relative; min-height:360px; overflow:hidden; border:1px solid var(--line); border-radius:8px; background:radial-gradient(circle at 18% 18%, hsla(var(--cover-a),82%,62%,.58), transparent 34%), radial-gradient(circle at 84% 72%, hsla(var(--cover-b),84%,58%,.45), transparent 38%), linear-gradient(135deg, hsl(var(--cover-c),52%,12%), #05050c); box-shadow:0 22px 58px rgba(0,0,0,.42); }
+    .cover-art::before { content:""; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); background-size:28px 28px; mask-image:linear-gradient(to bottom, rgba(0,0,0,.82), rgba(0,0,0,.18)); }
+    .cover-title { position:absolute; left:24px; right:24px; bottom:24px; font-family:'Orbitron', sans-serif; font-size:clamp(2rem,5vw,4rem); line-height:1; text-transform:uppercase; color:#fff; text-shadow:0 0 18px rgba(71,215,232,.55); }
+    .eyebrow { color:var(--acid); text-transform:uppercase; font-size:.82rem; }
+    button,.button { display:inline-block; border:1px solid rgba(71,215,232,.46); background:rgba(6,9,18,.78); color:var(--ink); cursor:pointer; padding:9px 11px; text-transform:uppercase; }
+    button:hover,.button:hover { border-color:var(--acid); color:var(--acid); }
+    .buy-button { background:linear-gradient(90deg, rgba(204,74,172,.9), rgba(71,215,232,.84)); color:#03030a; border-color:rgba(255,255,255,.38); }
+    .meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+    .meta-card { padding:14px; border:1px solid rgba(116,214,232,.24); background:rgba(255,255,255,.035); }
+    .meta-card strong { display:block; color:var(--ink); margin-bottom:5px; }
+    .media-frame { width:100%; aspect-ratio:16/9; border:1px solid rgba(116,214,232,.34); background:#000; }
+    .sample-frame { width:100%; height:520px; border:1px solid rgba(116,214,232,.34); background:#111; }
+    
+    header,main { width:min(1180px, calc(100% - 32px)); margin:0 auto; }
+    header { padding:42px 0 22px; }
+    .lede { max-width:760px; font-size:1.05rem; }
+    .store-shell { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:22px; align-items:start; padding-bottom:64px; }
+    .commission-panel { margin:0 auto 22px; padding:24px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:18px; align-items:center; }
+    .commission-panel h2 { margin:0 0 8px; }
+    .commission-panel p { margin:0; }
+    .commission-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .commission-list span { border:1px solid rgba(116,214,232,.26); background:rgba(255,255,255,.035); padding:7px 9px; color:var(--muted); }
+    .catalog { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+    .composition-card { display:grid; gap:12px; min-height:360px; padding:0; overflow:hidden; }
+    .card-cover { min-height:170px; }
+    .card-body { display:grid; gap:10px; padding:0 18px 18px; }
+    .composition-card h2 { margin:0; color:var(--ink); font-size:1rem; line-height:1.35; }
+    .meta { color:var(--muted); font-size:.86rem; line-height:1.45; }
+    .price { color:var(--acid); font-size:1.15rem; }
+    .card-actions { display:flex; flex-wrap:wrap; gap:8px; align-self:end; }
+    .checkout { position:sticky; top:18px; padding:20px; }
+    .license-options,.payment-grid { display:grid; gap:9px; margin-top:14px; }
+    .license-button { width:100%; text-align:left; line-height:1.35; }
+    .license-button.active { border-color:var(--acid); color:var(--acid); background:rgba(216,240,120,.08); }
+    .payment-link { display:block; border:1px solid rgba(71,215,232,.38); background:rgba(255,255,255,.035); padding:11px 12px; color:var(--ink); }
+    .payment-link.disabled { color:#7d8497; border-color:rgba(125,132,151,.28); cursor:not-allowed; }
+    .memo-box { margin-top:18px; padding:12px; border:1px solid rgba(204,74,172,.36); color:var(--muted); line-height:1.5; background:rgba(0,0,0,.18); }
+    .small { color:var(--muted); font-family:'Share Tech Mono', monospace; font-size:.82rem; }
+    @media (max-width:860px) { .store-shell,.commission-panel { grid-template-columns:1fr; } .checkout { position:static; } }
+  </style>
+</head>
+<body data-composition-title="Selected composition">
+  <header>
+    <a class="back-link" href="../index.html">Back to Everett Music Dojo</a>
+    <h1>Music Store</h1>
+    <p class="lede">Original compositions and teaching pieces by Aaron Dull. Each score has its own page with cover art, video, audio, sample pages, difficulty, instrumentation, duration, and licensing.</p>
+  </header>
+  <section class="panel commission-panel">
+    <div>
+      <div class="eyebrow">Composer for hire</div>
+      <h2>Need music written exactly for your choir or group?</h2>
+      <p>If the catalog is close but not quite what you need, commission a custom piece or arrangement built around your singers, instruments, occasion, difficulty level, rehearsal time, and local community.</p>
+      <div class="commission-list">
+        <span>Choir anthems</span>
+        <span>Church services</span>
+        <span>School ensembles</span>
+        <span>Recital features</span>
+        <span>Custom arrangements</span>
+      </div>
+    </div>
+    <a class="button buy-button" href="../index.html#contact-form">Ask about a commission</a>
+  </section>
+  <main class="store-shell">
+    <section class="catalog" id="catalog" aria-label="Composition catalog"></section>
+    <aside class="panel checkout" aria-label="Checkout">
+      <h2>Checkout</h2>
+      <div class="selected-title" id="selected-title">Select a composition to begin.</div>
+      <div class="price" id="selected-price">Solo copy: $4</div>
+      <div class="license-options" id="license-options" aria-label="License options"></div>
+      <div class="payment-grid">
+        <a class="payment-link disabled" id="card-link" href="#">Credit card</a>
+        <a class="payment-link" id="venmo-link" href="#" target="_blank" rel="noopener">Venmo</a>
+        <a class="payment-link disabled" id="paypal-link" href="#">PayPal</a>
+        <a class="payment-link disabled" id="zelle-link" href="#">Zelle</a>
+      </div>
+      <div class="memo-box"><strong>Payment memo:</strong><div id="payment-memo">Select a piece first.</div></div>
+      <div class="memo-box"><strong>Setup note:</strong> Credit card, PayPal, and Zelle need your real Stripe/Square, PayPal, and Zelle recipient details before these buttons can process payment. Venmo is wired to your existing Venmo code link.</div>
+    </aside>
+  </main>
+  <script>
+    const compositions = [
+      {
+            "title": "Untitled - 4/11/2018",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2023/04/Untitled_-_4_11_2018-1.pdf",
+            "slug": "untitled-4-11-2018",
+            "detailPath": "music-store/compositions/untitled-4-11-2018/",
+            "localDetailPath": "compositions/untitled-4-11-2018/",
+            "hueA": 107,
+            "hueB": 193,
+            "hueC": 281,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "1:30",
+            "mood": "quirky concert miniature"
+      },
+      {
+            "title": "Goo_De_Goo",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2023/04/Goo_De_Goo.pdf",
+            "slug": "goo-de-goo",
+            "detailPath": "music-store/compositions/goo-de-goo/",
+            "localDetailPath": "compositions/goo-de-goo/",
+            "hueA": 345,
+            "hueB": 71,
+            "hueC": 159,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "2:10",
+            "mood": "bright teaching piece"
+      },
+      {
+            "title": "Tiny Mouse",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/10/Tiny-Mouse.pdf",
+            "slug": "tiny-mouse",
+            "detailPath": "music-store/compositions/tiny-mouse/",
+            "localDetailPath": "compositions/tiny-mouse/",
+            "hueA": 253,
+            "hueB": 339,
+            "hueC": 67,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Early intermediate",
+            "duration": "2:45",
+            "mood": "offbeat recital feature"
+      },
+      {
+            "title": "Cappucino Cappricio",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/10/Cappucino-Cappricio-four-hands-piano-duet.pdf",
+            "slug": "cappucino-cappricio",
+            "detailPath": "music-store/compositions/cappucino-cappricio/",
+            "localDetailPath": "compositions/cappucino-cappricio/",
+            "hueA": 354,
+            "hueB": 80,
+            "hueC": 168,
+            "instrumentation": "Piano four hands",
+            "difficulty": "Intermediate",
+            "duration": "3:20",
+            "mood": "lyrical character study"
+      },
+      {
+            "title": "Thincopated Clock",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/09/Thincopated-Clock.pdf",
+            "slug": "thincopated-clock",
+            "detailPath": "music-store/compositions/thincopated-clock/",
+            "localDetailPath": "compositions/thincopated-clock/",
+            "hueA": 283,
+            "hueB": 9,
+            "hueC": 97,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "4:00",
+            "mood": "rhythmic chamber sketch"
+      },
+      {
+            "title": "Sunflower Tea",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/09/Sunflower-Tea.pdf",
+            "slug": "sunflower-tea",
+            "detailPath": "music-store/compositions/sunflower-tea/",
+            "localDetailPath": "compositions/sunflower-tea/",
+            "hueA": 79,
+            "hueB": 165,
+            "hueC": 253,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "5:15",
+            "mood": "strange little stage world"
+      },
+      {
+            "title": "Cold Stale Buns",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/09/cold-stale-buns.pdf",
+            "slug": "cold-stale-buns",
+            "detailPath": "music-store/compositions/cold-stale-buns/",
+            "localDetailPath": "compositions/cold-stale-buns/",
+            "hueA": 43,
+            "hueB": 129,
+            "hueC": 217,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "1:30",
+            "mood": "quirky concert miniature"
+      },
+      {
+            "title": "Phrizbee",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/Phrizbee-draft-4-3-2017.pdf",
+            "slug": "phrizbee",
+            "detailPath": "music-store/compositions/phrizbee/",
+            "localDetailPath": "compositions/phrizbee/",
+            "hueA": 255,
+            "hueB": 341,
+            "hueC": 69,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "2:10",
+            "mood": "bright teaching piece"
+      },
+      {
+            "title": "Yangtze River Boatmen (version 4)",
+            "url": "http://everettmusicdojo.com/wp-content/uploads/2024/09/Yangtze-v4-20240110.pdf",
+            "slug": "yangtze-river-boatmen-version-4",
+            "detailPath": "music-store/compositions/yangtze-river-boatmen-version-4/",
+            "localDetailPath": "compositions/yangtze-river-boatmen-version-4/",
+            "hueA": 333,
+            "hueB": 59,
+            "hueC": 147,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Advanced",
+            "duration": "2:45",
+            "mood": "offbeat recital feature"
+      },
+      {
+            "title": "Dangerous Daffodils",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2023/04/Dangerous_Daffodils_flute_solo_-_4_8_2018.pdf",
+            "slug": "dangerous-daffodils",
+            "detailPath": "music-store/compositions/dangerous-daffodils/",
+            "localDetailPath": "compositions/dangerous-daffodils/",
+            "hueA": 136,
+            "hueB": 222,
+            "hueC": 310,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Advanced",
+            "duration": "3:20",
+            "mood": "lyrical character study"
+      },
+      {
+            "title": "Frute of the Loom",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf",
+            "slug": "frute-of-the-loom",
+            "detailPath": "music-store/compositions/frute-of-the-loom/",
+            "localDetailPath": "compositions/frute-of-the-loom/",
+            "hueA": 235,
+            "hueB": 321,
+            "hueC": 49,
+            "instrumentation": "Flute or C instrument",
+            "difficulty": "Intermediate",
+            "duration": "4:00",
+            "mood": "rhythmic chamber sketch"
+      },
+      {
+            "title": "Fluentsy",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/03/fluentsy.pdf",
+            "slug": "fluentsy",
+            "detailPath": "music-store/compositions/fluentsy/",
+            "localDetailPath": "compositions/fluentsy/",
+            "hueA": 18,
+            "hueB": 104,
+            "hueC": 192,
+            "instrumentation": "Flute or C instrument",
+            "difficulty": "Intermediate",
+            "duration": "5:15",
+            "mood": "strange little stage world"
+      },
+      {
+            "title": "Floode",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2023/04/Floode.pdf",
+            "slug": "floode",
+            "detailPath": "music-store/compositions/floode/",
+            "localDetailPath": "compositions/floode/",
+            "hueA": 151,
+            "hueB": 237,
+            "hueC": 325,
+            "instrumentation": "Flute or C instrument",
+            "difficulty": "Intermediate",
+            "duration": "1:30",
+            "mood": "quirky concert miniature"
+      },
+      {
+            "title": "Yellow Cab",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/12/yellow-cab.pdf",
+            "slug": "yellow-cab",
+            "detailPath": "music-store/compositions/yellow-cab/",
+            "localDetailPath": "compositions/yellow-cab/",
+            "hueA": 120,
+            "hueB": 206,
+            "hueC": 294,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "2:10",
+            "mood": "bright teaching piece"
+      },
+      {
+            "title": "Flote Duet",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/12/wp-1670219195628.pdf",
+            "slug": "flote-duet",
+            "detailPath": "music-store/compositions/flote-duet/",
+            "localDetailPath": "compositions/flote-duet/",
+            "hueA": 190,
+            "hueB": 276,
+            "hueC": 4,
+            "instrumentation": "Two players",
+            "difficulty": "Intermediate",
+            "duration": "2:45",
+            "mood": "offbeat recital feature"
+      },
+      {
+            "title": "Flewd Conduct",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/flewd_conduct.pdf",
+            "slug": "flewd-conduct",
+            "detailPath": "music-store/compositions/flewd-conduct/",
+            "localDetailPath": "compositions/flewd-conduct/",
+            "hueA": 320,
+            "hueB": 46,
+            "hueC": 134,
+            "instrumentation": "Flute or C instrument",
+            "difficulty": "Intermediate",
+            "duration": "3:20",
+            "mood": "lyrical character study"
+      },
+      {
+            "title": "Fast Duet",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/Fast_Duet.pdf",
+            "slug": "fast-duet",
+            "detailPath": "music-store/compositions/fast-duet/",
+            "localDetailPath": "compositions/fast-duet/",
+            "hueA": 172,
+            "hueB": 258,
+            "hueC": 346,
+            "instrumentation": "Two players",
+            "difficulty": "Advanced",
+            "duration": "4:00",
+            "mood": "rhythmic chamber sketch"
+      },
+      {
+            "title": "Eevee's Kennel Club Dance",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/10/eevees-kennel-club-dance-20221030.pdf",
+            "slug": "eevee-s-kennel-club-dance",
+            "detailPath": "music-store/compositions/eevee-s-kennel-club-dance/",
+            "localDetailPath": "compositions/eevee-s-kennel-club-dance/",
+            "hueA": 170,
+            "hueB": 256,
+            "hueC": 344,
+            "instrumentation": "Small ensemble or keyboard",
+            "difficulty": "Intermediate",
+            "duration": "5:15",
+            "mood": "strange little stage world"
+      },
+      {
+            "title": "Goat Milk Waltz",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2023/04/Goat_Milk_Waltz.pdf",
+            "slug": "goat-milk-waltz",
+            "detailPath": "music-store/compositions/goat-milk-waltz/",
+            "localDetailPath": "compositions/goat-milk-waltz/",
+            "hueA": 336,
+            "hueB": 62,
+            "hueC": 150,
+            "instrumentation": "Small ensemble or keyboard",
+            "difficulty": "Intermediate",
+            "duration": "1:30",
+            "mood": "quirky concert miniature"
+      },
+      {
+            "title": "Ran Acrowned",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2024/07/Ran_Acrowned.pdf",
+            "slug": "ran-acrowned",
+            "detailPath": "music-store/compositions/ran-acrowned/",
+            "localDetailPath": "compositions/ran-acrowned/",
+            "hueA": 150,
+            "hueB": 236,
+            "hueC": 324,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Advanced",
+            "duration": "2:10",
+            "mood": "bright teaching piece"
+      },
+      {
+            "title": "McDuet",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/McDuet.pdf",
+            "slug": "mcduet",
+            "detailPath": "music-store/compositions/mcduet/",
+            "localDetailPath": "compositions/mcduet/",
+            "hueA": 38,
+            "hueB": 124,
+            "hueC": 212,
+            "instrumentation": "Two players",
+            "difficulty": "Intermediate",
+            "duration": "2:45",
+            "mood": "offbeat recital feature"
+      },
+      {
+            "title": "drownded",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/drownded.pdf",
+            "slug": "drownded",
+            "detailPath": "music-store/compositions/drownded/",
+            "localDetailPath": "compositions/drownded/",
+            "hueA": 75,
+            "hueB": 161,
+            "hueC": 249,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "3:20",
+            "mood": "lyrical character study"
+      },
+      {
+            "title": "Bildge Water Soup",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2022/04/Bildge_Water_Soup.pdf",
+            "slug": "bildge-water-soup",
+            "detailPath": "music-store/compositions/bildge-water-soup/",
+            "localDetailPath": "compositions/bildge-water-soup/",
+            "hueA": 355,
+            "hueB": 81,
+            "hueC": 169,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "4:00",
+            "mood": "rhythmic chamber sketch"
+      },
+      {
+            "title": "EMD Remote Ensemble 4/27/2021",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/EMD_Remote_Ensemble_4_27_2021-Score_and_Parts.pdf",
+            "slug": "emd-remote-ensemble-4-27-2021",
+            "detailPath": "music-store/compositions/emd-remote-ensemble-4-27-2021/",
+            "localDetailPath": "compositions/emd-remote-ensemble-4-27-2021/",
+            "hueA": 299,
+            "hueB": 25,
+            "hueC": 113,
+            "instrumentation": "Remote ensemble",
+            "difficulty": "Intermediate",
+            "duration": "5:15",
+            "mood": "strange little stage world"
+      },
+      {
+            "title": "Banana",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/banana-Score_and_Parts.pdf",
+            "slug": "banana",
+            "detailPath": "music-store/compositions/banana/",
+            "localDetailPath": "compositions/banana/",
+            "hueA": 277,
+            "hueB": 3,
+            "hueC": 91,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Early intermediate",
+            "duration": "1:30",
+            "mood": "quirky concert miniature"
+      },
+      {
+            "title": "Strawberry 4/19/2021",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/Strawberry_4_19_2021-Score_and_Parts-1.pdf",
+            "slug": "strawberry-4-19-2021",
+            "detailPath": "music-store/compositions/strawberry-4-19-2021/",
+            "localDetailPath": "compositions/strawberry-4-19-2021/",
+            "hueA": 208,
+            "hueB": 294,
+            "hueC": 22,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Early intermediate",
+            "duration": "2:10",
+            "mood": "bright teaching piece"
+      },
+      {
+            "title": "f f f c bc p u 20210418",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/f-f-f-c-bc-p-u-20210418-Score_and_Parts.pdf",
+            "slug": "f-f-f-c-bc-p-u-20210418",
+            "detailPath": "music-store/compositions/f-f-f-c-bc-p-u-20210418/",
+            "localDetailPath": "compositions/f-f-f-c-bc-p-u-20210418/",
+            "hueA": 47,
+            "hueB": 133,
+            "hueC": 221,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "2:45",
+            "mood": "offbeat recital feature"
+      },
+      {
+            "title": "Cranberry 4/19/2021",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/Cranberry_4_19_2021-Score_and_Parts.pdf",
+            "slug": "cranberry-4-19-2021",
+            "detailPath": "music-store/compositions/cranberry-4-19-2021/",
+            "localDetailPath": "compositions/cranberry-4-19-2021/",
+            "hueA": 187,
+            "hueB": 273,
+            "hueC": 1,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Early intermediate",
+            "duration": "3:20",
+            "mood": "lyrical character study"
+      },
+      {
+            "title": "Callobius Severus",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/04/Callobius_Severus.pdf",
+            "slug": "callobius-severus",
+            "detailPath": "music-store/compositions/callobius-severus/",
+            "localDetailPath": "compositions/callobius-severus/",
+            "hueA": 237,
+            "hueB": 323,
+            "hueC": 51,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "4:00",
+            "mood": "rhythmic chamber sketch"
+      },
+      {
+            "title": "Hazelnut Nutella Toast",
+            "url": "https://everettmusicdojo.com/wp-content/uploads/2021/02/Hazelnut-Nutella-Toast.pdf",
+            "slug": "hazelnut-nutella-toast",
+            "detailPath": "music-store/compositions/hazelnut-nutella-toast/",
+            "localDetailPath": "compositions/hazelnut-nutella-toast/",
+            "hueA": 85,
+            "hueB": 171,
+            "hueC": 259,
+            "instrumentation": "Flexible chamber score",
+            "difficulty": "Intermediate",
+            "duration": "5:15",
+            "mood": "strange little stage world"
+      }
+];
+    
+    const licenses = [
+      {
+            "id": "solo",
+            "label": "Solo copy",
+            "detail": "Personal use by one musician",
+            "price": 4
+      },
+      {
+            "id": "choir",
+            "label": "Choir/group license",
+            "detail": "Up to 20 singers",
+            "price": 40
+      },
+      {
+            "id": "unlimited",
+            "label": "Unlimited church/group license",
+            "detail": "Unlimited use within one church or group",
+            "price": 95
+      }
+];
+    const paymentConfig = {
+      cardUrl: "",
+      venmoUrl: "https://venmo.com/code?user_id=2177255539212288660&created=1743794426",
+      paypalUrl: "",
+      zelleRecipient: ""
+    };
+    let selectedLicense = licenses[0];
+    const selectedPrice = document.getElementById("selected-price");
+    const paymentMemo = document.getElementById("payment-memo");
+    const licenseOptions = document.getElementById("license-options");
+    const cardLink = document.getElementById("card-link");
+    const venmoLink = document.getElementById("venmo-link");
+    const paypalLink = document.getElementById("paypal-link");
+    const zelleLink = document.getElementById("zelle-link");
+    const compositionTitle = document.body.dataset.compositionTitle || "Selected composition";
+
+    function memoFor(license) { return `Music Store - ${compositionTitle} - ${license.label} - $${license.price}`; }
+    function configureLink(el, url, label, missingMessage) {
+      el.textContent = label;
+      if (!url) {
+        el.href = "#";
+        el.classList.add("disabled");
+        el.onclick = (event) => { event.preventDefault(); alert(missingMessage); };
+        return;
+      }
+      el.href = url;
+      el.classList.remove("disabled");
+      el.onclick = null;
+    }
+    function renderLicenseOptions() {
+      licenseOptions.innerHTML = "";
+      licenses.forEach((license) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `license-button${license.id === selectedLicense.id ? " active" : ""}`;
+        button.innerHTML = `${license.label}: $${license.price}<br><span class="small">${license.detail}</span>`;
+        button.addEventListener("click", () => { selectedLicense = license; updateCheckout(); });
+        licenseOptions.appendChild(button);
+      });
+    }
+    function updateCheckout() {
+      selectedPrice.textContent = `${selectedLicense.label}: $${selectedLicense.price}`;
+      paymentMemo.textContent = memoFor(selectedLicense);
+      renderLicenseOptions();
+      configureLink(cardLink, paymentConfig.cardUrl, "Credit card", "Add a Stripe, Square, or PayPal card checkout link in paymentConfig.cardUrl.");
+      configureLink(venmoLink, paymentConfig.venmoUrl, "Venmo", "Add your Venmo link in paymentConfig.venmoUrl.");
+      configureLink(paypalLink, paymentConfig.paypalUrl, "PayPal", "Add your PayPal payment link in paymentConfig.paypalUrl.");
+      configureLink(zelleLink, paymentConfig.zelleRecipient ? "#" : "", "Zelle", "Add your Zelle recipient email or phone in paymentConfig.zelleRecipient.");
+      zelleLink.onclick = (event) => {
+        event.preventDefault();
+        if (!paymentConfig.zelleRecipient) { alert("Add your Zelle recipient email or phone in paymentConfig.zelleRecipient."); return; }
+        alert(`Send $${selectedLicense.price} by Zelle to ${paymentConfig.zelleRecipient}. Memo: ${memoFor(selectedLicense)}`);
+      };
+    }
+    updateCheckout();
+    const catalog = document.getElementById("catalog");
+    const selectedTitle = document.getElementById("selected-title");
+    let selectedComposition = compositions[0];
+
+    function chooseComposition(composition) {
+      selectedComposition = composition;
+      document.body.dataset.compositionTitle = composition.title;
+      selectedTitle.textContent = composition.title;
+      updateCheckout();
+    }
+
+    compositions.forEach((composition) => {
+      const card = document.createElement("article");
+      card.className = "panel composition-card";
+      card.innerHTML = `
+        <div class="cover-art card-cover" style="--cover-a:${composition.hueA};--cover-b:${composition.hueB};--cover-c:${composition.hueC};"><div class="cover-title">${composition.title}</div></div>
+        <div class="card-body">
+          <h2>${composition.title}</h2>
+          <div class="meta">${composition.instrumentation} / ${composition.difficulty} / ${composition.duration}</div>
+          <div class="price">From $4</div>
+          <div class="card-actions">
+            <button class="buy-button" type="button">Select</button>
+            <a class="button" href="${composition.localDetailPath}">Experience page</a>
+            <a class="button" href="${composition.url}" target="_blank" rel="noopener">Sample PDF</a>
+          </div>
+        </div>
+      `;
+      card.querySelector("button").addEventListener("click", () => {
+        chooseComposition(composition);
+        document.querySelector(".checkout").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+      catalog.appendChild(card);
+    });
+    chooseComposition(compositions[0]);
+  </script>
+</body>
+</html>

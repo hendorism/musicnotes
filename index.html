@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Everett Music Dojo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <!-- https://megaone.acrothemes.com/index-personal-hotspot.html#home -->
 
 <style>
@@ -248,18 +248,567 @@ div.text-backdrop-div {
     margin: 20px auto;
     max-width: 800px;}
     li {}
+
+/* ===== TRON RAVE REDESIGN ===== */
+
+:root {
+    --void: #03020a;
+    --panel: rgba(9, 8, 25, 0.86);
+    --panel-strong: rgba(13, 10, 36, 0.94);
+    --cyan: #00f6ff;
+    --magenta: #ff2bd6;
+    --acid: #c8ff2d;
+    --gold: #ffe66d;
+    --ink: #f6fbff;
+    --muted: #b7b9d8;
+    --drift-cyan-rgb: 0, 246, 255;
+    --drift-magenta-rgb: 255, 43, 214;
+    --drift-acid-rgb: 200, 255, 45;
+    --drift-deep-rgb: 13, 0, 40;
+}
+
+* {
+    font-family: 'Share Tech Mono', monospace;
+}
+
+html {
+    background: var(--void);
+}
+
+body {
+    background:
+        radial-gradient(circle at 18% 10%, rgba(var(--drift-magenta-rgb), 0.28), transparent 28rem),
+        radial-gradient(circle at 84% 6%, rgba(var(--drift-cyan-rgb), 0.24), transparent 26rem),
+        linear-gradient(180deg, #020109 0%, #09001d 45%, #03020a 100%);
+    color: var(--ink);
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        linear-gradient(rgba(var(--drift-cyan-rgb), 0.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--drift-magenta-rgb), 0.08) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.15));
+    pointer-events: none;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.035),
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 5px
+    );
+    mix-blend-mode: screen;
+    opacity: 0.28;
+}
+
+header {
+    background: #04020c;
+    padding: 12px 16px 0;
+    border-bottom: 1px solid rgba(var(--drift-cyan-rgb), 0.45);
+    box-shadow: 0 0 34px rgba(var(--drift-cyan-rgb), 0.22);
+}
+
+header img {
+    border: 1px solid rgba(var(--drift-cyan-rgb), 0.55);
+    border-radius: 0 0 18px 18px;
+    filter: saturate(1.35) contrast(1.1);
+    box-shadow:
+        0 0 28px rgba(var(--drift-cyan-rgb), 0.34),
+        0 0 58px rgba(var(--drift-magenta-rgb), 0.2);
+}
+
+main {
+    padding: clamp(18px, 4vw, 46px) 16px 56px;
+}
+
+img#background-img {
+    object-fit: cover;
+    filter: saturate(1.55) contrast(1.15) brightness(0.38) hue-rotate(18deg);
+}
+
+div#background-div {
+    background:
+        linear-gradient(135deg, rgba(3, 2, 10, 0.9), rgba(var(--drift-deep-rgb), 0.78)),
+        radial-gradient(circle at center, transparent, rgba(0,0,0,0.65));
+    opacity: 1;
+}
+
+div.text-backdrop-div {
+    background:
+        linear-gradient(135deg, rgba(9, 8, 25, 0.9), rgba(20, 6, 50, 0.86)),
+        linear-gradient(90deg, rgba(var(--drift-cyan-rgb), 0.08), rgba(var(--drift-magenta-rgb), 0.08));
+    color: var(--ink);
+    border: 1px solid rgba(var(--drift-cyan-rgb), 0.42);
+    border-radius: 10px;
+    box-shadow:
+        0 0 0 1px rgba(var(--drift-magenta-rgb), 0.18) inset,
+        0 0 36px rgba(var(--drift-cyan-rgb), 0.18),
+        0 18px 60px rgba(0, 0, 0, 0.45);
+    max-width: 920px;
+    padding: clamp(26px, 4vw, 44px);
+    position: relative;
+    text-shadow: none;
+}
+
+div.text-backdrop-div::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(var(--drift-acid-rgb), 0.18);
+    pointer-events: none;
+}
+
+h1, h2, h3, h4,
+.featured-label,
+button,
+.featured-link {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0;
+}
+
+h1, h2, h3, h4 {
+    color: var(--cyan);
+    text-shadow:
+        0 0 12px rgba(var(--drift-cyan-rgb), 0.65),
+        0 0 28px rgba(var(--drift-magenta-rgb), 0.28);
+}
+
+.featured-project {
+    border-color: rgba(255, 43, 214, 0.72);
+    transform: skewY(-0.45deg);
+}
+
+.featured-project > * {
+    transform: skewY(0.45deg);
+}
+
+.featured-project::before {
+    background:
+        linear-gradient(120deg, rgba(255, 43, 214, 0.32), rgba(0, 246, 255, 0.18) 48%, rgba(200, 255, 45, 0.16)),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 13px);
+}
+
+.featured-label {
+    color: var(--acid);
+    border: 1px solid rgba(200, 255, 45, 0.78);
+    padding: 6px 10px;
+    text-shadow: 0 0 10px rgba(200, 255, 45, 0.65);
+}
+
+.featured-project h2 {
+    color: #fff;
+    font-size: clamp(2rem, 7vw, 4.8rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+}
+
+p {
+    color: var(--muted);
+    max-width: 720px;
+    text-align: left;
+}
+
+a {
+    color: var(--acid);
+    text-shadow: 0 0 8px rgba(200, 255, 45, 0.5);
+}
+
+a:hover {
+    color: var(--cyan);
+}
+
+.featured-link,
+button {
+    background: linear-gradient(90deg, var(--magenta), var(--cyan));
+    color: #05010b;
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 0;
+    box-shadow:
+        0 0 18px rgba(255, 43, 214, 0.52),
+        0 0 28px rgba(0, 246, 255, 0.28);
+    text-transform: uppercase;
+}
+
+.featured-link:hover,
+button:hover {
+    background: linear-gradient(90deg, var(--acid), var(--cyan));
+    color: #05010b;
+    transform: translateY(-2px);
+}
+
+form {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 43, 214, 0.45);
+    border-radius: 8px;
+    box-shadow: 0 0 24px rgba(255, 43, 214, 0.18);
+    color: var(--ink);
+}
+
+input,
+textarea {
+    background: rgba(4, 3, 13, 0.9);
+    border: 1px solid rgba(0, 246, 255, 0.48);
+    color: var(--ink);
+    border-radius: 4px;
+}
+
+input:focus,
+textarea:focus {
+    outline: 2px solid rgba(200, 255, 45, 0.65);
+    box-shadow: 0 0 18px rgba(0, 246, 255, 0.34);
+}
+
+#youtube1 {
+    display: block;
+    width: 100% !important;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 1px solid rgba(255, 43, 214, 0.7);
+    box-shadow:
+        0 0 32px rgba(255, 43, 214, 0.35),
+        0 0 60px rgba(0, 246, 255, 0.22);
+}
+
+.social_div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 110px);
+    padding: 6px 0;
+    transition: filter 180ms ease;
+}
+
+.social_div br {
+    display: none;
+}
+
+.social_div a {
+    display: block;
+    transform:
+        translate3d(var(--social-x, 0px), var(--social-y, 0px), 0)
+        rotate(var(--social-rot, 0deg));
+    transform-origin: 50% 50%;
+    will-change: transform;
+}
+
+.social_div img {
+    width: 42px;
+    height: auto;
+    filter: saturate(1.35) drop-shadow(0 0 10px rgba(0, 246, 255, 0.35));
+    transition: filter 180ms ease;
+}
+
+.bio-section {
+    display: grid;
+    grid-template-columns: 58px minmax(320px, 1fr) minmax(230px, 300px);
+    gap: clamp(18px, 3vw, 32px);
+    align-items: stretch;
+}
+
+.bio-card {
+    max-width: 1180px !important;
+}
+
+.bio-copy p {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.bio-video {
+    margin: 22px 0 22px;
+}
+
+.bio-blog-panel {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    border-left: 1px solid rgba(var(--drift-cyan-rgb), 0.32);
+    padding-left: 18px;
+}
+
+.bio-blog-panel h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.bio-blog-panel p {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin: 0 0 12px;
+}
+
+.blog-scroll {
+    position: sticky;
+    top: 76px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 6px;
+    scrollbar-color: rgba(var(--drift-cyan-rgb), 0.65) rgba(255,255,255,0.08);
+}
+
+.blog-feed {
+    display: grid;
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+.blog-preview-post {
+    display: block;
+    border: 1px solid rgba(var(--drift-magenta-rgb), 0.32);
+    border-left: 3px solid var(--acid);
+    background: rgba(255,255,255,0.035);
+    padding: 12px;
+    color: var(--ink);
+    text-shadow: none;
+}
+
+.blog-title-link {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.blog-title-link strong {
+    display: block;
+    color: var(--cyan);
+    margin-bottom: 6px;
+    line-height: 1.25;
+}
+
+.blog-date {
+    display: block;
+    color: var(--acid);
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+}
+
+.blog-preview-post p {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.48;
+    margin: 0 0 10px;
+}
+
+.blog-preview-post h4 {
+    color: var(--ink);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0;
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+}
+
+.blog-read-link {
+    display: inline-block;
+    color: var(--acid);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-top: 4px;
+}
+
+.blog-title-link:hover,
+.blog-read-link:hover {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.blog-preview-post:hover {
+    border-color: rgba(var(--drift-cyan-rgb), 0.58);
+    background: rgba(var(--drift-cyan-rgb), 0.08);
+}
+
+ul {
+    display: grid;
+    gap: 8px;
+}
+
+li a {
+    display: block;
+    padding: 8px 10px;
+    border-left: 3px solid var(--magenta);
+    background: rgba(255, 255, 255, 0.035);
+}
+
+li a:hover {
+    border-left-color: var(--cyan);
+    background: rgba(0, 246, 255, 0.09);
+}
+
+.music-store-link a {
+    font-size: 0.88rem;
+    padding: 6px 9px;
+}
+
+table {
+    background: rgba(5, 4, 18, 0.9);
+    border: 1px solid rgba(0, 246, 255, 0.35);
+}
+
+th {
+    background: linear-gradient(90deg, #3b006f, #004a73);
+}
+
+td,
+th {
+    border-color: rgba(0, 246, 255, 0.22);
+}
+
+tr:nth-child(even),
+tr:hover {
+    background: rgba(0, 246, 255, 0.07);
+}
+
+.menu-toggle {
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hamburger {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 20;
+    display: grid;
+    gap: 5px;
+    width: 48px;
+    height: 44px;
+    place-content: center;
+    border: 1px solid rgba(0, 246, 255, 0.72);
+    background: rgba(3, 2, 10, 0.88);
+    box-shadow: 0 0 18px rgba(0, 246, 255, 0.28);
+    cursor: pointer;
+}
+
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.8);
+}
+
+.site-menu {
+    position: fixed;
+    top: 74px;
+    left: 18px;
+    z-index: 19;
+    width: min(320px, calc(100vw - 36px));
+    padding: 14px;
+    border: 1px solid rgba(255, 43, 214, 0.64);
+    background: rgba(5, 3, 18, 0.96);
+    box-shadow:
+        0 0 26px rgba(255, 43, 214, 0.28),
+        0 0 48px rgba(0, 246, 255, 0.16);
+    transform: translateX(-115%);
+    transition: transform 180ms ease;
+}
+
+.menu-toggle:checked ~ .site-menu {
+    transform: translateX(0);
+}
+
+.site-menu a {
+    display: block;
+    padding: 11px 12px;
+    border-left: 3px solid var(--cyan);
+    color: var(--ink);
+    text-shadow: none;
+}
+
+.site-menu a + a {
+    margin-top: 6px;
+}
+
+.site-menu a:hover {
+    color: var(--acid);
+    background: rgba(0, 246, 255, 0.08);
+    text-decoration: none;
+}
+
+@media (max-width: 680px) {
+    div.text-backdrop-div {
+        padding: 24px 18px;
+    }
+
+    .featured-project h2 {
+        font-size: 2.2rem;
+    }
+
+    .bio-section {
+        grid-template-columns: 1fr;
+    }
+
+    .social_div {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        position: static;
+        transform: none;
+        max-height: none;
+    }
+
+    .social_div img {
+        transform: none;
+    }
+
+    .bio-blog-panel {
+        border-left: 0;
+        border-top: 1px solid rgba(var(--drift-cyan-rgb), 0.32);
+        padding-left: 0;
+        padding-top: 18px;
+    }
+
+    .blog-scroll {
+        position: static;
+        max-height: 320px;
+    }
+}
 </style>
 </head>
 <body>
     <div id="background-div"></div>
     <img id="background-img" src="https://everettmusicdojo.com/wp-content/uploads/2025/01/20250106_1608536497613424184382742-600x450.jpg">
+    <input class="menu-toggle" type="checkbox" id="site-menu-toggle" aria-label="Toggle site menu">
+    <label class="hamburger" for="site-menu-toggle" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+    </label>
+    <nav class="site-menu" aria-label="Site menu">
+        <a href="blog/">Blog</a>
+        <a href="#">Lesson Portal (under construction)</a>
+        <a href="#">Student Resources (under construction)</a>
+        <a href="music-store/">Music Store</a>
+        <a href="#">Events Calendar (under construction)</a>
+    </nav>
     <header>
         <img src="https://everettmusicdojo.com/wp-content/uploads/2025/06/EMD-1920x400-banner-Cascades-from-Pilchuck-summit.jpg" alt="Everett Music Dojo Banner" style="width: 100%; max-width: 1000px; height: auto; margin: 0 auto; display: block;">
     </header>
     <main>
         <div class="text-backdrop-div featured-project">
-            <span class="featured-label">Featured MusicNotes 2026</span>
-            <h2>Dinosaurio</h2>
+            <span class="featured-label">Try my app</span>
+            <h2>MusicNotes 4.0 Dinosaurio</h2>
             <p style="text-align: center;">Try the newest MusicNotes2026 dinosaurio build, with interactive notation practice in the latest experimental version.</p>
             <a class="featured-link" href="MusicNotes2026/MusicNotes2026-0006-dinosaurio.html?v=20260701-blue-screen-fix">Open MusicNotes2026 Dinosaurio</a>
         </div>
@@ -285,16 +834,23 @@ div.text-backdrop-div {
     </div>
     <!-- text-backdrop-div -->
     
-<iframe id="youtube1" width="560" height="315" src="https://www.youtube.com/embed/GarsBk3iwAQ?si=C_zHREa619YJFqVg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-
-
-
-
-
-
-<div class="text-backdrop-div">
+<div class="text-backdrop-div bio-card">
+<div class="bio-section">
+    <div class="social_div">
+        <a style="--icon-lag:0.05;--icon-tilt:0.08deg;" href="https://www.facebook.com/Hendorism" target="_blank"><img src="social_media_buttons_fb.png" alt="Facebook"></a>
+        <a style="--icon-lag:0.08;--icon-tilt:-0.09deg;" href="https://youtu.be/v7Zaqkzg_8Y?si=fYahAqhu0cuRQHqg" target="_blank"><img src="social_media_buttons_youtube.png" alt="YouTube"></a>
+        <a style="--icon-lag:0.11;--icon-tilt:0.1deg;" href="https://soundcloud.com/aaron-dull/flewd-conduct?si=18561583a165487a99e9a7d98278c9c3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank"><img src="social_media_buttons_soundcloud.png" alt="SoundCloud"></a>
+        <a style="--icon-lag:0.14;--icon-tilt:-0.11deg;" href="https://twitter.com/Hendorism" target="_blank"><img src="social_media_buttons_twitter.png" alt="Twitter"></a>
+        <a style="--icon-lag:0.17;--icon-tilt:0.12deg;" href="https://www.fiverr.com/hendorism" target="_blank"><img src="social_media_buttons_fiverr.png" alt="Fiverr"></a>
+        <a style="--icon-lag:0.20;--icon-tilt:-0.13deg;" href="https://www.linkedin.com/in/aaron-dull-57571889/" target="_blank"><img src="social_media_buttons_linkedin.png" alt="Linkedin"></a>
+        <a style="--icon-lag:0.23;--icon-tilt:0.14deg;" href="https://www.instagram.com/hendorism/?hl=en" target="_blank"><img src="social_media_buttons_insta.png" alt="Instagram"></a>
+        <a style="--icon-lag:0.26;--icon-tilt:-0.15deg;" href="https://www.tiktok.com/explore" target="_blank"><img src="social_media_buttons_ticktock.png" alt="tiktok"></a>
+        <a style="--icon-lag:0.29;--icon-tilt:0.16deg;" href="https://venmo.com/code?user_id=2177255539212288660&created=1743794426" target="_blank"><img src="social_media_buttons_venmo.png" alt="Venmo"></a>
+    </div>
+    <div class="bio-copy">
 <p>Aaron Dull's journey in music began at a young age, growing up in a household where music education was a way of life. Surrounded by a family deeply involved in music, Aaron was exposed to various instruments such as guitar, piano, and harp from an early age. His father was a drummer, his older brother became a drummer in the 6th grade, and Aaron intended to follow in their footsteps, but the middle school band had a surplus of drummers. So Aaron chose clarinet, which he knew and loved from Sergei Prokofiev's classic musical children's story Peter and the Wolf.</p>
+
+<iframe id="youtube1" class="bio-video" width="560" height="315" src="https://www.youtube.com/embed/GarsBk3iwAQ?si=C_zHREa619YJFqVg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 <p>Having the privilege of being raised by a great music educator, Aaron was treated to the best available instructor, Jodi Salzman, wife of Tim Salzman, head of woodwinds at University of Washington. This was not the beginning of his formal music education however. Prior to this he had studied elementary violin with Janet Coleman. And he was taught the basics of piano playing and note reading by his mother at such a young age that he had to reach above the level of his eyes to play the keys.</p>
 
@@ -305,121 +861,54 @@ div.text-backdrop-div {
 <p>Aaron's approach to teaching is focused on written notation as well as improvisation, performance as well as theoretical analysis, and study of modern pop hits alongside the classic works of centuries past. He believes young students can quickly incorporate advanced musical concepts when presented in an intuitive way.</p>
 
 <p>Aaron is always striving to find new ways to challenge himself musically and spread a love of music to his community.</p>
-    <div class="social_div">
-        <a href="https://www.facebook.com/Hendorism" target="_blank"><img src="social_media_buttons_fb.png" alt="Facebook"></a>
-        <a href="https://youtu.be/v7Zaqkzg_8Y?si=fYahAqhu0cuRQHqg" target="_blank"><img src="social_media_buttons_youtube.png" alt="YouTube"></a>
-        <a href="https://soundcloud.com/aaron-dull/flewd-conduct?si=18561583a165487a99e9a7d98278c9c3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" target="_blank"><img src="social_media_buttons_soundcloud.png" alt="SoundCloud"></a>
-        <br>
-        <a href="https://twitter.com/Hendorism" target="_blank"><img src="social_media_buttons_twitter.png" alt="Twitter"></a>
-        <a href="https://www.fiverr.com/hendorism" target="_blank"><img src="social_media_buttons_fiverr.png" alt="Fiverr"></a>
-        <a href="https://www.linkedin.com/in/aaron-dull-57571889/" target="_blank"><img src="social_media_buttons_linkedin.png" alt="Linkedin"></a>
-        <br>
-        <a href="https://www.instagram.com/hendorism/?hl=en" target="_blank"><img src="social_media_buttons_insta.png" alt="Instagram"></a>
-        <a href="https://www.tiktok.com/explore" target="_blank"><img src="social_media_buttons_ticktock.png" alt="tiktok"></a>
-        <a href="https://venmo.com/code?user_id=2177255539212288660&created=1743794426" target="_blank"><img src="social_media_buttons_venmo.png" alt="Venmo"></a>
     </div>
+    <aside class="bio-blog-panel" aria-label="Blog posts">
+        <h3>Preview My Blog</h3>
+        <p>Browse my music blog. Scroll through every post here, or click a title to open the full page.</p>
+        <div class="blog-scroll" id="bio-blog-scroll">
+            <div class="blog-feed" id="bio-blog-feed">
+                <article class="blog-preview-post">
+                    <a class="blog-title-link" href="blog/2025-11-21-equal-temperament-major-third.html">
+                        <span class="blog-date">21/11/2025</span>
+                        <strong>Why the Equal Temperament Major Third Feels "Bent"</strong>
+                    </a>
+                    <p>This article was compiled by ChatGPT.</p>
+                    <p>Let's dive into it with some geometric analogies that illuminate why the equal temperament major third, about 400 cents, feels the most "bent" or "distorted" compared to its pure just-intonation version, about 386.3 cents with the ratio 5:4.</p>
 
-    <h4>Check out some of my original compositions:</h4>
+                    <h4>1. The Circle Division Analogy</h4>
+                    <p>Imagine tuning as dividing a circle, the octave, into 12 equal slices. Each semitone is 30 degrees. A pure major third should correspond to the ratio 5:4, which is about 4.86 semitones, or roughly 145.8 degrees on our circle. But equal temperament forces it to land exactly at 4 semitones, 400 cents, or 144 degrees on our circle.</p>
+                    <p>That is like trying to make a perfect pentagon by dividing a circle into 12 equal parts. The points almost line up, but not quite. The geometry is regular, but the proportions are off. The major third is the point where the grid of equal spacing and the natural ratios of harmonic geometry diverge most visibly.</p>
+
+                    <h4>2. The Triangle Stretch Analogy</h4>
+                    <p>A pure major third, 5:4, is like an isosceles triangle with sides that meet perfectly to form a harmonious shape. When you temper it, 400 cents instead of 386 cents, it is as if you stretch one side slightly, making the triangle no longer close perfectly. You still have a triangle, but the symmetry is broken.</p>
+                    <p>Intervals like the perfect fifth, 700 cents in equal temperament versus about 702 cents pure, only stretch a tiny bit, so the triangle still looks good. But the major third's deviation is large enough that the figure looks noticeably warped.</p>
+
+                    <h4>3. The Spiral Misalignment Analogy</h4>
+                    <p>Think of stacking intervals as tracing a spiral staircase upward. Pure intervals, in just intonation, spiral smoothly so that every few steps land neatly above a harmonic floor. In equal temperament, each step is forced to be the same size, but that makes the spiral twist slightly off-center.</p>
+                    <p>The major third happens where the spiral's mismatch is most visible: the step lands furthest away from the pure harmonic level. That is why chords with equal-tempered major thirds, like C-E-G, have that slight shimmer or beating. The geometry of the frequencies does not quite align.</p>
+
+                    <h4>4. The Grid Distortion Analogy</h4>
+                    <p>Imagine drawing a harmonic lattice on graph paper. The horizontal axis is fifths, ratio 3:2. The vertical axis is thirds, ratio 5:4. In just intonation, the grid lines are rationally related. Intersections are clean, forming a rectangular lattice.</p>
+                    <p>Equal temperament slightly shears the grid. Each cell becomes a parallelogram, not a rectangle. The major third line is the one most obviously tilted, because the adjustment needed to make 12 equal semitones fit in an octave causes that line to shift the most.</p>
+
+                    <h4>5. The Harmonic Projection Analogy</h4>
+                    <p>If you picture harmonics as points on a smooth curve, the fifth harmonic, which defines the pure major third, lies slightly off the curve defined by equal temperament's 12 equal points. When equal temperament projects that curve onto its uniform lattice, the fifth harmonic point gets displaced the most. That is why the major third becomes the most audibly off.</p>
+                    <a class="blog-read-link" href="blog/2025-11-21-equal-temperament-major-third.html">Open full post</a>
+                </article>
+            </div>
+        </div>
+    </aside>
+</div>
+    <h4>Original compositions</h4>
 <ul>
-    <li><a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Untitled_-_4_11_2018-1.pdf" target="_blank" rel="noopener">Untitled - 4/11/2018</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Goo_De_Goo.pdf" target="_blank" rel="noopener">Goo_De_Goo</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/10/Tiny-Mouse.pdf" target="_blank" rel="noopener">Tiny Mouse</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/10/Cappucino-Cappricio-four-hands-piano-duet.pdf" target="_blank" rel="noopener">Cappucino Cappricio</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/09/Thincopated-Clock.pdf" target="_blank" rel="noopener">Thincopated Clock</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/09/Sunflower-Tea.pdf" target="_blank" rel="noopener">Sunflower Tea</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/09/cold-stale-buns.pdf" target="_blank" rel="noopener">Cold Stale Buns</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Phrizbee-draft-4-3-2017.pdf" target="_blank" rel="noopener">Phrizbee</a>
-    </li><li><a href="http://everettmusicdojo.com/wp-content/uploads/2024/09/Yangtze-v4-20240110.pdf" target="_blank" rel="noopener">Yangtze River Boatmen (version 4)</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Dangerous_Daffodils_flute_solo_-_4_8_2018.pdf" target="_blank" rel="noopener">Dangerous Daffodils</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf" target="_blank" rel="noopener">Frute of the Loom</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/03/fluentsy.pdf" target="_blank" rel="noopener">Fluentsy</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Floode.pdf" target="_blank" rel="noopener">Floode</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/12/yellow-cab.pdf" target="_blank" rel="noopener">Yellow Cab</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/12/wp-1670219195628.pdf" target="_blank" rel="noopener">Flöte Duet</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/flewd_conduct.pdf" target="_blank" rel="noopener">Flewd Conduct</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Fast_Duet.pdf" target="_blank" rel="noopener">Fast Duet</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/03/fluentsy.pdf" target="_blank" rel="noopener">Fluentsy</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/10/eevees-kennel-club-dance-20221030.pdf" target="_blank" rel="noopener">Eevee's Kennel Club Dance</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Frute-of-the-Loom.pdf" target="_blank" rel="noopener">Frute of the Loom</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2023/04/Goat_Milk_Waltz.pdf" target="_blank" rel="noopener">Goat Milk Waltz</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2024/07/Ran_Acrowned.pdf" target="_blank" rel="noopener">Ran Acrowned</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/McDuet.pdf" target="_blank" rel="noopener">McDuet</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/drownded.pdf" target="_blank" rel="noopener">drownded</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2022/04/Bildge_Water_Soup.pdf" target="_blank" rel="noopener">Bildge Water Soup</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/EMD_Remote_Ensemble_4_27_2021-Score_and_Parts.pdf" target="_blank" rel="noopener">EMD Remote Ensemble 4/27/2021</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/banana-Score_and_Parts.pdf" target="_blank" rel="noopener">Banana</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/Strawberry_4_19_2021-Score_and_Parts-1.pdf" target="_blank" rel="noopener">Strawberry 4/19/2021</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/f-f-f-c-bc-p-u-20210418-Score_and_Parts.pdf" target="_blank" rel="noopener">f f f c bc p u 20210418</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/Cranberry_4_19_2021-Score_and_Parts.pdf" target="_blank" rel="noopener">Cranberry 4/19/2021</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/04/Callobius_Severus.pdf" target="_blank" rel="noopener">Callobius Severus</a>
-    </li><li><a href="https://everettmusicdojo.com/wp-content/uploads/2021/02/Hazelnut-Nutella-Toast.pdf" target="_blank" rel="noopener">Hazelnut Nutella Toast</a>
-    </li>
+    <li class="music-store-link"><a href="music-store/">Browse the Music Store</a></li>
 </ul>
-
 <h4>Check out some of these cool online resources:</h4>
 <ul>
     <li><a href="https://music.school.nz/" target="_blank">music.school.nz</a></li>
     <li><a href="https://www.musictheory.net/exercises" target="_blank">musictheory.net</a></li>
     <li><a href="https://tonedear.com/" target="_blank">tonedear.com</a></li>
 </ul>
-
-
-<div>
-
-<h1>Why the Equal Temperament Major Third Feels "Bent"</h1>
-
-<p>This article was compiled by Chat GPT</p>
-
-<p>Let’s dive into it with some geometric analogies that illuminate why the equal temperament major third (~400 ¢) feels the most “bent” or “distorted” compared to its pure (just intonation) version (~386.3 ¢, ratio = 5:4).</p>
-
-<div class="analogy">
-<h2 class="emoji">🎯 1. The Circle Division Analogy</h2>
-<p>Imagine tuning as dividing a circle (the octave) into 12 equal slices — each semitone is 30°.<br>
-A pure major third should correspond to the ratio 5:4, which is about 4.86 semitones, or roughly 145.8° on our circle.<br>
-But equal temperament forces it to land exactly at 4 semitones = 400 ¢, or 144° on our circle.</p>
-<p>That’s like trying to make a perfect pentagon by dividing a circle into 12 equal parts — the points almost line up, but not quite. The geometry is regular, but the proportions are off.<br>
-→ The major third is the point where the “grid” of equal spacing and the “natural ratios” of harmonic geometry diverge most visibly.</p>
-</div>
-
-<div class="analogy">
-<h2 class="emoji">📐 2. The Triangle Stretch Analogy</h2>
-<p>A pure major third (5:4) is like an isosceles triangle with sides that meet perfectly to form a harmonious shape.<br>
-When you temper it (400 ¢ instead of 386 ¢), it’s as if you stretch one side slightly, making the triangle no longer close perfectly — you still have a triangle, but the symmetry is broken.<br>
-Intervals like the perfect fifth (700 ¢ vs 702 ¢) only stretch a tiny bit, so the triangle still looks good. But the major third’s deviation is large enough that the figure looks noticeably warped.</p>
-</div>
-
-<div class="analogy">
-<h2 class="emoji">🌀 3. The Spiral Misalignment Analogy</h2>
-<p>Think of stacking intervals as tracing a spiral staircase upward:<br>
-Pure intervals (just intonation) spiral smoothly so that every few steps land neatly above a harmonic “floor.”<br>
-In equal temperament, each step is forced to be the same size — but that makes the spiral twist slightly off-center.<br>
-The major third happens where the spiral’s mismatch is most visible: the step lands furthest away from the pure harmonic level.<br>
-That’s why chords with equal-tempered major thirds (like C–E–G) have that slight “shimmer” or beating — the geometry of the frequencies doesn’t quite align.</p>
-</div>
-
-<div class="analogy">
-<h2 class="emoji">📏 4. The Grid Distortion Analogy</h2>
-<p>Imagine you’re drawing a harmonic lattice on graph paper:<br>
-The horizontal axis is fifths (ratio 3:2).<br>
-The vertical axis is thirds (ratio 5:4).<br>
-In just intonation, the grid lines are rationally related — intersections are clean, forming a rectangular lattice.<br>
-Equal temperament slightly shears the grid — each cell becomes a parallelogram, not a rectangle.<br>
-The major third line is the one most obviously tilted, because the adjustment needed to make 12 equal semitones fit in an octave causes that line to shift the most.</p>
-</div>
-
-<div class="analogy">
-<h2 class="emoji">🎵 5. The Harmonic Projection Analogy</h2>
-<p>If you picture harmonics as points on a smooth curve, the 5th harmonic (which defines the pure major third) lies slightly off the curve defined by equal temperament’s 12 equal points.<br>
-So when equal temperament “projects” that curve onto its uniform lattice, the 5th harmonic point gets displaced the most — hence, the major third becomes the most audibly “off.”</p>
-</div>
-
-</div>
-
-
-</div>
-
-
-
 
 
 <img src="https://everettmusicdojo.com/wp-content/uploads/2025/03/Musicians-Pledge-Khristy-2-scaled.jpg" alt="musicians pledge" style="width: 100%; max-width: 600px; margin: 0 auto; display: block;">
@@ -446,16 +935,15 @@ So when equal temperament “projects” that curve onto its uniform lattice, th
 //         });
 //     }
 
-        // #youtube1 is same width as <p> elements
-        var youtube1 = document.getElementById('youtube1');
-        youtube1.style.width = 600 + 'px';
-        //iframe id="youtube1" top and bottom margin is 16px
-        youtube1.style.margin = '20px auto';
+        const youtube1 = document.getElementById('youtube1');
+        if (youtube1) {
+            youtube1.style.margin = '';
+        }
 
 
         //<form action="https://formspree.io/f/xanqrnyv" method="POST" id="contact-form"> text color is #333333 and no text shadow
         const contactForm = document.querySelector('form#contact-form');
-        contactForm.style.color = '#333333';
+        contactForm.style.color = '';
         contactForm.style.textShadow = 'none';
 
 
@@ -473,100 +961,198 @@ So when equal temperament “projects” that curve onto its uniform lattice, th
 
 
 document.addEventListener("DOMContentLoaded", function () {
-////////////////////////////////////////////////////////////////////////////////
-const colorSchemes = {
-    greens1: ["#af108e", "#3e0d68", "#074784", "#0878a8"],
-    greys: ["#333", "#666", "#999", "#ccc", "#eee"],
-};
-const header = document.querySelector('header');
-if (header) {
-    header.style.color = colorSchemes.greens1[0];
-    header.style.backgroundColor = colorSchemes.greys[4];
-}
-//make a game loop so that the background color of div#background-div changes over time smoothly. color is a function of time
-const backgroundDiv = document.querySelector('div#background-div');
-if (backgroundDiv) {
+    const root = document.documentElement;
     let time = 0;
-    setInterval(() => {
+
+    function hslToRgb(h, s, l) {
+        const c = (1 - Math.abs(2 * l - 1)) * s;
+        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        const m = l - c / 2;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+
+        if (h < 60) [r, g, b] = [c, x, 0];
+        else if (h < 120) [r, g, b] = [x, c, 0];
+        else if (h < 180) [r, g, b] = [0, c, x];
+        else if (h < 240) [r, g, b] = [0, x, c];
+        else if (h < 300) [r, g, b] = [x, 0, c];
+        else [r, g, b] = [c, 0, x];
+
+        return [
+            Math.round((r + m) * 255),
+            Math.round((g + m) * 255),
+            Math.round((b + m) * 255)
+        ];
+    }
+
+    function setRgbVar(name, rgb) {
+        root.style.setProperty(name, rgb.join(", "));
+    }
+
+    function updateColorDrift() {
         time += 0.01;
-        let plus = 205;
-        let times = 50;
-        let red = plus + Math.sin(time) * times;
-        let green = plus + Math.sin(time + (2 * Math.PI) / 3) * times;
-        let blue = plus + Math.sin(time + (4 * Math.PI) / 3) * times;
-        let color = `rgb(${red}, ${green}, ${blue})`;
-        backgroundDiv.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
-        console.log(`rgb(${red}, ${green}, ${blue})`);
-//header background color smoothly cycles between colors of colorSchemes.greens1
-let headerColor = colorSchemes.greens1[1];
-header.style.backgroundColor = headerColor;
-//header text color is the same as the background color of div#background-div
-header.style.color = color;
+        const cyanHue = 185 + Math.sin(time) * 18;
+        const magentaHue = 312 + Math.sin(time + Math.PI * 0.66) * 18;
+        const acidHue = 78 + Math.sin(time + Math.PI * 1.33) * 14;
+        const deepHue = 262 + Math.sin(time + Math.PI) * 22;
 
+        setRgbVar("--drift-cyan-rgb", hslToRgb((cyanHue + 360) % 360, 1, 0.52));
+        setRgbVar("--drift-magenta-rgb", hslToRgb((magentaHue + 360) % 360, 1, 0.58));
+        setRgbVar("--drift-acid-rgb", hslToRgb((acidHue + 360) % 360, 0.95, 0.56));
+        setRgbVar("--drift-deep-rgb", hslToRgb((deepHue + 360) % 360, 0.95, 0.12));
+    }
 
+    updateColorDrift();
+    setInterval(updateColorDrift, 1000 / 3);
 
+    const socialRail = document.querySelector(".social_div");
+    const bioCard = document.querySelector(".bio-card");
+    if (socialRail && bioCard && !window.matchMedia("(max-width: 680px)").matches) {
+        const socialLinks = Array.from(socialRail.querySelectorAll("a"));
+        let lastRelativeY = null;
+        let lastSampleTime = performance.now();
+        let animationFrame = null;
+        let lastFrameTime = performance.now();
+        const bodies = socialLinks.map((link, index) => ({
+            link,
+            y: 0,
+            x: 0,
+            rotation: 0,
+            velocityY: 0,
+            velocityX: 0,
+            angularVelocity: 0,
+            mass: 0.82 + index * 0.075,
+            spring: 92 - Math.min(index * 3.6, 26),
+            damping: 13.5 + index * 0.35,
+            sway: index % 2 === 0 ? 1 : -1
+        }));
 
+        function getRelativeY() {
+            const railBounds = socialRail.getBoundingClientRect();
+            const bioBounds = bioCard.getBoundingClientRect();
+            return {
+                relativeY: railBounds.top - bioBounds.top,
+                isNearBio: bioBounds.bottom > 0 && bioBounds.top < window.innerHeight
+            };
+        }
 
-let textColor = colorSchemes.greys[0];
-let backgroundColor = colorSchemes.greens1[4];
-        //grab all div.text-backdrop-div elements and set their background color to colorSchemes.greens[0] and their text color to colorSchemes.greys[0]
-        document.querySelectorAll('div.text-backdrop-div').forEach(div => {
-            // div.style.backgroundColor = colorSchemes.greens1[0];
-            div.style.backgroundColor = colorSchemes.greens1[1];
+        function resetSocialBodies() {
+            bodies.forEach(body => {
+                body.y = 0;
+                body.x = 0;
+                body.rotation = 0;
+                body.velocityY = 0;
+                body.velocityX = 0;
+                body.angularVelocity = 0;
+                body.link.style.setProperty("--social-y", "0px");
+                body.link.style.setProperty("--social-x", "0px");
+                body.link.style.setProperty("--social-rot", "0deg");
+            });
+        }
 
-            div.style.color = color;
-            //apply a text shadow to the text in div.text-backdrop-div
-            div.style.textShadow = `1px 0px 10px ${colorSchemes.greys[2]}`;
-        });
-    }, 1000 / 3);
-}
+        function animateSocialPhysics(now) {
+            const { isNearBio } = getRelativeY();
+            const dt = Math.min(0.032, Math.max(0.001, (now - lastFrameTime) / 1000));
+            let maxMotion = 0;
 
+            if (!isNearBio) {
+                resetSocialBodies();
+                animationFrame = null;
+                return;
+            }
 
-//below header, display div to show all the colors in greens1
-for (i=0; i<colorSchemes.greens1.length; i++) {
-    let col = colorSchemes.greens1[i];
-    let div = document.createElement('div');
-    div.style.backgroundColor = col;
-    div.style.width = '100%';
-    div.style.height = '20px';
-    document.body.appendChild(div);
-}
+            bodies.forEach(body => {
+                const accelY = (-body.spring * body.y - body.damping * body.velocityY) / body.mass;
+                const accelX = (-(body.spring * 0.72) * body.x - (body.damping * 0.86) * body.velocityX) / body.mass;
+                const accelRot = (-(body.spring * 0.54) * body.rotation - (body.damping * 0.72) * body.angularVelocity) / body.mass;
 
+                body.velocityY += accelY * dt;
+                body.velocityX += accelX * dt;
+                body.angularVelocity += accelRot * dt;
 
+                body.y += body.velocityY * dt;
+                body.x += body.velocityX * dt;
+                body.rotation += body.angularVelocity * dt;
 
+                if (Math.abs(body.y) < 0.02 && Math.abs(body.velocityY) < 0.04) {
+                    body.y = 0;
+                    body.velocityY = 0;
+                }
 
+                if (Math.abs(body.x) < 0.02 && Math.abs(body.velocityX) < 0.04) {
+                    body.x = 0;
+                    body.velocityX = 0;
+                }
 
-//create another div above the background image that is a solid color with 0.2 opacity
-// const backgroundImg = document.querySelector('img#background-img');
-// if (backgroundImg) {
-//     const backgroundDiv = document.createElement('div');
-//     backgroundDiv.id = 'background-div2';
-//     backgroundDiv.style.position = 'fixed';
-//     backgroundDiv.style.top = 0;
-//     backgroundDiv.style.left = 0;
-//     backgroundDiv.style.width = '100%';
-//     backgroundDiv.style.height = '100%';
-//     backgroundDiv.style.backgroundColor = '#ffffff';
-//     backgroundDiv.style.zIndex = -1;
-//     backgroundDiv.style.opacity = 0.92;
-//     backgroundImg.parentNode.insertBefore(backgroundDiv, backgroundImg);
+                if (Math.abs(body.rotation) < 0.01 && Math.abs(body.angularVelocity) < 0.02) {
+                    body.rotation = 0;
+                    body.angularVelocity = 0;
+                }
 
-    // position: fixed;
-    //         top: 0;
-    //         left: 0;
-    //         width: 100%;
-    //         height: 100%;
-    //         background-color: #77ccff;
-    //         z-index: -1;
-    //         opacity: 0.92;
+                body.y = Math.max(-26, Math.min(26, body.y));
+                body.x = Math.max(-7, Math.min(7, body.x));
+                body.rotation = Math.max(-8, Math.min(8, body.rotation));
 
+                body.link.style.setProperty("--social-y", `${body.y.toFixed(2)}px`);
+                body.link.style.setProperty("--social-x", `${body.x.toFixed(2)}px`);
+                body.link.style.setProperty("--social-rot", `${body.rotation.toFixed(2)}deg`);
 
+                maxMotion = Math.max(
+                    maxMotion,
+                    Math.abs(body.y),
+                    Math.abs(body.x),
+                    Math.abs(body.rotation) * 0.45,
+                    Math.abs(body.velocityY) * 0.035,
+                    Math.abs(body.velocityX) * 0.035,
+                    Math.abs(body.angularVelocity) * 0.02
+                );
+            });
 
+            lastFrameTime = now;
 
+            if (maxMotion < 1) {
+                resetSocialBodies();
+                animationFrame = null;
+                return;
+            }
 
+            animationFrame = requestAnimationFrame(animateSocialPhysics);
+        }
 
+        function sampleSocialMovement() {
+            const now = performance.now();
+            const { relativeY } = getRelativeY();
+            const dt = Math.max(0.001, (now - lastSampleTime) / 1000);
 
+            if (lastRelativeY !== null) {
+                const relativeVelocity = (relativeY - lastRelativeY) / dt;
+                const speed = Math.abs(relativeVelocity);
 
+                if (speed > 12) {
+                    const impulse = Math.max(-720, Math.min(720, relativeVelocity));
+                    bodies.forEach((body, index) => {
+                        const lag = 1 + index * 0.09;
+                        const wobble = body.sway * Math.min(90, Math.abs(impulse) * 0.075);
+                        body.velocityY += (-impulse * 0.13) / (body.mass * lag);
+                        body.velocityX += (wobble * 0.08) / body.mass;
+                        body.angularVelocity += (wobble * 1.8) / (body.mass * lag);
+                    });
+                    lastFrameTime = now;
+                    if (animationFrame === null) {
+                        animationFrame = requestAnimationFrame(animateSocialPhysics);
+                    }
+                }
+            }
+
+            lastRelativeY = relativeY;
+            lastSampleTime = now;
+        }
+
+        sampleSocialMovement();
+        window.addEventListener("scroll", sampleSocialMovement, { passive: true });
+        window.addEventListener("resize", sampleSocialMovement, { passive: true });
+    }
 });
 
 
