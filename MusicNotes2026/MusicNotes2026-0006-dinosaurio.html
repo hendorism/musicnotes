@@ -33,7 +33,22 @@
       font-family: Chicago, Geneva, sans-serif;
     }
 
+    #cheat-sheet-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 20, 34, 0.22);
+      z-index: 11;
+      font-family: Chicago, Geneva, sans-serif;
+    }
+
     #rename-modal.visible {
+      display: flex;
+    }
+
+    #cheat-sheet-modal.visible {
       display: flex;
     }
 
@@ -43,6 +58,19 @@
       border: 2px solid #000;
       box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
       padding: 16px;
+    }
+
+    #cheat-sheet-dialog {
+      width: min(820px, calc(100vw - 36px));
+      max-height: min(680px, calc(100vh - 36px));
+      overflow: auto;
+      background: rgba(238, 252, 255, 0.86);
+      border: 2px solid rgba(0, 18, 28, 0.85);
+      box-shadow:
+        3px 3px 0 rgba(0, 0, 0, 0.46),
+        0 0 28px rgba(76, 220, 255, 0.38);
+      padding: 14px;
+      backdrop-filter: blur(8px);
     }
 
     #rename-dialog label {
@@ -66,12 +94,76 @@
       gap: 10px;
     }
 
+    #cheat-sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    #cheat-sheet-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    #cheat-sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .cheat-sheet-section {
+      border: 1px solid rgba(0, 0, 0, 0.24);
+      background: rgba(255, 255, 255, 0.45);
+      padding: 8px;
+    }
+
+    .cheat-sheet-section h3 {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+
+    .cheat-row {
+      display: grid;
+      grid-template-columns: 98px 1fr;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 12px;
+      line-height: 1.25;
+      padding: 3px 0;
+    }
+
+    .cheat-row kbd {
+      display: inline-block;
+      border: 1px solid #555;
+      border-bottom-width: 2px;
+      background: rgba(255,255,255,0.68);
+      padding: 1px 5px;
+      font: 11px Consolas, monospace;
+      white-space: nowrap;
+    }
+
     #rename-buttons button {
       min-width: 72px;
       border: 2px outset #fff;
       background: #ddd;
       font: 13px Chicago, Geneva, sans-serif;
       padding: 4px 12px;
+    }
+
+    #cheat-sheet-close {
+      min-width: 72px;
+      border: 2px outset #fff;
+      background: #ddd;
+      font: 13px Chicago, Geneva, sans-serif;
+      padding: 4px 12px;
+    }
+
+    @media (max-width: 720px) {
+      #cheat-sheet-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -94,6 +186,62 @@
       </div>
     </div>
   </div>
+  <div id="cheat-sheet-modal" aria-hidden="true">
+    <div id="cheat-sheet-dialog" role="dialog" aria-modal="true" aria-labelledby="cheat-sheet-title">
+      <div id="cheat-sheet-header">
+        <h2 id="cheat-sheet-title">Keyboard Controls</h2>
+        <button id="cheat-sheet-close" type="button">Close</button>
+      </div>
+      <div id="cheat-sheet-grid">
+        <section class="cheat-sheet-section">
+          <h3>Write</h3>
+          <div class="cheat-row"><kbd>1-9</kbd><span>Add scale-degree notes from the current tonic.</span></div>
+          <div class="cheat-row"><kbd>0</kbd><span>Add a rest using the selected duration.</span></div>
+          <div class="cheat-row"><kbd>Space</kbd><span>Insert a barline.</span></div>
+          <div class="cheat-row"><kbd>Shift</kbd><span>Hold to add notes into the current chord.</span></div>
+          <div class="cheat-row"><kbd>Enter</kbd><span>Apply the currently held accidental to the active note.</span></div>
+        </section>
+        <section class="cheat-sheet-section">
+          <h3>Edit</h3>
+          <div class="cheat-row"><kbd>Ctrl/Cmd+A</kbd><span>Select the full notation timeline.</span></div>
+          <div class="cheat-row"><kbd>Ctrl/Cmd+top 1-7</kbd><span>Change selected or active note/rest duration.</span></div>
+          <div class="cheat-row"><kbd>Dur + 1-7</kbd><span>On touch controls, toggle Dur, then tap a number to change selected duration.</span></div>
+          <div class="cheat-row"><kbd>Backspace</kbd><span>Delete selection, or delete behind the cursor.</span></div>
+          <div class="cheat-row"><kbd>Delete</kbd><span>Delete selection, or delete ahead of the cursor.</span></div>
+          <div class="cheat-row"><kbd>Ctrl/Cmd+Z</kbd><span>Undo.</span></div>
+          <div class="cheat-row"><kbd>B</kbd><span>Toggle beaming mode for beamable notes.</span></div>
+        </section>
+        <section class="cheat-sheet-section">
+          <h3>Navigate</h3>
+          <div class="cheat-row"><kbd>Left/Right</kbd><span>Move through notes, rests, barlines, and key signatures.</span></div>
+          <div class="cheat-row"><kbd>Up/Down</kbd><span>Move the cursor pitch on the current staff.</span></div>
+          <div class="cheat-row"><kbd>Shift+Left/Right</kbd><span>Extend selection.</span></div>
+          <div class="cheat-row"><kbd>Z+Shift+Arrows</kbd><span>Slide the selected range left or right.</span></div>
+          <div class="cheat-row"><kbd>Ctrl+Shift+Up/Down</kbd><span>Jump the cursor between grand-staff staves.</span></div>
+        </section>
+        <section class="cheat-sheet-section">
+          <h3>Tonic And Key</h3>
+          <div class="cheat-row"><kbd>T</kbd><span>Hold for tonic controls.</span></div>
+          <div class="cheat-row"><kbd>T + A-G</kbd><span>Set tonic letter.</span></div>
+          <div class="cheat-row"><kbd>T + 1-9</kbd><span>Transpose tonic by interval.</span></div>
+          <div class="cheat-row"><kbd>T + Up/Down</kbd><span>Change tonic octave.</span></div>
+          <div class="cheat-row"><kbd>K + 0-7</kbd><span>Insert a key signature.</span></div>
+        </section>
+        <section class="cheat-sheet-section">
+          <h3>Accidentals</h3>
+          <div class="cheat-row"><kbd>A/S/D/F/G</kbd><span>Hold double-flat, flat, natural, sharp, or double-sharp.</span></div>
+          <div class="cheat-row"><kbd>-</kbd><span>Toggle minus mode for interval/key actions.</span></div>
+        </section>
+        <section class="cheat-sheet-section">
+          <h3>Playback And View</h3>
+          <div class="cheat-row"><kbd>P</kbd><span>Toggle playback mode.</span></div>
+          <div class="cheat-row"><kbd>Space</kbd><span>Play/pause while playback mode is on.</span></div>
+          <div class="cheat-row"><kbd>Wheel/Drag</kbd><span>Pan or zoom the notation workspace.</span></div>
+          <div class="cheat-row"><kbd>Right Click</kbd><span>Open context actions for notes, beams, staff, and symbols.</span></div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script src="vendor/vexflow-4.2.2.js"></script>
   <script>
@@ -103,6 +251,8 @@
     const renameInput = document.getElementById("rename-input");
     const renameOkButton = document.getElementById("rename-ok");
     const renameCancelButton = document.getElementById("rename-cancel");
+    const cheatSheetModal = document.getElementById("cheat-sheet-modal");
+    const cheatSheetCloseButton = document.getElementById("cheat-sheet-close");
     const ctx = canvas.getContext("2d");
     const VF = window.Vex?.Flow;
     const vexContext = VF ? new VF.CanvasContext(ctx) : null;
@@ -122,8 +272,10 @@
         playing: false
       },
       staves: [
-        { id: "staff-1", name: "Staff 1" }
+        { id: "staff-1", name: "Treble Staff", clef: "treble" },
+        { id: "staff-2", name: "Bass Staff", clef: "bass" }
       ],
+      activeStaffIndex: 0,
       modal: {
         type: null,
         staffId: null
@@ -213,7 +365,8 @@
       },
 
       controls: {
-        noteheadDiameterScale: 1
+        noteheadDiameterScale: 1,
+        staffGap: 78
       },
 
       pinch: {
@@ -233,6 +386,7 @@
         value: "1/4",
         shift: false,
         selectedShift: false,
+        durationEditMode: false,
         tonicMenuOpen: false
       },
 
@@ -336,16 +490,45 @@
         };
       },
 
-      staffTop() {
-        return 110;
+      staffGap() {
+        return AppState.controls.staffGap ?? 78;
       },
 
-      lineY(i) {
-        return this.staffTop() + i * this.S;
+      staffTop(staff = AppState.activeStaffIndex ?? 0) {
+        const index = Math.max(0, Math.min(AppState.staves.length - 1, staff ?? 0));
+        return 82 + index * (this.S * 4 + this.staffGap());
       },
 
-      bottomLineY() {
-        return this.lineY(4);
+      lineY(i, staff = AppState.activeStaffIndex ?? 0) {
+        return this.staffTop(staff) + i * this.S;
+      },
+
+      bottomLineY(staff = AppState.activeStaffIndex ?? 0) {
+        return this.lineY(4, staff);
+      },
+
+      staffAtY(y) {
+        let best = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        AppState.staves.forEach((staff, index) => {
+          const center = this.lineY(2, index);
+          const distance = Math.abs(y - center);
+          if (distance < bestDistance) {
+            best = index;
+            bestDistance = distance;
+          }
+        });
+
+        return best;
+      },
+
+      staffBounds(staff = AppState.activeStaffIndex ?? 0) {
+        return {
+          top: this.lineY(0, staff),
+          middle: this.lineY(2, staff),
+          bottom: this.lineY(4, staff)
+        };
       }
     };
 
@@ -373,24 +556,46 @@
       },
 
       keySignaturePitches: {
-        sharp: [
-          ["F", 5],
-          ["C", 5],
-          ["G", 5],
-          ["D", 5],
-          ["A", 4],
-          ["E", 5],
-          ["B", 4]
-        ],
-        flat: [
-          ["B", 4],
-          ["E", 5],
-          ["A", 4],
-          ["D", 5],
-          ["G", 4],
-          ["C", 5],
-          ["F", 4]
-        ]
+        treble: {
+          sharp: [
+            ["F", 5],
+            ["C", 5],
+            ["G", 5],
+            ["D", 5],
+            ["A", 4],
+            ["E", 5],
+            ["B", 4]
+          ],
+          flat: [
+            ["B", 4],
+            ["E", 5],
+            ["A", 4],
+            ["D", 5],
+            ["G", 4],
+            ["C", 5],
+            ["F", 4]
+          ]
+        },
+        bass: {
+          sharp: [
+            ["F", 3],
+            ["C", 3],
+            ["G", 3],
+            ["D", 3],
+            ["A", 2],
+            ["E", 3],
+            ["B", 2]
+          ],
+          flat: [
+            ["B", 2],
+            ["E", 3],
+            ["A", 2],
+            ["D", 3],
+            ["G", 2],
+            ["C", 3],
+            ["F", 2]
+          ]
+        }
       },
 
       accidentalOffset: {
@@ -427,6 +632,7 @@
           cursorIndex: AppState.cursorIndex,
           cursorFreeX: AppState.cursorFreeX,
           cursorStaffOffset: AppState.cursorStaffOffset,
+          activeStaffIndex: AppState.activeStaffIndex,
           selection: AppState.selection ? { ...AppState.selection } : null,
           noteInput: { ...AppState.noteInput }
         };
@@ -458,6 +664,7 @@
         AppState.cursorIndex = previous.cursorIndex;
         AppState.cursorFreeX = previous.cursorFreeX ?? null;
         AppState.cursorStaffOffset = previous.cursorStaffOffset;
+        AppState.activeStaffIndex = previous.activeStaffIndex ?? 0;
         AppState.selection = previous.selection ? { ...previous.selection } : null;
         AppState.noteInput = {
           ...AppState.noteInput,
@@ -502,6 +709,7 @@
       ordered() {
         return [...AppState.notes].sort((a, b) => {
           if (a.x !== b.x) return a.x - b.x;
+          if ((a.staff ?? 0) !== (b.staff ?? 0)) return (a.staff ?? 0) - (b.staff ?? 0);
           return (a.y ?? 0) - (b.y ?? 0);
         });
       },
@@ -514,17 +722,28 @@
         return (octave - 4) * 7 + this.letterIndex(letter);
       },
 
-      yFromPitch(letter, octave) {
-        // Treble clef: E4 is the bottom staff line.
-        const e4Step = this.diatonicStep("E", 4);
-        const noteStep = this.diatonicStep(letter, octave);
-
-        return Layout.bottomLineY() - (noteStep - e4Step) * (Layout.S / 2);
+      staffClef(staff = AppState.activeStaffIndex ?? 0) {
+        return AppState.staves[staff]?.clef || "treble";
       },
 
-      pitchFromStaffOffset(offset = AppState.cursorStaffOffset) {
-        const e4Step = this.diatonicStep("E", 4);
-        const step = e4Step - offset;
+      staffReferencePitch(staff = AppState.activeStaffIndex ?? 0) {
+        return this.staffClef(staff) === "bass"
+          ? { letter: "G", octave: 2 }
+          : { letter: "E", octave: 4 };
+      },
+
+      yFromPitch(letter, octave, staff = AppState.activeStaffIndex ?? 0) {
+        const reference = this.staffReferencePitch(staff);
+        const referenceStep = this.diatonicStep(reference.letter, reference.octave);
+        const noteStep = this.diatonicStep(letter, octave);
+
+        return Layout.bottomLineY(staff) - (noteStep - referenceStep) * (Layout.S / 2);
+      },
+
+      pitchFromStaffOffset(offset = AppState.cursorStaffOffset, staff = AppState.activeStaffIndex ?? 0) {
+        const center = this.staffReferencePitch(staff);
+        const centerStep = this.diatonicStep(center.letter, center.octave) + 4;
+        const step = centerStep - offset;
         const index =
           ((step % this.letters.length) + this.letters.length) %
           this.letters.length;
@@ -618,8 +837,8 @@
           drawX: x,
           letter,
           octave,
-          y: this.yFromPitch(letter, octave),
           staff,
+          y: this.yFromPitch(letter, octave, staff),
           accidental,
           showAccidental,
           value: AppState.noteInput.value
@@ -636,7 +855,7 @@
       keySignatureOffsetForLetter(keySignature, letter) {
         if (!keySignature || keySignature.count === 0) return 0;
 
-        const pitches = this.keySignaturePitches[keySignature.accidental] || [];
+        const pitches = this.keySignaturePitches.treble[keySignature.accidental] || [];
         const affectedLetters = pitches
           .slice(0, keySignature.count)
           .map(([pitchLetter]) => pitchLetter);
@@ -644,6 +863,25 @@
         if (!affectedLetters.includes(letter)) return 0;
 
         return keySignature.accidental === "flat" ? -1 : 1;
+      },
+
+      keySignaturePitchesForStaff(accidental, staff = AppState.activeStaffIndex ?? 0) {
+        const clef = this.staffClef(staff);
+        return this.keySignaturePitches[clef]?.[accidental] ||
+          this.keySignaturePitches.treble[accidental] ||
+          [];
+      },
+
+      durationValueForNumber(number) {
+        return {
+          1: "1/64",
+          2: "1/32",
+          3: "1/16",
+          4: "1/8",
+          5: "1/4",
+          6: "1/2",
+          7: "1"
+        }[number] || null;
       },
 
       accidentalContextStartX(x) {
@@ -778,7 +1016,7 @@
 
         const pitch = this.pitchFromDegree(degree);
         const selectedAccidental = AppState.noteInput.accidental;
-        const staff = 0;
+        const staff = AppState.activeStaffIndex ?? 0;
         const effectiveAccidental = this.effectiveAccidental(
           pitch.letter,
           pitch.octave,
@@ -887,7 +1125,8 @@
           x: this.insertionX(false),
           layoutX: 0,
           drawX: 0,
-          y: Layout.lineY(2),
+          y: Layout.lineY(2, AppState.activeStaffIndex ?? 0),
+          staff: AppState.activeStaffIndex ?? 0,
           value: AppState.noteInput.value
         };
 
@@ -952,9 +1191,33 @@
       },
 
       deleteBehindCursor() {
+        if (AppState.selection) {
+          this.deleteSelection();
+          return;
+        }
+
         const ordered = this.ordered();
         const index = AppState.cursorIndex - 1;
         if (index < 0) return;
+
+        this.deleteAtOrderedIndex(index, "backward");
+      },
+
+      deleteAheadOfCursor() {
+        if (AppState.selection) {
+          this.deleteSelection();
+          return;
+        }
+
+        const ordered = this.ordered();
+        if (!ordered.length || AppState.cursorIndex >= ordered.length) return;
+
+        this.deleteAtOrderedIndex(AppState.cursorIndex, "forward");
+      },
+
+      deleteAtOrderedIndex(index, direction = "backward") {
+        const ordered = this.ordered();
+        if (index < 0 || index >= ordered.length) return;
 
         this.saveUndo();
         const activeItem = ordered[index];
@@ -973,11 +1236,16 @@
           AppState.cursorIndex -= 1;
         }
 
+        if (direction === "forward") {
+          AppState.cursorIndex = Math.min(AppState.cursorIndex, AppState.notes.length);
+        }
+
         AppState.cursorIndex = Math.max(
           0,
           Math.min(AppState.cursorIndex, AppState.notes.length)
         );
 
+        AppState.selection = null;
         this.layout();
         this.refreshAccidentalDisplay();
         this.syncCursorToActiveNote();
@@ -999,8 +1267,103 @@
         return true;
       },
 
+      changeDuration(value, { updateInputWhenNoTarget = true } = {}) {
+        const validValues = new Set(["1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64"]);
+        if (!validValues.has(value)) return false;
+
+        const ordered = this.ordered();
+        const targets = new Map();
+
+        if (AppState.selection) {
+          const range = this.selectedRange();
+          if (range) {
+            ordered
+              .slice(range.start, range.end + 1)
+              .filter(item => item.kind === "note" || item.kind === "rest")
+              .forEach(item => targets.set(item.id, item));
+          }
+        } else {
+          const active = this.activeItem();
+
+          if (active?.kind === "note") {
+            this.chordOf(active).forEach(note => targets.set(note.id, note));
+          } else if (active?.kind === "rest") {
+            targets.set(active.id, active);
+          }
+        }
+
+        if (!targets.size) {
+          if (updateInputWhenNoTarget) {
+            AppState.noteInput.value = value;
+          }
+          return false;
+        }
+
+        const alreadySet = [...targets.values()].every(item => item.value === value);
+        AppState.noteInput.value = value;
+        if (alreadySet) return true;
+
+        this.saveUndo();
+        targets.forEach(item => {
+          item.value = value;
+        });
+        this.layout();
+        this.refreshAccidentalDisplay();
+        this.syncCursorToActiveNote();
+        this.resetCursorBlink();
+        return true;
+      },
+
       clearSelection() {
         AppState.selection = null;
+      },
+
+      selectAll() {
+        const ordered = this.ordered();
+        if (!ordered.length) return false;
+
+        AppState.selection = {
+          start: 0,
+          end: ordered.length - 1,
+          activeEdge: "right"
+        };
+        AppState.cursorIndex = ordered.length;
+        AppState.cursorFreeX = null;
+        this.syncCursorToActiveNote();
+        this.resetCursorBlink();
+        this.scrollToNote(ordered[ordered.length - 1]);
+        return true;
+      },
+
+      deleteSelection() {
+        if (!AppState.selection) return false;
+
+        const ordered = this.ordered();
+        const range = this.selectedRange();
+        if (!range) return false;
+
+        const start = Math.min(range.start, range.end);
+        const end = Math.max(range.start, range.end);
+        const selectedIds = new Set(
+          ordered.slice(start, end + 1).map(item => item.id)
+        );
+
+        if (!selectedIds.size) return false;
+
+        this.saveUndo();
+        AppState.notes = AppState.notes.filter(item => !selectedIds.has(item.id));
+        AppState.selection = null;
+        AppState.cursorIndex = Math.max(
+          0,
+          Math.min(start, AppState.notes.length)
+        );
+        AppState.cursorFreeX = null;
+
+        this.layout();
+        this.refreshAccidentalDisplay();
+        this.syncCursorToActiveNote();
+        this.resetCursorBlink();
+        return true;
       },
 
       selectedRange() {
@@ -1181,7 +1544,8 @@
         AppState.selection = null;
         AppState.cursorIndex = index;
         AppState.cursorFreeX = wx;
-        AppState.cursorStaffOffset = this.staffOffsetFromY(sy);
+        AppState.activeStaffIndex = Layout.staffAtY(sy);
+        AppState.cursorStaffOffset = this.staffOffsetFromY(sy, AppState.activeStaffIndex);
         this.resetCursorBlink();
         AppState.camera.followX = AppState.camera.x;
       },
@@ -1288,7 +1652,7 @@
           n.drawX += (n.layoutX - n.drawX) * 0.22;
 
         if (n.kind === "note") {
-          n.y = this.yFromPitch(n.letter, n.octave);
+          n.y = this.yFromPitch(n.letter, n.octave, n.staff ?? 0);
         }
 
         const selectionTarget = this.isItemSelected(n) ? 1 : 0;
@@ -1316,7 +1680,12 @@
       },
 
       chordOf(note) {
-        return AppState.notes.filter(n => n.kind === "note" && n.x === note.x);
+        const staff = note.staff ?? 0;
+        return AppState.notes.filter(n =>
+          n.kind === "note" &&
+          n.x === note.x &&
+          (n.staff ?? 0) === staff
+        );
       },
 
       activeItem() {
@@ -1328,24 +1697,47 @@
         ];
       },
 
-      staffOffsetFromY(y) {
+      staffOffsetFromY(y, staff = AppState.activeStaffIndex ?? 0) {
         return Math.round(
-          (y - Layout.lineY(2)) / (Layout.S / 2)
+          (y - Layout.lineY(2, staff)) / (Layout.S / 2)
         );
       },
 
       syncCursorToActiveNote() {
         const active = this.activeItem();
-        if (!active || active.kind !== "note") return;
+        if (!active) return;
 
-        AppState.cursorStaffOffset = this.staffOffsetFromY(active.y);
+        if (active.staff !== undefined) {
+          AppState.activeStaffIndex = Math.max(
+            0,
+            Math.min(AppState.staves.length - 1, active.staff ?? 0)
+          );
+        }
+
+        if (active.kind !== "note") return;
+
+        AppState.cursorStaffOffset = this.staffOffsetFromY(active.y, active.staff ?? 0);
       },
 
       cursorY() {
         return (
-          Layout.lineY(2) +
+          Layout.lineY(2, AppState.activeStaffIndex ?? 0) +
           AppState.cursorStaffOffset * (Layout.S / 2)
         );
+      },
+
+      moveCursorStaff(delta) {
+        const nextStaff = Math.max(
+          0,
+          Math.min(AppState.staves.length - 1, (AppState.activeStaffIndex ?? 0) + delta)
+        );
+
+        if (nextStaff === AppState.activeStaffIndex) return;
+
+        AppState.activeStaffIndex = nextStaff;
+        AppState.cursorFreeX = AppState.cursorFreeX ?? this.insertionX(false);
+        this.clearSelection();
+        this.resetCursorBlink();
       },
 
       chordDeleteTarget(chord, activeNote) {
@@ -1395,7 +1787,7 @@
         if (!chord.length) return 0;
 
         const offsets = chord.map(note =>
-          (Layout.lineY(2) - note.y) / (Layout.S / 2)
+          (Layout.lineY(2, note.staff ?? 0) - note.y) / (Layout.S / 2)
         );
 
         return offsets.reduce((sum, offset) => sum + offset, 0) / offsets.length;
@@ -1499,8 +1891,8 @@
         const flagMinimum = flagHeight * goldenRatio;
         const outerY = direction > 0 ? highest : lowest;
         const outsideStaff = direction > 0
-          ? Math.max(0, Layout.lineY(0) - outerY)
-          : Math.max(0, outerY - Layout.lineY(4));
+          ? Math.max(0, Layout.lineY(0, chord[0]?.staff ?? 0) - outerY)
+          : Math.max(0, outerY - Layout.lineY(4, chord[0]?.staff ?? 0));
         const contourExtension = Math.min(Layout.S * 1.2, outsideStaff * 0.32);
         const base = Layout.S * 3.35 + span * 0.42 + contourExtension;
 
@@ -1739,7 +2131,7 @@
                   label: staff.name,
                   submenu: [
                     { id: `staff-visible-${staff.id}`, label: "Visible", disabled: true },
-                    { id: `staff-clef-${staff.id}`, label: "Treble Clef", disabled: true },
+                    { id: `staff-clef-${staff.id}`, label: `${staff.clef === "bass" ? "Bass" : "Treble"} Clef`, disabled: true },
                     { id: `staff-rename-${staff.id}`, label: "Renameâ€¦", action: () => this.openRenameModal(staff.id) }
                   ]
                 }))
@@ -1751,7 +2143,7 @@
             label: "Help",
             items: [
               { id: "tutorial-mode", label: "Tutorial Mode", action: () => this.toggleTutorial(), check: () => AppState.tutorial.enabled },
-              { id: "keyboard-help", label: "Keyboard Shortcuts", action: () => this.notify("Try number pad: 1–9 notes, 0 rest, Space barline, K key signature, T tonic.") }
+              { id: "keyboard-help", label: "Keyboard Shortcuts", action: () => this.openCheatSheet() }
             ]
           }
         ];
@@ -1831,6 +2223,25 @@
         AppState.modal.staffId = null;
         renameModal?.classList.remove("visible");
         renameModal?.setAttribute("aria-hidden", "true");
+        canvas.focus?.();
+      },
+
+      openCheatSheet() {
+        if (!cheatSheetModal) return;
+
+        AppState.modal.type = "cheat-sheet";
+        cheatSheetModal.classList.add("visible");
+        cheatSheetModal.setAttribute("aria-hidden", "false");
+        requestAnimationFrame(() => cheatSheetCloseButton?.focus());
+      },
+
+      closeCheatSheet() {
+        if (AppState.modal.type === "cheat-sheet") {
+          AppState.modal.type = null;
+        }
+
+        cheatSheetModal?.classList.remove("visible");
+        cheatSheetModal?.setAttribute("aria-hidden", "true");
         canvas.focus?.();
       },
 
@@ -2006,7 +2417,11 @@
             if (Input.keySignatureModifierHeld) {
               Input.tonicModifierHeld = false;
             }
-          })
+          }),
+          make("duration-edit", "Dur", 1, () => {
+            AppState.noteInput.durationEditMode = !AppState.noteInput.durationEditMode;
+          }),
+          make("cheat-sheet", "Cheat", 2, () => this.openCheatSheet())
         ];
       },
 
@@ -2024,6 +2439,18 @@
             valuePath: ["controls", "noteheadDiameterScale"],
             x: keyButton.x,
             y: keyButton.y + keyButton.h + 12,
+            w: keyButton.w,
+            h: 46
+          },
+          {
+            type: "controlSlider",
+            id: "staffGap",
+            label: "Staff Gap",
+            min: 48,
+            max: 128,
+            valuePath: ["controls", "staffGap"],
+            x: keyButton.x,
+            y: keyButton.y + keyButton.h + 62,
             w: keyButton.w,
             h: 46
           }
@@ -2219,6 +2646,14 @@
             w: cellW,
             h: cellH,
             action: () => {
+              if (AppState.noteInput.durationEditMode) {
+                const duration = Notes.durationValueForNumber(degreeValue);
+                if (duration) {
+                  Notes.changeDuration(duration, { updateInputWhenNoTarget: false });
+                  return;
+                }
+              }
+
               if (Input.keySignatureModifierHeld) {
                 if (degreeValue <= 7) {
                   Notes.createKeySignature(
@@ -2668,20 +3103,21 @@
         for (const item of Notes.ordered()) {
           const sx = Notes.displayScreenCenterX(item);
           const sy = item.kind === "keysig" || item.kind === "barline"
-            ? Layout.lineY(2)
+            ? Layout.lineY(2, AppState.activeStaffIndex ?? 0)
             : item.kind === "rest"
-              ? item.vexRestCenterY ?? Layout.lineY(2)
+              ? item.vexRestCenterY ?? Layout.lineY(2, item.staff ?? 0)
               : item.y;
           if (Math.hypot(p.sx - sx, p.sy - sy) < 18) {
             return { type: item.kind, item };
           }
         }
 
+        const staffIndex = Layout.staffAtY(p.sy);
         if (
-          p.sy >= Layout.lineY(0) - 90 &&
+          p.sy >= Layout.lineY(0, 0) - 90 &&
           p.sy <= Layout.inputPanel.y
         ) {
-          return { type: "staff", staff: AppState.staves[0] };
+          return { type: "staff", staff: AppState.staves[staffIndex], staffIndex };
         }
 
         return { type: "empty" };
@@ -2897,8 +3333,14 @@
         if (hit.type === "accidental") return `Select accidental ${hit.label}.`;
         if (hit.type === "tonicDisplay") return "Open the tonic date-picker.";
         if (hit.type === "keySignatureChoice") return `Insert key signature ${hit.label}.`;
-        if (hit.type === "controlSlider") return "Drag to adjust notehead diameter.";
+        if (hit.type === "controlSlider") {
+          return hit.id === "staffGap"
+            ? "Drag to adjust spacing between the grand staff staves."
+            : "Drag to adjust notehead diameter.";
+        }
         if (hit.id === "virtual-k") return "Open the key signature picker.";
+        if (hit.id === "duration-edit") return "Toggle duration edit mode; then tap 1-7 to change selected note or rest duration.";
+        if (hit.id === "cheat-sheet") return "Open the keyboard control cheat sheet.";
         if (hit.id === "delete") return "Delete the active note, rest, or barline.";
         if (hit.id === "shift") return "Toggle chord/selection shift behavior.";
         if (hit.id === "left" || hit.id === "right") return "Move the cursor left or right.";
@@ -2964,6 +3406,10 @@
         renameModal?.addEventListener("pointerdown", e => {
           if (e.target === renameModal) CanvasUI.closeRenameModal();
         });
+        cheatSheetCloseButton?.addEventListener("click", () => CanvasUI.closeCheatSheet());
+        cheatSheetModal?.addEventListener("pointerdown", e => {
+          if (e.target === cheatSheetModal) CanvasUI.closeCheatSheet();
+        });
         renameInput?.addEventListener("keydown", e => {
           if (e.code === "Enter") {
             e.preventDefault();
@@ -2996,6 +3442,14 @@
 
       keydown(e) {
         if (e.target === renameInput) return;
+
+        if (AppState.modal.type === "cheat-sheet") {
+          if (e.code === "Escape") {
+            e.preventDefault();
+            CanvasUI.closeCheatSheet();
+          }
+          return;
+        }
 
         if (e.code === "KeyP") {
           e.preventDefault();
@@ -3030,6 +3484,29 @@
           }
 
           e.preventDefault();
+
+          if (
+            e.shiftKey &&
+            (e.code === "ArrowUp" || e.code === "ArrowDown")
+          ) {
+            Notes.moveCursorStaff(e.code === "ArrowUp" ? -1 : 1);
+            return;
+          }
+
+          const durationValue = this.noteValueKeyMap[e.code];
+          if (durationValue) {
+            if (!e.repeat && Notes.changeDuration(durationValue)) {
+              CanvasUI.notify(`Duration ${durationValue}`);
+            }
+            return;
+          }
+
+          if (e.code === "KeyA") {
+            if (!e.repeat && Notes.selectAll()) {
+              CanvasUI.notify("Selected all");
+            }
+            return;
+          }
 
           if (e.code === "KeyZ" && !e.shiftKey) {
             Notes.undo();
@@ -3115,7 +3592,11 @@
 
         if (e.code === "Backspace" || e.code === "Delete") {
           e.preventDefault();
-          Notes.deleteBehindCursor();
+          if (e.code === "Backspace") {
+            Notes.deleteBehindCursor();
+          } else {
+            Notes.deleteAheadOfCursor();
+          }
           return;
         }
 
@@ -3723,7 +4204,7 @@
         }
 
         if (
-          p.sy >= Layout.lineY(0) - 90 &&
+          p.sy >= Layout.lineY(0, 0) - 90 &&
           p.sy <= Layout.inputPanel.y
         ) {
           Notes.setCursorFromPoint(p.wx, p.sy);
@@ -3856,14 +4337,15 @@
 
     const Renderer = {
       vexStave: null,
+      vexStaves: new Map(),
       vexFailed: false,
 
-      createVexStave() {
+      createVexStave(staff = 0) {
         if (!VF || !vexContext || this.vexFailed) return null;
 
         return new VF.Stave(
           0,
-          Layout.lineY(0) - Layout.S * 4,
+          Layout.lineY(0, staff) - Layout.S * 4,
           canvas.width,
           {
             left_bar: false,
@@ -3872,6 +4354,10 @@
             spacing_between_lines_px: Layout.S
           }
         ).setContext(vexContext);
+      },
+
+      vexStaveFor(staff = 0) {
+        return this.vexStaves.get(staff) || this.vexStave || null;
       },
 
       vexDefaultStaffSpacing() {
@@ -3898,15 +4384,16 @@
         return this.vexGlyphPoint();
       },
 
-      vexTrebleClef() {
+      vexClef(staff = 0) {
         if (!VF || !vexContext || !VF.Glyph) return;
 
+        const clef = Notes.staffClef(staff);
         VF.Glyph.renderGlyph(
           vexContext,
           42,
-          Layout.lineY(3),
+          Layout.lineY(clef === "bass" ? 1.7 : 3, staff),
           this.vexTrebleClefPoint(),
-          "gClef",
+          clef === "bass" ? "fClef" : "gClef",
           { category: "clef_default" }
         );
       },
@@ -4031,19 +4518,20 @@
         ctx.fillStyle = "#72ddff";
 
         if (item.kind === "barline") {
-          const top = Layout.lineY(0) - 5;
-          const height = Layout.lineY(4) - Layout.lineY(0) + 10;
+          const top = Layout.lineY(0, 0) - 5;
+          const bottom = Layout.lineY(4, AppState.staves.length - 1) + 5;
+          const height = bottom - top;
           ctx.beginPath();
           this.roundedRectPath(sx - 7, top, 14, height, 7);
           ctx.fill();
         } else if (item.kind === "rest") {
-          const sy = item.vexRestCenterY ?? Layout.lineY(2);
+          const sy = item.vexRestCenterY ?? Layout.lineY(2, item.staff ?? 0);
           ctx.beginPath();
           ctx.ellipse(sx, sy, 16, 11, -0.18, 0, Math.PI * 2);
           ctx.fill();
         } else {
           ctx.beginPath();
-          ctx.ellipse(sx, Layout.lineY(2), 14, 10, 0, 0, Math.PI * 2);
+          ctx.ellipse(sx, Layout.lineY(2, AppState.activeStaffIndex ?? 0), 14, 10, 0, 0, Math.PI * 2);
           ctx.fill();
         }
 
@@ -4187,15 +4675,23 @@
       },
 
       staff() {
+        this.vexStaves.clear();
+        this.vexStave = null;
+
         if (VF && !this.vexFailed) {
           try {
-            this.vexStave = this.createVexStave();
-            this.vexStave.draw();
-            this.vexTrebleClef();
+            AppState.staves.forEach((staff, index) => {
+              const stave = this.createVexStave(index);
+              this.vexStaves.set(index, stave);
+              if (index === 0) this.vexStave = stave;
+              stave.draw();
+              this.vexClef(index);
+            });
             return;
           } catch (error) {
             this.vexFailed = true;
             this.vexStave = null;
+            this.vexStaves.clear();
             console.error("VexFlow staff rendering failed; using Canvas fallback.", error);
           }
         }
@@ -4205,18 +4701,24 @@
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
 
-        for (let i = 0; i < 5; i++) {
-          const y = Layout.lineY(i);
+        AppState.staves.forEach((staff, staffIndex) => {
+          for (let i = 0; i < 5; i++) {
+            const y = Layout.lineY(i, staffIndex);
 
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(canvas.width, y);
-          ctx.stroke();
-        }
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+          }
 
-        ctx.font = "90px serif";
-        ctx.fillStyle = "black";
-        ctx.fillText("𝄞", 45, Layout.lineY(4) + 30);
+          ctx.font = "90px serif";
+          ctx.fillStyle = "black";
+          ctx.fillText(
+            Notes.staffClef(staffIndex) === "bass" ? "𝄢" : "𝄞",
+            45,
+            Layout.lineY(4, staffIndex) + 30
+          );
+        });
 
         ctx.restore();
       },
@@ -4229,7 +4731,7 @@
         ctx.fillRect(0, y - Layout.S / 2, canvas.width, Layout.S);
 
         const ledgerVisibility = this.tonicLedgerVisibility(y);
-        const guideLineAlpha = y >= Layout.lineY(0) && y <= Layout.lineY(4)
+        const guideLineAlpha = y >= Layout.lineY(0, AppState.activeStaffIndex) && y <= Layout.lineY(4, AppState.activeStaffIndex)
           ? 0.22
           : 0.22 * ledgerVisibility;
 
@@ -4251,7 +4753,8 @@
       tonicTargetY() {
         return Notes.yFromPitch(
           AppState.noteInput.tonicLetter,
-          AppState.noteInput.tonicOctave
+          AppState.noteInput.tonicOctave,
+          AppState.activeStaffIndex ?? 0
         );
       },
 
@@ -4311,16 +4814,18 @@
       },
 
       tonicIsOnLine(y) {
+        const staff = AppState.activeStaffIndex ?? 0;
         const step = Layout.S / 2;
-        const unitsFromTopLine = Math.round((y - Layout.lineY(0)) / step);
+        const unitsFromTopLine = Math.round((y - Layout.lineY(0, staff)) / step);
 
-        return Math.abs(y - (Layout.lineY(0) + unitsFromTopLine * step)) < 0.01 &&
+        return Math.abs(y - (Layout.lineY(0, staff) + unitsFromTopLine * step)) < 0.01 &&
           unitsFromTopLine % 2 === 0;
       },
 
       tonicGuideLineYs(y) {
-        const top = Layout.lineY(0);
-        const bottom = Layout.lineY(4);
+        const staff = AppState.activeStaffIndex ?? 0;
+        const top = Layout.lineY(0, staff);
+        const bottom = Layout.lineY(4, staff);
         const step = Layout.S / 2;
 
         if (y >= top && y <= bottom) return [y];
@@ -4329,8 +4834,9 @@
       },
 
       tonicLedgerVisibility(y) {
-        const top = Layout.lineY(0);
-        const bottom = Layout.lineY(4);
+        const staff = AppState.activeStaffIndex ?? 0;
+        const top = Layout.lineY(0, staff);
+        const bottom = Layout.lineY(4, staff);
         const distanceOutside = y < top
           ? top - y
           : y > bottom
@@ -4344,8 +4850,9 @@
       },
 
       tonicLedgerLineYs(y) {
-        const top = Layout.lineY(0);
-        const bottom = Layout.lineY(4);
+        const staff = AppState.activeStaffIndex ?? 0;
+        const top = Layout.lineY(0, staff);
+        const bottom = Layout.lineY(4, staff);
         const step = Layout.S / 2;
         const lines = [];
 
@@ -4416,8 +4923,9 @@
       },
 
       ledgerLines(note, sx) {
-        const top = Layout.lineY(0);
-        const bottom = Layout.lineY(4);
+        const staff = note.staff ?? 0;
+        const top = Layout.lineY(0, staff);
+        const bottom = Layout.lineY(4, staff);
         const step = Layout.S / 2;
         const width = 26;
 
@@ -4455,10 +4963,12 @@
         ctx.save();
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.moveTo(sx, Layout.lineY(0));
-        ctx.lineTo(sx, Layout.lineY(4));
-        ctx.stroke();
+        AppState.staves.forEach((staff, index) => {
+          ctx.beginPath();
+          ctx.moveTo(sx, Layout.lineY(0, index));
+          ctx.lineTo(sx, Layout.lineY(4, index));
+          ctx.stroke();
+        });
         ctx.restore();
       },
 
@@ -4468,9 +4978,11 @@
 
         if (VF && this.vexStave && !this.vexFailed) {
           try {
-            const vexBarline = new VF.Barline(VF.BarlineType.SINGLE);
-            vexBarline.setX(sx);
-            vexBarline.draw(this.vexStave);
+            AppState.staves.forEach((staff, index) => {
+              const vexBarline = new VF.Barline(VF.BarlineType.SINGLE);
+              vexBarline.setX(sx);
+              vexBarline.draw(this.vexStaveFor(index));
+            });
             return;
           } catch (error) {
             console.error("VexFlow barline rendering failed; using Canvas fallback.", error);
@@ -4485,7 +4997,6 @@
         if (sx < -80 || sx > canvas.width + 80) return;
 
         const symbol = Notes.keySignatureSymbol[keySignature.accidental];
-        const pitches = Notes.keySignaturePitches[keySignature.accidental] || [];
         const count = Math.max(0, Math.min(7, keySignature.count));
 
         ctx.save();
@@ -4496,19 +5007,28 @@
 
         if (count === 0) {
           ctx.font = "18px sans-serif";
-          ctx.fillText("C", sx, Layout.lineY(2));
+          AppState.staves.forEach((staff, index) => {
+            ctx.fillText("C", sx, Layout.lineY(2, index));
+          });
           ctx.restore();
           return;
         }
 
-        for (let i = 0; i < count; i++) {
-          const [letter, octave] = pitches[i];
-          ctx.fillText(
-            symbol,
-            sx + i * 12,
-            Notes.yFromPitch(letter, octave)
+        AppState.staves.forEach((staff, staffIndex) => {
+          const pitches = Notes.keySignaturePitchesForStaff(
+            keySignature.accidental,
+            staffIndex
           );
-        }
+
+          for (let i = 0; i < count; i++) {
+            const [letter, octave] = pitches[i];
+            ctx.fillText(
+              symbol,
+              sx + i * 12,
+              Notes.yFromPitch(letter, octave, staffIndex)
+            );
+          }
+        });
 
         ctx.restore();
       },
@@ -4624,7 +5144,7 @@
         const vexNote = new VF.StaveNote({
           keys: ordered.map(note => `${note.letter.toLowerCase()}/${note.octave}`),
           duration: this.vexDisplayDurationForChord(ordered),
-          clef: "treble",
+          clef: Notes.staffClef(ordered[0].staff ?? 0),
           auto_stem: false,
           stem_direction: stemPlan.direction,
           glyph_font_scale: this.vexGlyphPoint(),
@@ -4643,7 +5163,7 @@
           );
         });
 
-        vexNote.setStave(this.vexStave).setContext(vexContext);
+        vexNote.setStave(this.vexStaveFor(ordered[0].staff ?? 0)).setContext(vexContext);
         vexNote.addToModifierContext(new VF.ModifierContext());
 
         const tickContext = new VF.TickContext();
@@ -4836,16 +5356,19 @@
       vexRest(rest) {
         const sx = Input.worldToScreenX(rest.drawX);
         if (sx < -80 || sx > canvas.width + 80) return;
+        const staff = rest.staff ?? 0;
+        const clef = Notes.staffClef(staff);
+        const restKey = clef === "bass" ? "d/3" : "b/4";
 
         const vexRest = new VF.StaveNote({
-          keys: ["b/4"],
+          keys: [restKey],
           duration: `${this.vexDuration(rest.value)}r`,
-          clef: "treble",
+          clef,
           glyph_font_scale: this.vexGlyphPoint(),
           stroke_px: VF.StaveNote.LEDGER_LINE_OFFSET * this.vexGlyphScale()
         });
 
-        vexRest.setStave(this.vexStave).setContext(vexContext);
+        vexRest.setStave(this.vexStaveFor(staff)).setContext(vexContext);
         vexRest.addToModifierContext(new VF.ModifierContext());
 
         const tickContext = new VF.TickContext();
@@ -4860,7 +5383,7 @@
           : 0;
         rest.vexRestCenterY = Number.isFinite(centerY)
           ? centerY
-          : Layout.lineY(2);
+          : Layout.lineY(2, staff);
       },
 
       music() {
@@ -4874,8 +5397,9 @@
             const beamGroups = new Map();
 
             for (const note of notes) {
-              if (!chords.has(note.x)) chords.set(note.x, []);
-              chords.get(note.x).push(note);
+              const chordKey = `${note.x}:${note.staff ?? 0}`;
+              if (!chords.has(chordKey)) chords.set(chordKey, []);
+              chords.get(chordKey).push(note);
             }
 
             for (const chord of chords.values()) {
@@ -4934,7 +5458,7 @@
         ctx.font = "24px serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("𝄽", sx, Layout.lineY(2));
+        ctx.fillText("𝄽", sx, Layout.lineY(2, rest.staff ?? 0));
         ctx.restore();
       },
 
@@ -5033,11 +5557,11 @@
         }
 
         if (selected.kind === "rest") {
-          return selected.vexRestCenterY ?? Layout.lineY(2);
+          return selected.vexRestCenterY ?? Layout.lineY(2, selected.staff ?? AppState.activeStaffIndex ?? 0);
         }
 
         if (selected.kind === "barline" || selected.kind === "keysig") {
-          return Layout.lineY(2);
+          return Layout.lineY(2, AppState.activeStaffIndex ?? 0);
         }
 
         return Notes.cursorY();
@@ -5342,8 +5866,9 @@
       },
 
       cursorVerticalGeometry(cursorY) {
-        const staffTop = Layout.lineY(0);
-        const staffBottom = Layout.lineY(4);
+        const staff = AppState.activeStaffIndex ?? 0;
+        const staffTop = Layout.lineY(0, staff);
+        const staffBottom = Layout.lineY(4, staff);
         const staffCenter = (staffTop + staffBottom) / 2;
         const staffHeight = staffBottom - staffTop;
         const minimumLength = staffHeight + 50;
@@ -5609,7 +6134,7 @@
 
         const text = "Press Enter to apply accidental";
         const x = canvas.width / 2;
-        const y = Math.max(28, Layout.lineY(0) - 48);
+        const y = Math.max(28, Layout.lineY(0, AppState.activeStaffIndex ?? 0) - 48);
         const padX = 16;
         const w = Math.min(330, ctx.measureText(text).width + padX * 2);
         const h = 30;
@@ -5716,7 +6241,10 @@
         const count = b.count ?? 0;
         const accidental = b.accidental ?? "sharp";
         const symbol = Notes.keySignatureSymbol[accidental];
-        const pitches = Notes.keySignaturePitches[accidental] || [];
+        const pitches = Notes.keySignaturePitchesForStaff(
+          accidental,
+          AppState.activeStaffIndex ?? 0
+        );
         const spacing = Math.min(10.5, Math.max(8, b.w / 9));
         const totalW = Math.max(0, count - 1) * spacing;
         const startX = b.x + b.w / 2 - totalW / 2;
@@ -5740,7 +6268,8 @@
           for (let i = 0; i < count; i++) {
             const [letter, octave] = pitches[i];
             const relativeY =
-              (Notes.yFromPitch(letter, octave) - Layout.lineY(2)) * scaleY;
+              (Notes.yFromPitch(letter, octave, AppState.activeStaffIndex ?? 0) -
+                Layout.lineY(2, AppState.activeStaffIndex ?? 0)) * scaleY;
             ctx.fillText(symbol, startX + i * spacing, centerY + relativeY);
           }
         }
@@ -6113,7 +6642,9 @@
         ctx.textAlign = "right";
         ctx.fillStyle = "rgba(255,122,232,0.82)";
         const valueLabel = slider.type === "controlSlider"
-          ? `${value.toFixed(2)}×`
+          ? slider.id === "staffGap"
+            ? `${Math.round(value)}px`
+            : `${value.toFixed(2)}×`
           : `1/${(1 / value).toFixed(1)}`;
         ctx.fillText(valueLabel, slider.x + slider.w, slider.y + slider.h * 0.28);
 
@@ -6169,6 +6700,7 @@
             (b.type === "noteValue" && b.value === AppState.noteInput.value) ||
             (b.type === "degree" && Input.isDegreeHeld(b.value)) ||
             (b.id === "shift" && AppState.noteInput.shift) ||
+            (b.id === "duration-edit" && AppState.noteInput.durationEditMode) ||
             (b.id === "virtual-k" && Input.keySignatureModifierHeld) ||
             (b.type === "tonicDisplay" &&
               (Input.tonicModifierHeld || AppState.noteInput.tonicMenuOpen)) ||
